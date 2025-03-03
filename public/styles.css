@@ -1,0 +1,73 @@
+/* Make sure the body takes full height and centers the content */
+body {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container for the login page */
+.container {
+    display: flex;
+    background-color: white;
+    width: 60%;
+    max-width: 800px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Left side with the book image */
+.left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: black;
+}
+
+.left img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Right side with the login form */
+.right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background-color: rgb(16, 16, 16);
+}
+
+.right h2 {
+    margin-bottom: 20px;
+    color: rgb(242, 239, 239);
+}
+
+.right input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.right button {
+    width: 34%;
+    padding: 10px;
+    border: none;
+    background-color: rgb(42, 39, 199);
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.right button:hover {
+    background-color: gray;
+}
