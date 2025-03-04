@@ -19,7 +19,12 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
-
+app.use(
+  cors({
+    origin: "http://localhost:5000", // Your frontend URL
+    credentials: true, // Allow credentials (cookies)
+  })
+);
 // Set EJS as the view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(path.resolve(), "views"));
@@ -28,8 +33,8 @@ app.set("views", path.join(path.resolve(), "views"));
 app.use(express.static(path.join(path.resolve(), "public")));
 
 // Use routes
-app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes); // ✅ Register Admin Routes
+app.use('/users', userRoutes);
+app.use('/admin', adminRoutes); // ✅ Register Admin Routes
 
 // Default route
 app.get("/", (req, res) => {
@@ -37,8 +42,9 @@ app.get("/", (req, res) => {
 });
 // Render the admin login page
 app.get("/admin/login", (req, res) => {
-  res.render("adminLogin");
+  res.render("adminLogin",{error:null});
 });
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

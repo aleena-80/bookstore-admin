@@ -8,6 +8,12 @@ body {
     margin: 0;
 }
 
+#errorMessage {
+    color: red; /* Red color */
+    font-weight: bold;
+    margin-top: 10px;
+    display: none;
+}
 /* Container for the login page */
 .container {
     display: flex;

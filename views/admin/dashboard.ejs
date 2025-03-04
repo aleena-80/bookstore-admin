@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css"> 
+</head>
+<body>
+    <h1>Welcome, Admin!</h1>
+    <p>This is the admin dashboard.</p>
+    <form id="logoutForm" action="/admin/logout" method="POST">
+        <button id="logoutBtn"  type="submit">Logout</button>
+    </form>
+    <script>
+        
+        window.onload = function() {
+            if (!localStorage.getItem("token")) {
+                window.location.href = "/admin/login"; // Redirect if not logged in
+            } else {
+                history.replaceState(null, null, window.location.href);
+                window.onpopstate = function() {
+                    history.go(1); // Prevent going back to login
+                };
+            }
+        };
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+        localStorage.removeItem("token"); // Remove token
+        history.replaceState(null, null, "/admin/login"); // Prevent back navigation
+        window.location.href = "/admin/login";
+    });
+    </script>
+    
+</body>
+</html>
