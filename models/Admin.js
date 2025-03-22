@@ -5,9 +5,10 @@ const adminSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, required: true, default: "admin" },
 });
 
-// Compare entered password with hashed password
+
 adminSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

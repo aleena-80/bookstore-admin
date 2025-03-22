@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - Ocean Books</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    </div>
+    <ul>
+      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li> <!-- Added -->
+      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <h1>Users</h1>
+    <div class="filter">
+      <form method="GET" action="/admin/users">
+        <input type="text" name="search" value="<%= search %>" placeholder="Search by email">
+        <button type="submit">Search</button>
+        <button type="button" onclick="window.location.href='/admin/users'">Clear</button>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>
+            <td><%= user.email %></td>
+            <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+            <td class="actions">
+              <% if (user.isBlocked) { %>
+                <button class="unblock-btn" onclick="showConfirmation('<%= user._id %>', 'unblock')">Unblock</button>
+              <% } else { %>
+                <button class="block-btn" onclick="showConfirmation('<%= user._id %>', 'block')">Block</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="/admin/users?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+      <% } %>
+    </div>
+  </div>
+
+  <div id="confirmationModal" class="confirmation-modal">
+    <div class="modal-content">
+      <p id="confirmationMessage"></p>
+      <button class="confirm-btn" onclick="confirmAction()">Yes</button>
+      <button class="cancel-btn" onclick="hideConfirmation()">No</button>
+    </div>
+  </div>
+
+  <script>
+    let actionForm;
+
+    function showConfirmation(userId, action) {
+      actionForm = document.createElement('form');
+      actionForm.method = 'POST';
+      actionForm.action = `/admin/users/${action}/${userId}`;
+      document.getElementById('confirmationMessage').textContent = 
+        `Are you sure you want to ${action} this user?`;
+      document.getElementById('confirmationModal').style.display = 'block';
+    }
+
+    function hideConfirmation() {
+      document.getElementById('confirmationModal').style.display = 'none';
+      actionForm = null;
+    }
+
+    function confirmAction() {
+      if (actionForm) {
+        document.body.appendChild(actionForm);
+        actionForm.submit();
+      }
+    }
+  </script>
+</body>
+</html>

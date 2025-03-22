@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - <%= product.name %></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/product-details.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/users/landing">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/home">Home</a></li>
+                <li><a href="/users/products">Shop</a></li>
+                <li><a href="/users/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="product-details">
+          <div class="breadcrumbs">
+            <a href="/users/products">Shop</a> > 
+            <a href="/users/products?category=<%= encodeURIComponent(product.category && product.category._id ? product.category._id : product.category) %>"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></a> > 
+            <span><%= product.name %></span>
+        </div>
+
+            <div class="product-content">
+                <div class="product-image">
+                    <div class="thumbnails">
+                        <% if (product.images && product.images.length > 0) { %>
+                            <% product.images.slice(0, 3).forEach((img, index) => { %>
+                                <img src="/images/<%= img %>" alt="Thumbnail <%= index + 1 %>" onclick="changeImage(this, '/images/<%= img %>')" class="<%= index === 0 ? 'active' : '' %>">
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <div class="main-image">
+                        <img src="/images/<%= product.images[0] || '/images/default.jpg' %>" alt="<%= product.name %>" id="mainImage">
+                        <div class="zoom-result"></div>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h1><%= product.name %></h1>
+                    <p class="price">₹<%= (product.price * (1 - product.discount / 100)).toFixed(2) %>
+                        <% if (product.discount > 0) { %>
+                            <span class="original-price">₹<%= product.price.toFixed(2) %></span> (<%= product.discount %>% off)
+                        <% } %>
+                    </p>
+                    <p class="stock <%= product.stock > 0 ? 'stock-in' : 'stock-out' %>">
+                        <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                    </p>
+                    <% if (product.stock === 0) { %>
+                        <p class="error">This product is currently unavailable.</p>
+                    <% } %>
+                    <div class="button-group">
+                      <button id="add-to-cart" class="yellow-btn" <%= product.stock === 0 ? 'disabled' : '' %>>Add to Cart</button>
+                      <button id="buy-now" class="yellow-btn" <%= product.stock === 0 ? 'disabled' : '' %>>Buy Now</button>
+                  </div>
+                    <div class="ratings">
+                        <% if (product.ratings && product.ratings.length > 0) { %>
+                            <% const avgRating = product.ratings.reduce((sum, r) => sum + r.rating, 0) / product.ratings.length; %>
+                            <p>Average Rating: <%= avgRating.toFixed(1) %> / 5</p>
+                        <% } else { %>
+                            <p class="no-ratings">4.5 ★</p>
+                        <% } %>
+                    </div>
+                    <p>Discount: <%= product.discount %>%</p>
+                    <div class="highlights">
+                        <h3>Highlights</h3>
+                        <p><%= product.description || 'No description available.' %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="related-products">
+                <h2>Related Products</h2>
+                <div class="product-grid">
+                    <% relatedProducts.forEach(related => { %>
+                        <div class="product-card">
+                            <img src="/images/<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
+                            <h3><a href="/users/products/<%= related._id %>"><%= related.name %></a></h3>
+                            <p>₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+
+
+
+
+            <div class="container mt-5">
+                <h1> Review</h1>
+                <div class="row">
+                    <!-- LEFT SECTION: Review Summary -->
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <h4>Customer Reviews</h4>
+                            <p><strong>Average Rating:</strong> <%= averageRating %> ⭐</p>
+                            <p><strong>Total Reviews:</strong> <%= totalReviews %></p>
+              
+                            <!-- Rating Breakdown -->
+                            <div>
+                                <% for (let i = 5; i >= 1; i--) { %>
+                                    <div class="d-flex align-items-center">
+                                        <span><%= i %> ⭐</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 10px;">
+                                            <% let percentage = (ratingCounts[i] / totalReviews) * 100 || 0; %>
+                                            <div class="progress-bar" style="width: '<%= percentage %>%';"></div>
+                                        </div>
+                                        <span>(<%= ratingCounts[i] || 0 %>)</span>
+                                    </div>
+                                <% } %>
+                            </div>
+              
+                            <!-- Add Review Button -->
+                            <button class="btn  mt-3" style="background-color: #ffcc00; color: black;" id="openModalBtn">Add Review</button>
+                        </div>
+                    </div>
+              
+                    <!-- RIGHT SECTION: Customer Reviews -->
+                    <div class="col-md-8">
+                        <div class="card p-3">
+                            <h4>All Reviews</h4>
+              
+                            <div id="reviewsContainer">
+                                <% if (reviews.length === 0) { %>
+                                    <p>No reviews yet.</p>
+                                <% } else { %>
+                                    <% reviews.forEach(review => { %>
+                                        <div class="border p-2 my-2">
+                                            <strong><%= review.user.name %></strong>
+                                            <span class="badge bg-warning text-dark"><%= review.rating %> ⭐</span>
+                                            <p><%= review.comment %></p>
+                                            <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+              
+                                            <% if (user && reviews.user && reviews.user._id && user._id.toString() === reviews.user._id.toString()) { %>
+                                                <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
+                                                    Edit
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+              
+                          
+                            <div class="d-flex justify-content-center mt-3">
+                              <button id="prevPage" class="btn btn-primary me-2" style="background-color: #ffcc00; color: black;" disabled>Previous</button>
+                              
+                              <span id="pageInfo">Page 1 of <%= totalPages %></span>
+                              
+                              <button id="nextPage" class="btn  ms-2" style="background-color: #ffcc00; color: black;">Next</button>
+                          </div>
+                          <input type="hidden" id="productId" value="<%= product._id %>">
+                          
+                          
+                        </div>
+                    </div>
+                </div>
+              </div>
+              
+              <!-- Review Modal -->
+              <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="reviewModalLabel">Add Review</h5>
+                            <button type="button" class="close btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="reviewForm">
+                                <div class="form-group">
+                                    <label for="rating">Rating:</label>
+                                    <select class="form-control" id="rating">
+                                        <option value="5">5 ⭐</option>
+                                        <option value="4">4 ⭐</option>
+                                        <option value="3">3 ⭐</option>
+                                        <option value="2">2 ⭐</option>
+                                        <option value="1">1 ⭐</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comment">Review:</label>
+                                    <textarea class="form-control" id="comment" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              
+              <!-- Edit Review Modal -->
+              <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editReviewForm">
+                                <input type="hidden" id="editReviewId">
+                                <div class="mb-3">
+                                    <label for="editRating" class="form-label">Rating:</label>
+                                    <input type="number" id="editRating" class="form-control" min="1" max="5" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editComment" class="form-label">Comment:</label>
+                                    <textarea id="editComment" class="form-control" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Review</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Close</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+              </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ocean Books</h4>
+                <p>Explore a world of literature with us.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/terms">Terms & Conditions</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function changeImage(element, src) {
+  console.log("Clicked thumbnail, changing to:", src);
+  const mainImage = document.getElementById('mainImage');
+  mainImage.src = src;
+  document.querySelectorAll('.thumbnails img').forEach(img => img.classList.remove('active'));
+  element.classList.add('active');
+}
+        document.getElementById('add-to-cart').addEventListener('click', () => {
+            alert('Add to cart not implemented yet!');
+        });
+        document.getElementById('buy-now').addEventListener('click', () => {
+  alert('Buy Now not implemented yet!');
+});
+        const mainImage = document.getElementById('mainImage');
+        const zoomResult = document.querySelector('.zoom-result');
+
+        mainImage.addEventListener('mouseover', () => {
+            zoomResult.style.display = 'block';
+            zoomResult.style.backgroundImage = `url(${mainImage.src})`;
+            zoomResult.style.backgroundSize = `${mainImage.width * 3}px ${mainImage.height * 3}px`;
+        });
+
+        mainImage.addEventListener('mousemove', (e) => {
+            const rect = mainImage.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const lensWidth = 100;
+            const lensHeight = 100;
+            let lensX = x - lensWidth / 2;
+            let lensY = y - lensHeight / 2;
+            lensX = lensX < 0 ? 0 : lensX > mainImage.width - lensWidth ? mainImage.width - lensWidth : lensX;
+            lensY = lensY < 0 ? 0 : lensY > mainImage.height - lensHeight ? mainImage.height - lensHeight : lensY;
+            zoomResult.style.backgroundPosition = `-${lensX * 3}px -${lensY * 3}px`;
+        });
+
+        mainImage.addEventListener('mouseout', () => {
+            zoomResult.style.display = 'none';
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+   
+       
+
+   document.getElementById("openModalBtn").addEventListener("click", function () {
+       var modal = new bootstrap.Modal(document.getElementById("reviewModal"));
+       modal.show();
+   });
+
+  
+   document.getElementById("reviewForm").addEventListener("submit", function (event) {
+       event.preventDefault();
+       
+       const rating = document.getElementById("rating").value;
+       const comment = document.getElementById("comment").value;
+
+       const token = localStorage.getItem('token');
+
+       fetch(`/users/products/<%= product._id %>/review`, {
+           method: "POST",
+           headers: { 
+        'Content-Type': 'application/json', 
+         'Authorization': `Bearer ${token}` 
+      },
+           body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
+       })
+       .then(response => response.json())
+       .then(data => {
+           if (data.success) {
+               Swal.fire({
+                   title: "Success!",
+                   text: "Review added successfully!",
+                   icon: "success",
+                   confirmButtonText: "OK"
+               }).then(() => location.reload());
+           } else {
+               Swal.fire("Error!", data.message, "error");
+           }
+       })
+       .catch(error => console.error("Error:", error));
+   });
+});
+
+
+
+
+
+
+function openEditModal(reviewId, rating, comment) {
+document.getElementById("editReviewId").value = reviewId;
+document.getElementById("editRating").value = rating;
+document.getElementById("editComment").value = comment;
+
+
+var editModal = new bootstrap.Modal(document.getElementById("editReviewModal"));
+editModal.show();
+}
+
+document.getElementById("editReviewForm").addEventListener("submit", function (event) {
+event.preventDefault();
+
+const reviewId = document.getElementById("editReviewId").value;
+const rating = document.getElementById("editRating").value;
+const comment = document.getElementById("editComment").value;
+
+fetch(`/users/products/${productId}/review/edit`, {
+   method: "POST",
+   headers: { 
+        'Content-Type': 'application/json', 
+         'Authorization': `Bearer ${token}` 
+      },
+   body: JSON.stringify({ reviewId, rating, comment })
+})
+.then(response => response.json())
+.then(data => {
+   if (data.success) {
+      
+       Swal.fire({
+           icon: "success",
+           title: "Review Updated!",
+           text: "Your review has been successfully updated.",
+           timer: 2000, 
+           showConfirmButton: false
+       }).then(() => {
+          
+           var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
+           editModal.hide();
+           location.reload(); 
+       });
+   } else {
+       Swal.fire({
+           icon: "error",
+           title: "Update Failed",
+           text: data.message
+       });
+   }
+})
+.catch(error => {
+   console.error("Error:", error);
+   Swal.fire({
+       icon: "error",
+       title: "Error",
+       text: "Something went wrong. Please try again."
+   });
+});
+});
+
+
+
+function closeEditModal() {
+var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
+editModal.hide();
+}
+//---------------------------
+document.addEventListener("DOMContentLoaded", function () {
+document.getElementById("prevPage")?.addEventListener("click", function () {
+   loadReviews(currentPage - 1);
+});
+
+document.getElementById("nextPage")?.addEventListener("click", function () {
+   loadReviews(currentPage + 1);
+});
+});
+
+function loadReviews(page) {
+const productId = document.getElementById("productId").value; 
+
+fetch(`/product-details?id=${productId}&page=${page}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+   .then(response => response.json())
+   .then(data => {
+       if (data.reviews) {
+           updateReviewsUI(data.reviews, data.currentPage, data.totalPages);
+       }
+   })
+   .catch(error => console.error("Error fetching reviews:", error));
+}
+
+function updateReviewsUI(reviews, currentPage, totalPages) {
+const reviewsContainer = document.getElementById("reviewsList");
+reviewsContainer.innerHTML = ""; 
+
+reviews.forEach(review => {
+   const reviewElement = document.createElement("div");
+   reviewElement.innerHTML = `
+       <div class="review">
+           <p><strong>${review.userName}</strong> - ${review.rating}⭐</p>
+           <p>${review.comment}</p>
+       </div>
+   `;
+   reviewsContainer.appendChild(reviewElement);
+});
+
+
+document.getElementById("prevPage").disabled = currentPage === 1;
+document.getElementById("nextPage").disabled = currentPage === totalPages;
+}
+
+
+        // function toggleRating(rating) {
+        //     const stars = document.querySelectorAll('.stars span');
+        //     const currentRating = parseInt(document.getElementById('rating-value').value);
+        //     const newRating = currentRating === rating ? 0 : rating;
+        //     stars.forEach((star, index) => {
+        //         star.classList.toggle('active', index < newRating);
+        //     });
+        //     document.getElementById('rating-value').value = newRating;
+        // }
+
+//         function toggleAddReviewForm() {
+//             const form = document.getElementById('add-review-form');
+//             form.style.display = form.style.display === 'none' ? 'block' : 'none';
+//         }
+
+//         function showEditReviewForm(reviewId, rating, reviewText) {
+//             const form = document.getElementById('edit-review-form');
+//             document.getElementById('edit-review-id').value = reviewId;
+//             document.getElementById('edit-rating-value').value = rating || 0;
+//             document.getElementById('edit-review-text').value = reviewText || '';
+//             const stars = document.querySelectorAll('#edit-stars span');
+//             stars.forEach((star, index) => {
+//                 star.classList.toggle('active', index < (rating || 0));
+//             });
+//             form.style.display = 'block';
+//         }
+
+//         function hideEditReviewForm() {
+//             document.getElementById('edit-review-form').style.display = 'none';
+//         }
+
+//         function setRating(rating, formType) {
+//   console.log(`Setting rating ${rating} for ${formType}`);
+//   const stars = document.querySelectorAll(`#${formType}-stars span`);
+//   if (!stars.length) console.error(`No stars found for ${formType}`);
+//   stars.forEach((star, index) => {
+//     star.classList.toggle('active', index < rating);
+//   });
+//   document.getElementById(`${formType}-rating-value`).value = rating;
+// }
+
+//         document.getElementById('new-review-form')?.addEventListener('submit', async (e) => {
+//   e.preventDefault();
+//   console.log("Submitting review...");
+//   const rating = document.getElementById('new-rating-value').value;
+
+//   const review = document.querySelector('#new-review-form textarea').value;
+
+
+//   console.log("Rating:", rating, "Review:", review);
+//   if (rating === "0") {
+//     alert("Please select a rating.");
+//     return;
+//   }
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     alert("No token found. Please log in again.");
+//     return;
+//   }
+//   try {
+//     const response = await fetch(`/users/products/<%= product._id %>/review`, {
+//       method: 'POST',
+//       headers: { 
+//         'Content-Type': 'application/json', 
+//         'Authorization': `Bearer ${token}` 
+//       },
+//       body: JSON.stringify({ rating: Number(rating), review })
+//     });
+//     const data = await response.json();
+//     console.log("Response:", data);
+//     if (response.ok) {
+//       window.location.reload();
+//     } else {
+//       alert("Failed to submit review: " + (data.message || "Unknown error"));
+//     }
+//   } catch (error) {
+//     console.error("Submit Error:", error);
+//     alert("Error submitting review: " + error.message);
+//   }
+// });
+
+//         document.getElementById('update-review-form')?.addEventListener('submit', async (e) => {
+//             e.preventDefault();
+//             const reviewId = document.getElementById('edit-review-id').value;
+//             const rating = document.getElementById('edit-rating-value').value;
+//             const review = document.getElementById('edit-review-text').value;
+//             if (rating === "0") {
+//                 alert("Please select a rating.");
+//                 return;
+//             }
+//             const token = localStorage.getItem('token');
+//             try {
+//                 const response = await fetch(`/users/products/<%= product._id %>/review/edit`, {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+//                     body: JSON.stringify({ reviewId, rating, review })
+//                 });
+//                 if (response.ok) {
+//                     window.location.reload();
+//                 } else {
+//                     alert("Failed to update review.");
+//                 }
+//             } catch (error) {
+//                 alert("Error updating review: " + error.message);
+//             }
+//         });
+    </script>
+</body>
+</html>

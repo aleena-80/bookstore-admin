@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Signup</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/login">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="signup-form">
+            <div class="form-container">
+                <h2>Create Your Ocean Books Account</h2>
+                <p class="subtitle">Join our community of book lovers today.</p>
+                <form action="/users/signup" method="POST"> <!-- Fixed to /users/signup -->
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name">
+                        <p class="error-message" id="name-error"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                        <p class="error-message" id="email-error"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Create a strong password">
+                        <p class="error-message" id="password-error"></p>
+                    </div>
+                    <button id="sendOtp" type="submit">Sign Up</button>
+                    <p class="error-message" id="form-error"></p>
+                </form>
+                <p class="form-footer">Already have an account? <a href="/users/login">Login here</a>.</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ocean Books</h4>
+                <p>Explore a world of literature with us.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/terms">Terms & Conditions</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
+    </footer>
+    <script>
+        document.getElementById("sendOtp").addEventListener("click", async function(event) {
+            event.preventDefault(); // Stop refresh
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            document.getElementById("name-error").textContent = "";
+            document.getElementById("email-error").textContent = "";
+            document.getElementById("password-error").textContent = "";
+            document.getElementById("form-error").textContent = "";
+
+            let hasError = false;
+            if (!name) {
+                document.getElementById("name-error").textContent = "Full name is required";
+                hasError = true;
+            }
+            if (!email.includes("@")) {
+                document.getElementById("email-error").textContent = "Invalid email address";
+                hasError = true;
+            }
+            if (!/(?=.*[!@#$%^&*])(?=.*[0-9])(?=.*[A-Z]).{8,}/.test(password)) {
+                document.getElementById("password-error").textContent =
+                    "Password must have at least 8 characters, one uppercase letter, one number, and one special character";
+                hasError = true;
+            }
+            if (hasError) return;
+
+            try {
+                const response = await fetch("/users/signup", { // Fixed to /users/signup
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await response.json();
+                if (data.success === true) {
+                    localStorage.setItem("email", email);
+                    document.getElementById("form-error").style.color = "green";
+                    document.getElementById("form-error").textContent = data.message;
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1500);
+                } else {
+                    document.getElementById("form-error").textContent = data.message;
+                }
+            } catch (error) {
+                console.error("Signup Error:", error);
+                document.getElementById("form-error").textContent = "Failed to send OTP. Try again later.";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Management - Ocean Books</title>
+  
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    </div>
+    <ul>
+      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li> <!-- Added -->
+      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <h1>Categories</h1>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+    <div class="add-form">
+      <form method="POST" action="/admin/categories/add">
+        <input type="text" name="name" placeholder="New Category" required>
+        <button type="submit">Add</button>
+      </form>
+    </div>
+    <div class="filter">
+      <form method="GET" action="/admin/categories">
+        <input type="text" name="search" value="<%= search %>" placeholder="Search categories">
+        <button type="submit">Search</button>
+        <button type="button" onclick="window.location.href='/admin/categories'">Clear</button>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% categories.forEach(category => { %>
+          <tr>
+            <td><%= category.name %></td>
+            <td class="actions">
+              <button onclick="toggleEditForm('<%= category._id %>')">Edit</button>
+              <button onclick="showConfirmation('<%= category._id %>')">Delete</button>
+              <form method="POST" action="/admin/categories/edit/<%= category._id %>" id="editForm-<%= category._id %>" style="display: none;">
+                <input type="text" name="name" value="<%= category.name %>" required>
+                <button type="submit">Save</button>
+                <button type="button" onclick="toggleEditForm('<%= category._id %>')">Cancel</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="/admin/categories?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+      <% } %>
+    </div>
+  </div>
+
+  <div id="confirmationModal" class="confirmation-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this category?</p>
+      <button class="confirm-btn" onclick="confirmDelete()">Yes</button>
+      <button class="cancel-btn" onclick="hideConfirmation()">No</button>
+    </div>
+  </div>
+
+  <script>
+    let deleteForm;
+
+    function toggleEditForm(categoryId) {
+      const editForm = document.getElementById(`editForm-${categoryId}`);
+      editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showConfirmation(categoryId) {
+      deleteForm = document.createElement('form');
+      deleteForm.method = 'POST';
+      deleteForm.action = `/admin/categories/delete/${categoryId}`;
+      document.getElementById('confirmationModal').style.display = 'block';
+    }
+
+    function hideConfirmation() {
+      document.getElementById('confirmationModal').style.display = 'none';
+      deleteForm = null;
+    }
+
+    function confirmDelete() {
+      if (deleteForm) {
+        document.body.appendChild(deleteForm);
+        deleteForm.submit();
+      }
+    }
+
+    window.onload = function() {
+      fetch('/admin/dashboard', { credentials: 'include' })
+        .then(response => {
+          if (!response.ok) window.location.replace('/admin/login');
+        });
+
+      window.history.pushState(null, null, window.location.href);
+      window.onpopstate = function() {
+        fetch('/logout', { method: 'POST', credentials: 'include' })
+          .then(() => window.location.replace('/admin/login'));
+      };
+    };
+  </script>
+</body>
+</html>

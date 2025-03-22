@@ -2,30 +2,48 @@ import jwt from "jsonwebtoken";
 
 const protectAdmin = (req, res, next) => {
   let token = req.cookies.token || req.headers.authorization;
-
+  console.log("Incoming cookies:", req.cookies);
   if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token" });
+    return res.redirect('/admin/login');
   }
 
+  if (token.startsWith("Bearer ")) token = token.split(" ")[1];
+
   try {
-    // Handle "Bearer <token>" format
-    if (token.startsWith("Bearer ")) {
-      token = token.split(" ")[1]; // Extract the actual token
-    }
-
-    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Ensure decoded contains role info
-    if (!decoded.role || decoded.role !== "admin") {
+    if (!decoded.role || decoded.role !== 'admin') {
       return res.status(403).json({ message: "Not authorized as admin" });
     }
 
-    req.admin = decoded; // Attach admin data to request
-    next(); // Proceed to next middleware
+    req.admin = decoded;
+    next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    if (error.name === 'TokenExpiredError') {
+      return res.redirect('/admin/login');
+    }
+     return res.status(401).json({ message: 'Invalid token' });
   }
 };
-
-export default protectAdmin;
+//------------------------------------------------------------------------------------------------
+ const protectUser = (req, res, next) => {
+  let token = req.cookies.token || req.headers.authorization;
+  if (!token) {
+    return req.method === 'POST' 
+      ? res.status(401).json({ message: "Unauthorized: Please log in" })
+      : res.redirect('/users/login');
+  }
+  if (token.startsWith("Bearer ")) token = token.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    if (req.path === '/login' || req.path === '/users/login') {
+      return res.redirect('/users/home');
+    }
+    next();
+  } catch (error) {
+    return req.method === 'POST' 
+      ? res.status(401).json({ message: "Invalid or expired token" })
+      : res.redirect('/users/login');
+  }
+};
+export default {protectUser,protectAdmin};

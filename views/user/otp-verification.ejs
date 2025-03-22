@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Books - OTP Verification</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <h1><a href="/">Ocean Books</a></h1>
+        <p class="tagline">Dive into a Sea of Stories</p>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="otp-verification-form">
+      <div class="form-container">
+        <h2>Verify Your OTP</h2>
+        <p class="subtitle">Enter the OTP sent to your email.</p>
+        <p id="otp-error" class="error-message"></p>
+        <form id="otpForm" action="/users/otp/verify-otp?email=<%= encodeURIComponent(email) %>" method="POST">
+          <div class="form-group">
+            <label for="otp">OTP</label>
+            <input type="text" id="otpInput" name="otp" placeholder="Enter OTP" required>
+          </div>
+          <button id="verifyOtpBtn" type="submit">Verify OTP</button>
+        </form>
+        <div class="form-footer">
+          <p id="timer" class="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+          <button id="resendOtp" type="button" disabled>Resend OTP</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="successModal" class="modal">
+    <div class="modal-content">
+      <h3>Success!</h3>
+      <p>OTP verified successfully. Redirecting to home...</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Ocean Books</h4>
+        <p>Explore a world of literature with us.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="/terms">Terms & Conditions</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Newsletter</h4>
+        <p>Subscribe for updates and offers!</p>
+        <form action="/subscribe" method="POST">
+          <input type="email" placeholder="Enter your email" name="email">
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+    <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const timerElement = document.getElementById("timer");
+    const resendButton = document.getElementById("resendOtp");
+    const otpInput = document.getElementById("otpInput");
+    const otpError = document.getElementById("otp-error");
+    const modal = document.getElementById("successModal");
+    const email = "<%= email %>";
+
+    let countdown = 60;
+    let timerInterval;
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      countdown = 60;
+      resendButton.disabled = true;
+      timerElement.textContent = `Time remaining: ${countdown} seconds`;
+      timerInterval = setInterval(() => {
+        countdown--;
+        timerElement.textContent = `Time remaining: ${countdown} seconds`;
+        if (countdown <= 0) {
+          clearInterval(timerInterval);
+          timerElement.textContent = "You can now resend OTP.";
+          resendButton.disabled = false;
+        }
+      }, 1000);
+    }
+
+    window.onload = () => startTimer();
+
+    resendButton.addEventListener("click", async function () {
+      otpError.textContent = "";
+      if (!email) {
+        otpError.textContent = " Email not found. Please start over.";
+        return;
+      }
+      startTimer();
+      try {
+        const response = await fetch("/users/otp/resend-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.message || "Failed to resend OTP.");
+        }
+        otpError.className = "success-message";
+        otpError.textContent = " New OTP sent! Check your email.";
+        otpInput.value = "";
+      } catch (error) {
+        console.error("Error resending OTP:", error);
+        otpError.className = "error-message";
+        otpError.textContent = ` ${error.message}`;
+      }
+    });
+
+    document.getElementById('otpForm')?.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      otpError.textContent = "";
+      const otp = otpInput.value; // Get OTP directly from input
+
+      try {
+        const response = await fetch(event.target.action, {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" }, // Use JSON
+          body: JSON.stringify({ otp }) // Send as JSON
+        });
+        const data = await response.json();
+        if (data.success) {
+          modal.style.display = "flex";
+          setTimeout(() => {
+            modal.style.display = "none";
+            window.location.href = data.redirect;
+          }, 2000);
+        } else {
+          otpError.textContent = ` ${data.message}`;
+        }
+      } catch (error) {
+        console.error("Verify OTP Error:", error);
+        otpError.textContent = " Something went wrong. Try again.";
+      }
+    });
+  </script>
+</body>
+</html>

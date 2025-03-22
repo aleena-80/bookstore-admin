@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Home</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+           
+            <ul class="nav-links">
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> Wishlist (<%= wishlistCount || 0 %>)</a></li>
+                <li><a href="/users/profile"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                <% if (user) { %>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <% } else { %>
+                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i> Signup</a></li>
+                <% } %>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="breadcrumbs">
+            <span>Home</span>
+        </section>
+        <section class="hero">
+            <div class="banner">
+                <img src="/images/banner.jpg" alt="Welcome Banner" class="banner-img">
+                <div class="banner-content">
+                    <h2>Discover New Books!</h2>
+                    <p>Explore our latest collection today.</p>
+                    <a href="/users/products" class="banner-btn">Shop Now</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-books">
+            <h3>Featured Books</h3>
+            <div class="book-grid">
+                <% books.forEach(book => { %>
+                    <div class="book-card">
+                        <img src="/images/<%= book.coverImage %>" alt="<%= book.title %>">
+                        <h4><%= book.title %></h4>
+                        <p>by <%= book.author %></p>
+                        <p>₹<%= book.price %></p>
+                        <button onclick="addToWishlist('<%= book.id %>')">Add to Wishlist</button>
+                        <button onclick="addToCart('<%= book.id %>')">Add to Cart</button>
+                    </div>
+                <% }); %>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ocean Books</h4>
+                <p>Explore a world of literature with us.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/terms">Terms & Conditions</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+          
+        </div>
+        <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
+    </footer>
+
+    <script>
+    window.history.replaceState(null, null, window.location.href);
+    setTimeout(() => {
+    window.history.pushState(null, null, window.location.href);
+}, 100);
+window.onpopstate = function(event) {
+    window.history.pushState(null, null, window.location.href);
+};
+
+function logout() {
+    fetch('/logout', { method: 'POST', credentials: 'include' })
+        .then(() => {
+            window.location.replace('/users/login');
+
+            window.history.pushState(null, null, '/users/login');
+        })
+        .catch(err => console.error('Logout failed:', err));
+}
+        
+        function addToWishlist(bookId) {
+            console.log(`Added ${bookId} to wishlist`);
+        }
+        function addToCart(bookId) {
+            console.log(`Added ${bookId} to cart`);
+        }
+    </script>
+</body>
+</html>

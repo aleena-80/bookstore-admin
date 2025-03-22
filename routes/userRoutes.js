@@ -1,43 +1,34 @@
-import express from "express";
-import User from "../models/User.js";
+import express from 'express';
+import { sendOtp, verifyOtp, resendOtp, login, googleAuthCallback, forgotPassword,
+     resetPassword, logout,addReview,editReview, getProductDetails,getProducts} from '../controllers/userController.js';
+import passport from 'passport';
+import '../config/passportConfig.js';
+import autheMiddleware from '../middleware/autheMiddleware.js';
+const { protectUser } = autheMiddleware;
 
 const router = express.Router();
 
-// ✅ Get all users with search, pagination, and sorting
-router.get("/", async (req, res) => {
-  try {
-    const { search, page = 1, limit = 10 } = req.query;
-    
-    const query = search
-      ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
-      : {};
-    
-    const users = await User.find(query)
-      .sort({ createdAt: -1 }) // Latest users first
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+// Separate Routes (No router.route)
+router.get('/login', login);
+router.post('/login', login);
+router.get('/signup', sendOtp);    // Signup page
+router.post('/signup', sendOtp);   // Signup form submission
+router.get('/otp/verify-otp', verifyOtp);
+router.post('/otp/verify-otp', verifyOtp);
+router.post('/otp/resend-otp', resendOtp);
+router.get('/forgot-password', forgotPassword);
+router.post('/forgot-password', forgotPassword);
+router.get('/reset-password', resetPassword);
+router.post('/reset-password', resetPassword);
 
-    const total = await User.countDocuments(query);
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/users/login', session: false }), googleAuthCallback);
 
-    res.json({ users, total, page, limit });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// ✅ Block/Unblock a user
-router.patch("/block/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    user.isBlocked = !user.isBlocked;
-    await user.save();
-    
-    res.json({ message: `User ${user.isBlocked ? "blocked" : "unblocked"} successfully` });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router.get('/logout', protectUser, logout);
+router.get('/products', protectUser, getProducts);
+router.get('/api/products', protectUser, getProducts);
+router.get('/products/:id', protectUser, getProductDetails);
+router.post('/products/:id/review', protectUser, addReview);
+router.post('/products/:id/review/edit', protectUser, editReview);
 
 export default router;

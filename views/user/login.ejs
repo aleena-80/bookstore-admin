@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Login</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/signup">Signup</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="login-form">
+            <div class="form-container">
+                <h2>Login to Your Ocean Books Account</h2>
+                <p class="subtitle">Access your bookshelf and wishlist!</p>
+                <form id="login-form" action="/users/login" method="POST">
+                    <div class="form-group">
+                        <p id="error-message" class="error-message"></p>
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" >
+                       
+                        
+                        <a href="/users/forgot-password" class="forgot-password">Forgot Password?</a>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="google-auth">
+                    <a href="/users/auth/google" class="google-btn">
+                        <img src="https://developers.google.com/identity/images/g-logo.png"  alt="Google Logo" class="google-icon"> Login with Google
+                    </a>
+                </div>
+                <p class="form-footer">Don't have an account? <a href="/users/signup">Sign up here</a>.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ocean Books</h4>
+                <p>Explore a world of literature with us.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/terms">Terms & Conditions</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Subscribe for updates and offers!</p>
+                <form action="/subscribe" method="POST">
+                    <input type="email" placeholder="Enter your email" name="email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+      <!-- JavaScript for Form Handling -->
+      <script>
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Stop default form submit
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = "";
+    try {
+      const response = await fetch('/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      console.log("Response Status:", response.status, "OK:", response.ok);
+      const rawText = await response.text();
+      console.log("Response Text:", rawText);
+      const data = JSON.parse(rawText);
+      console.log("Login Response:", data);
+      if (!response.ok) {
+        errorMessage.textContent = data.error || "Login failed";
+        return;
+      }
+      localStorage.setItem("token", data.token);
+      window.location.href = data.redirect || "/users/home";
+    } catch (error) {
+      errorMessage.textContent = "Error: " + error.message;
+      console.error("Fetch Error:", error);
+    }       
+});
+</script>
+</body>
+</html>
