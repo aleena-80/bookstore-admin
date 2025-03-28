@@ -1,9 +1,18 @@
 import Product from '../../models/Product.js'
 import Category from '../../models/Category.js'
+import Address from '../../models/Address.js';  
+import Order from '../../models/Order.js';  
+import Wishlist from '../../models/Wishlist.js'
+import Cart from '../../models/Carts.js'
+import Language from '../../models/Language.js'
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import Newsletter from '../../models/Newsletter.js'
+
+
 export const getProducts = async (req, res) => {
   try {
+    const user = req.user || null;
     const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
@@ -26,21 +35,24 @@ export const getProducts = async (req, res) => {
 
     const totalProducts = await Product.countDocuments(query);
     const products = await Product.find(query)
-      .populate('category')
+      .populate({ path: 'category', select: 'name isListed' })
       .sort(sortOption)
       .skip(skip)
       .limit(Number(limit));
-      console.log("User products images:", products.map(p => p.images));
 
     const categories = await Category.find();
+    const languages = await Language.find().select('name');
+    const wishlistCount = user ? await Wishlist.countDocuments({ userId: user.id }) : 0;
+    const cartCount = user ? await Cart.countDocuments({ userId: user.id }) : 0;
 
-    
     if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
       return res.json({
         success: true,
         products,
         totalPages: Math.ceil(totalProducts / limit),
-        currentPage: Number(page)
+        currentPage: Number(page),
+        wishlistCount,
+        cartCount
       });
     }
 
@@ -52,26 +64,16 @@ export const getProducts = async (req, res) => {
       category,
       priceMin,
       priceMax,
+      languages: languages.map(l => l.name),
+      user,
       currentPage: Number(page),
+      wishlistCount,
+      cartCount,
       totalPages: Math.ceil(totalProducts / limit)
     });
   } catch (error) {
     console.error('Get User Products Error:', error);
-    if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
-      return res.status(500).json({ success: false, message: 'Failed to load products' });
-    }
-    res.render('user/products', {
-      products: [],
-      categories: [],
-      search: '',
-      sort: '',
-      category: '',
-      priceMin: '',
-      priceMax: '',
-      currentPage: 1,
-      totalPages: 1,
-      error: 'Failed to load products'
-    });
+    res.render('user/products', { products: [], categories: [], languages: [], user, wishlistCount: 0, cartCount: 0, error: 'Failed to load products' });
   }
 };
 //------------------------------------------------------------------------------------- 
@@ -143,7 +145,68 @@ export const getProductDetails = async (req, res) => {
     res.status(500).send("Error loading product");
   }
 };
+//-------------------------------------------------------------
+export const buyNow = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const userId = req.user.id;
 
+    // Fetch product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Get user's default or first address
+    const address = await Address.findOne({ userId, isDefault: true }) || await Address.findOne({ userId });
+    if (!address) {
+      return res.status(400).json({ success: false, message: 'Please add an address to proceed' });
+    }
+
+    // Prepare order items (single product for Buy Now)
+    const items = [{
+      productId: product._id,
+      quantity: 1, // Default to 1 for Buy Now
+      price: product.price,
+      discount: product.discount || 0
+    }];
+
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100), 0);
+    const taxes = subtotal * 0.05;
+    const shipping = 100;
+    const total = subtotal + taxes + shipping;
+
+    // Create temporary order
+    const order = new Order({
+      userId,
+      items,
+      address: {
+        name: address.name,
+        street: address.street,
+        city: address.city,
+        state: address.state,
+        postalCode: address.postalCode,
+        country: address.country || 'India'
+      },
+      subtotal,
+      taxes,
+      shipping,
+      total,
+      paymentMethod: 'Pending',
+      status: 'Pending',
+      orderId: `ORD${Date.now()}`,
+      createdAt: new Date()
+    });
+
+    await order.save();
+    console.log('Buy Now Order Created:', order.orderId);
+
+    res.json({ success: true, orderId: order.orderId });
+  } catch (error) {
+    console.error('Buy Now Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process Buy Now' });
+  }
+};
 //--------------------------------------------------------------------
 export const addReview = async (req, res) => {
   try {
@@ -177,7 +240,6 @@ export const addReview = async (req, res) => {
       return res.json({ success: false, message: "You have already reviewed this product." });
     }
 
-    // ✅ Fix: Add user._id properly
     product.reviews.push({ user: user._id, rating, comment });
 
     await product.save();
@@ -238,266 +300,108 @@ export const editReview = async (req, res) => {
       res.json({ success: false, message: "Error updating review." });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // controllers/productController.js
-// import multer from "multer";
-// import Product from "../models/Product.js";
-// import Category from "../models/Category.js";
-// import Language from "../models/Language.js";
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => cb(null, "uploads/"),
-//   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
-// });
-// const upload = multer({ storage });
-
-// export const renderProducts = async (req, res) => {
-//   const { search = "", page = 1, limit = 3 } = req.query;
-//   let query = { isDeleted: false };
-//   if (search) query.name = { $regex: search, $options: "i" };
-
-//   const totalProducts = await Product.countDocuments(query);
-//   const products = await Product.find(query)
-//     .sort({ createdAt: -1 })
-//     .skip((page - 1) * limit)
-//     .limit(Number(limit));
-
-//   res.render("admin/products", {
-//     products,
-//     totalPages: Math.ceil(totalProducts / limit),
-//     currentPage: Number(page),
-//     currentPath: req.path,
-//     search,
-//   });
-// };
-
-// export const getAddProduct = async (req, res) => {
-//   try {
-//     const categories = await Category.find();
-//     const languages = await Language.find();
-//     res.render("admin/products-add", { categories, languages, currentPath: "/admin/products-add" });
-//   } catch (error) {
-//     console.error("Get Add Product Error:", error);
-//     res.status(500).render("admin/error", { message: "Failed to load add product page." });
-//   }
-// };
-
-// export const getProducts = async (req, res) => {
-//   try {
-//     const { search = "", page = 1 } = req.query;
-//     const limit = 10;
-//     const skip = (page - 1) * limit;
-
-//     let query = { isDeleted: false };
-//     if (search) query.name = { $regex: search, $options: "i" };
-
-//     const totalProducts = await Product.countDocuments(query);
-//     const products = await Product.find(query)
-//       .populate("category")
-//       .skip(skip)
-//       .limit(limit);
-
-//     const categories = await Category.find();
-//     const languages = await Language.find();
-
-//     res.render("admin/products", {
-//       products,
-//       categories,
-//       languages,
-//       search,
-//       totalPages: Math.ceil(totalProducts / limit),
-//       currentPage: Number(page),
-//     });
-//   } catch (error) {
-//     console.error("Get Products Error:", error);
-//     res.render("admin/products", {
-//       products: [],
-//       categories: [],
-//       languages: [],
-//       search: "",
-//       totalPages: 1,
-//       currentPage: 1,
-//       error: "Failed to load products",
-//     });
-//   }
-// };
-
-// export const getEditProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const product = await Product.findById(id).populate("category");
-//     const categories = await Category.find();
-//     const languages = await Language.find();
-//     res.render("admin/products/edit", { product, categories, languages, currentPath: "/admin/products/edit" });
-//   } catch (error) {
-//     console.error("Get Edit Product Error:", error);
-//     res.status(500).render("admin/error", { message: "Failed to load edit product page." });
-//   }
-// };
-
-// export const addProduct = async (req, res) => {
-//   try {
-//     const { name, price, discount, category, language, stock, author, description } = req.body;
-//     const images = req.files ? req.files.map((file) => file.path) : [];
-
-//     if (!name || !price || !category || !language || !stock || !author || !description || images.length < 3) {
-//       return res.status(400).json({ success: false, message: "All fields are required, including at least 3 images." });
-//     }
-//     if (images.length > 5) {
-//       return res.status(400).json({ success: false, message: "Maximum 5 images allowed." });
-//     }
-
-//     const product = new Product({
-//       name,
-//       price,
-//       discount: discount || 0,
-//       category,
-//       language,
-//       stock,
-//       author,
-//       description,
-//       images,
-//     });
-//     await product.save();
-//     res.status(201).json({ success: true, message: "Product added successfully!" });
-//   } catch (error) {
-//     console.error("Add Product Error:", error);
-//     res.status(500).json({ success: false, message: "Failed to add product." });
-//   }
-// };
-
-// export const editProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { name, price, discount, category, language, stock, author, description, existingImages } = req.body;
-//     const newImages = req.files ? req.files.map((file) => file.path) : [];
-
-//     if (!name || !price || !category || !language || !stock || !author || !description) {
-//       return res.status(400).json({ success: false, message: "All fields are required." });
-//     }
-
-//     const product = await Product.findById(id);
-//     if (!product) {
-//       return res.status(404).json({ success: false, message: "Product not found." });
-//     }
-
-//     const updatedImages = [...(existingImages ? (Array.isArray(existingImages) ? existingImages : [existingImages]) : []), ...newImages];
-//     if (updatedImages.length < 3) {
-//       return res.status(400).json({ success: false, message: "At least 3 images are required." });
-//     }
-//     if (updatedImages.length > 5) {
-//       return res.status(400).json({ success: false, message: "Maximum 5 images allowed." });
-//     }
-
-//     product.name = name;
-//     product.price = price;
-//     product.discount = discount || 0;
-//     product.category = category;
-//     product.language = language;
-//     product.stock = stock;
-//     product.author = author;
-//     product.description = description;
-//     product.images = updatedImages;
-
-//     await product.save();
-//     res.status(200).json({ success: true, message: "Product updated successfully!" });
-//   } catch (error) {
-//     console.error("Edit Product Error:", error);
-//     res.status(500).json({ success: false, message: "Failed to update product." });
-//   }
-// };
-
-// export const deleteProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     await Product.findByIdAndUpdate(id, { isDeleted: true });
-//     res.redirect("/admin/products");
-//   } catch (error) {
-//     console.error("Delete Product Error:", error);
-//     res.status(500).render("admin/error", { message: "Failed to delete product." });
-//   }
-// };
-
-
-
-
-
-
-// // Add Review (New - Assuming users can review products)
-// export const addReview = async (req, res) => {
-//   try {
-//     const { productId, rating, comment } = req.body;
-//     const userId = req.user?.id; // Assuming auth middleware sets req.user
-
-//     if (!userId) {
-//       return res.status(401).json({ success: false, message: "You must be logged in to add a review." });
-//     }
-
-//     if (!productId || !rating || !comment) {
-//       return res.status(400).json({ success: false, message: "Product ID, rating, and comment are required." });
-//     }
-
-//     const product = await Product.findById(productId);
-//     if (!product) {
-//       return res.status(404).json({ success: false, message: "Product not found." });
-//     }
-
-//     const review = { user: userId, rating: Number(rating), comment, date: new Date() };
-//     product.reviews = product.reviews || [];
-//     product.reviews.push(review);
-//     await product.save();
-
-//     res.status(201).json({ success: true, message: "Review added successfully!" });
-//   } catch (error) {
-//     console.error("Add Review Error:", error);
-//     res.status(500).json({ success: false, message: "Failed to add review." });
-//   }
-// };
+//-------------------------------------------------------------------------------------------------------------------------
+export const getHome = async (req, res) => {
+  try {
+      const books = await Product.find({ 
+          isListed: true, 
+          isDeleted: false 
+      })
+      .sort({ createdAt: -1 })
+      .limit(15)
+      .select('name images price author language inStock');
+
+      const formattedBooks = books.map(book => ({
+          id: book._id.toString(),
+          title: book.name,
+          coverImage: book.images[0] || '/images/default.jpg',
+          author: book.author,
+          price: book.price,
+          language: book.language || 'English',
+          inStock: book.stock !== false 
+      }));
+      
+      let wishlistCount = 0;
+      let cartCount = 0;
+      let cartItems = [];
+
+      if (req.user) {
+          cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
+          wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
+          cartCount = cartItems.length;
+      }
+      console.log('cartCount:', cartCount, 'wishlistCount:', wishlistCount);
+
+      res.render('user/home', { 
+          books: formattedBooks, 
+          user: req.user || null, 
+          wishlistCount, 
+          cartItems,
+          cartCount,
+          success: req.query.success || null 
+      });
+  } catch (error) {
+      console.error('Home Page Error:', error);
+      res.render('user/home', { 
+          books: [], 
+          user: req.user || null, 
+          wishlistCount: 0, 
+          cartCount: 0,
+          success: null, 
+          error: 'Failed to load products' 
+      });
+  }
+};
+//---------------------------------------------------------------------
+export const searchBooks = async (req, res) => {
+    try {
+        const query = req.query.q || '';
+        const books = await Product.find({ 
+            isListed: true, 
+            isDeleted: false,
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { author: { $regex: query, $options: 'i' } },
+                { language: { $regex: query, $options: 'i' } }
+            ]
+        })
+        .sort({ createdAt: -1 })
+        .select('name images price author language inStock');
+
+        const formattedBooks = books.map(book => ({
+            id: book._id.toString(),
+            title: book.name,
+            coverImage: book.images[0] || '/images/default.jpg',
+            author: book.author,
+            price: book.price,
+            language: book.language || 'English',
+            inStock: book.inStock !== false
+        }));
+
+        res.json({ books: formattedBooks });
+    } catch (error) {
+        console.error('Search Error:', error);
+        res.status(500).json({ error: 'Search failed' });
+    }
+};
+//--------------------------------------------------------------------------
+export const subscribeNewsletter = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) throw new Error('Email is required');
+
+        const existing = await Newsletter.findOne({ email });
+        if (existing) {
+            return res.redirect('/users/home?success=Already subscribed!');
+        }
+
+        const subscriber = new Newsletter({ email });
+        await subscriber.save();
+
+        res.redirect('/users/home?success=Subscribed successfully!');
+    } catch (error) {
+        console.error('Newsletter Subscription Error:', error);
+        res.redirect('/users/home?error=Subscription failed');
+    }
+};
+//----------------------------------------------------------------------------------

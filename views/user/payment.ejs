@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; padding-top: 100px; }
+        .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
+        .tagline { color: #1C2526; font-size: 14px; margin-top: 5px; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+        .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
+        .nav-links li a:hover { color: #58CC02; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+        .section { background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
+        .section h3 { font-size: 20px; color: #58CC02; margin-bottom: 15px; }
+        .payment-option { padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; }
+        .payment-option input { margin-right: 10px; }
+        .confirm-btn { width: 100%; padding: 12px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        .confirm-btn:hover { background: #46a802; }
+        .message { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #58CC02; color: #FFFFFF; border-radius: 5px; display: none; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table td { padding: 10px; border: 1px solid #e0e0e0; }
+        .summary-table td:first-child { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/users/landing">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+                <% } %>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Delivery Address Section -->
+        <div class="section">
+            <h3>Delivery Address</h3>
+            <p>
+                <%= order.address.name || 'N/A' %>, 
+                <%= order.address.street || 'N/A' %>, 
+                <%= order.address.city || 'N/A' %>, 
+                <%= order.address.state || 'N/A' %>, 
+                <%= order.address.postalCode || 'N/A' %>, 
+                <%= order.address.country || 'India' %>
+            </p>
+        </div>
+
+        <!-- Order Summary Section -->
+        <div class="section">
+            <h3>Order Summary</h3>
+            <table class="summary-table">
+                <tr>
+                    <td>Total Amount:</td>
+                    <td>₹<%= order.total.toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Discount:</td>
+                    <td>₹<%= order.items.reduce((sum, item) => sum + (item.price * item.quantity * (item.discount || 0) / 100), 0).toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Shipping:</td>
+                    <td>₹<%= order.shipping.toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Taxes:</td>
+                    <td>₹<%= order.taxes.toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Final Amount:</td>
+                    <td><strong>₹<%= order.total.toFixed(2) %></strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Payment Method Section -->
+        <div class="section">
+            <h3>Select Payment Method</h3>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery (COD)
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="Card"> Credit/Debit Card (Coming Soon)
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="Wallet"> Wallet (Coming Soon)
+            </label>
+            <button id="confirm-payment-btn" class="confirm-btn">Confirm Payment</button>
+        </div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <script>
+        function showMessage(text, isError = false) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.style.background = isError ? '#FF4D4D' : '#58CC02';
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+        document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const orderId = '<%= order.orderId %>';
+            console.log('Confirming Payment:', { orderId, paymentMethod });
+
+            try {
+                const response = await fetch('/users/checkout/confirm-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ orderId, paymentMethod })
+                });
+                const data = await response.json();
+                console.log('Confirm Payment Response:', data);
+                if (data.success) {
+                    window.location.href = `${data.redirect}?orderId=${data.orderId}`;
+                } else {
+                    showMessage(data.message || 'Failed to confirm payment', true);
+                }
+            } catch (error) {
+                console.error('Confirm Payment Error:', error);
+                showMessage('Error confirming payment', true);
+            }
+        });
+    </script>
+</body>
+</html>

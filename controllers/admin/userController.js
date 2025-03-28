@@ -15,7 +15,9 @@ export const renderDashboard = (req, res) => {
     }
   }
 };
+
 export const renderUsers = async (req, res) => {
+
     const { search = '', page = 1, limit = 2 } = req.query;
     let query = {};
     if (search) query.email = { $regex: search, $options: 'i' };

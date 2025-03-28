@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Management - Ocean Books</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      margin: 0;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar-header {
+      padding: 20px 10px;
+      text-align: center;
+      background: rgb(32,31,49); /* Deep navy */
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.6em;
+      margin: 0;
+      color: #FFFFFF; /* White text */
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar ul {
+      padding: 10px 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar a, .sidebar button {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 12px 20px;
+      border-radius: 5px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover, .sidebar button:hover {
+      background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+    }
+
+    .sidebar a.active {
+      color: rgb(232, 232, 232);
+    }
+
+    .main-content {
+      margin-left: 220px;
+      flex: 1;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .error {
+      color: #E74C3C; /* Red */
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .filter {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter input, .filter select, .filter button {
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid #E5E5E5;
+      font-size: 14px;
+      background: #FFFFFF;
+      color: rgb(32,31,49);
+    }
+
+    .filter button {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+      border: none;
+      transition: background 0.3s;
+    }
+
+    .filter button:hover {
+      background: rgba(255, 186, 222, 0.8);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      color: rgb(32,31,49);
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgb(32,31,49);
+      color: #FFFFFF;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    th:hover {
+      background: rgba(32,31,49, 0.9);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .status-select {
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #E5E5E5;
+      color: rgb(32,31,49);
+      font-size: 14px;
+    }
+
+    .view-btn, button[onclick^="showReturnModal"] {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .view-btn:hover, button[onclick^="showReturnModal"]:hover {
+      background: rgba(255, 186, 222, 0.8);
+    }
+
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .pagination a {
+      padding: 8px 12px;
+      margin: 0 5px;
+      text-decoration: none;
+      color: #FFBADE; /* Soft pink */
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .pagination a:hover {
+      background: rgba(255, 186, 222, 0.2);
+    }
+
+    .pagination a.active {
+      background: #FFBADE;
+      color: rgb(32,31,49);
+      border-radius: 5px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #FFFFFF;
+      margin: 15% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+      text-align: center;
+      color: rgb(32,31,49);
+    }
+
+    .modal-content p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .modal button {
+      padding: 8px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .confirm-btn {
+      background: #2ECC71; /* Green */
+      color: #FFFFFF;
+    }
+
+    .confirm-btn:hover {
+      background: #27AE60;
+    }
+
+    .reject-btn {
+      background: #E74C3C; /* Red */
+      color: #FFFFFF;
+    }
+
+    .reject-btn:hover {
+      background: #C0392B;
+    }
+
+    .cancel-btn {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+    }
+
+    .cancel-btn:hover {
+      background: rgba(255, 186, 222, 0.8);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 180px;
+      }
+
+      .main-content {
+        margin-left: 180px;
+      }
+
+      .sidebar-header h2 {
+        font-size: 1.4em;
+      }
+
+      .sidebar a, .sidebar button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    </div>
+    <ul>
+      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+      <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <h1>Order Management</h1>
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+    <div class="filter">
+      <form method="GET" action="/admin/orders">
+        <input type="text" name="search" value="<%= search || '' %>" placeholder="Search by Order ID or User">
+        <select name="status">
+          <option value="">All Statuses</option>
+          <option value="Pending" <%= status === 'Pending' ? 'selected' : '' %>>Pending</option>
+          <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+          <option value="Out for Delivery" <%= status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+          <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+          <option value="Cancelled" <%= status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+        </select>
+        <button type="submit">Filter</button>
+        <button type="button" onclick="window.location.href='/admin/orders'">Clear</button>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable('orderId')">Order ID <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable('date')">Date <i class="fas fa-sort"></i></th>
+          <th>User</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td><%= order.orderId %></td>
+            <td><%= order.createdAt.toLocaleDateString() %></td>
+            <td><%= order.userId.name %> (<%= order.userId.email %>)</td>
+            <td>
+              <select class="status-select" onchange="updateStatus('<%= order._id %>', this.value)">
+                <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                <option value="Out for Delivery" <%= order.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+              </select>
+            </td>
+            <td class="actions">
+              <button class="view-btn" onclick="viewOrder('<%= order._id %>')">View</button>
+              <% if (order.returnRequest) { %>
+                <button onclick="showReturnModal('<%= order._id %>', '<%= order.total %>')">Verify Return</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="/admin/orders?page=<%= i %>&search=<%= search || '' %>&status=<%= status || '' %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+      <% } %>
+    </div>
+  </div>
+
+  <div id="returnModal" class="modal">
+    <div class="modal-content">
+      <p>Verify Return Request</p>
+      <p>Order ID: <span id="returnOrderId"></span></p>
+      <p>Refund Amount: ₹<span id="returnAmount"></span></p>
+      <button class="confirm-btn" onclick="verifyReturn('approve')">Approve</button>
+      <button class="reject-btn" onclick="verifyReturn('reject')">Reject</button>
+      <button class="cancel-btn" onclick="hideReturnModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    let currentOrderId;
+
+    function updateStatus(orderId, status) {
+      fetch(`/admin/orders/status/${orderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) alert('Failed to update status');
+      })
+      .catch(err => console.error('Status Update Error:', err));
+    }
+
+    function viewOrder(orderId) {
+      window.location.href = `/admin/orders/view/${orderId}`;
+    }
+
+    function sortTable(field) {
+      const url = new URL(window.location);
+      const currentSort = url.searchParams.get('sort') || 'createdAt';
+      const direction = url.searchParams.get('direction') === 'asc' && currentSort === field ? 'desc' : 'asc';
+      url.searchParams.set('sort', field);
+      url.searchParams.set('direction', direction);
+      window.location.href = url.toString();
+    }
+
+    function showReturnModal(orderId, amount) {
+      currentOrderId = orderId;
+      document.getElementById('returnOrderId').textContent = orderId;
+      document.getElementById('returnAmount').textContent = amount;
+      document.getElementById('returnModal').style.display = 'block';
+    }
+
+    function hideReturnModal() {
+      document.getElementById('returnModal').style.display = 'none';
+      currentOrderId = null;
+    }
+
+    function verifyReturn(action) {
+      fetch(`/admin/orders/verify-return/${currentOrderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert(data.message || 'Failed to verify return');
+        }
+      })
+      .catch(err => console.error('Verify Return Error:', err));
+      hideReturnModal();
+    }
+  </script>
+</body>
+</html>

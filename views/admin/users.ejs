@@ -4,94 +4,341 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - Ocean Books</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            text-align: center;
+            background: rgb(32,31,49);
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.6em;
+            margin: 0;
+            color: rgb(255, 255, 255);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar ul {
+            padding: 10px 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 5px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+        }
+
+        .sidebar a.active {
+            color: rgb(255, 255, 255);
+        }
+
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter input, .filter button {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #E5E5E5;
+            font-size: 14px;
+            background: #FFFFFF;
+            color: rgb(32,31,49);
+        }
+
+        .filter button {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .filter button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E5E5;
+            color: rgb(32,31,49);
+        }
+
+        th {
+            background: rgb(32,31,49);
+            color: #FFFFFF;
+        }
+
+        .actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .block-btn {
+            background: #E74C3C; /* Red */
+            color: #FFFFFF;
+        }
+
+        .unblock-btn {
+            background: #2ECC71; /* Green */
+            color: #FFFFFF;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #FFBADE; /* Soft pink */
+            transition: background 0.3s;
+        }
+
+        .pagination a:hover {
+            background: rgba(255, 186, 222, 0.2);
+        }
+
+        .pagination a.active {
+            background: #FFBADE;
+            color: rgb(32,31,49);
+            border-radius: 5px;
+        }
+
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .confirmation-modal .modal-content {
+            background: #FFFFFF;
+            margin: 20% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+            color: rgb(32,31,49);
+        }
+
+        .confirmation-modal button {
+            padding: 8px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .confirm-btn {
+            background: #E74C3C; /* Red */
+            color: #FFFFFF;
+        }
+
+        .cancel-btn {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1.4em;
+            }
+
+            .sidebar a, .sidebar button {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        </div>
+        <ul>
+            <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+            <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+            <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+            <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+            <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+        </ul>
     </div>
-    <ul>
-      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
-      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
-      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li> <!-- Added -->
-      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
-      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
-      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
-    </ul>
-  </div>
-  <div class="main-content">
-    <h1>Users</h1>
-    <div class="filter">
-      <form method="GET" action="/admin/users">
-        <input type="text" name="search" value="<%= search %>" placeholder="Search by email">
-        <button type="submit">Search</button>
-        <button type="button" onclick="window.location.href='/admin/users'">Clear</button>
-      </form>
+    <div class="main-content">
+        <h1>Users</h1>
+        <div class="filter">
+            <form method="GET" action="/admin/users">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search by email">
+                <button type="submit">Search</button>
+                <button type="button" onclick="window.location.href='/admin/users'">Clear</button>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.phone %></td>
+                        <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+                        <td class="actions">
+                            <% if (user.isBlocked) { %>
+                                <button class="unblock-btn" onclick="showConfirmation('<%= user._id %>', 'unblock')">Unblock</button>
+                            <% } else { %>
+                                <button class="block-btn" onclick="showConfirmation('<%= user._id %>', 'block')">Block</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a href="/admin/users?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+            <% } %>
+        </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% users.forEach(user => { %>
-          <tr>
-            <td><%= user.email %></td>
-            <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
-            <td class="actions">
-              <% if (user.isBlocked) { %>
-                <button class="unblock-btn" onclick="showConfirmation('<%= user._id %>', 'unblock')">Unblock</button>
-              <% } else { %>
-                <button class="block-btn" onclick="showConfirmation('<%= user._id %>', 'block')">Block</button>
-              <% } %>
-            </td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-    <div class="pagination">
-      <% for(let i = 1; i <= totalPages; i++) { %>
-        <a href="/admin/users?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
-      <% } %>
+
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="modal-content">
+            <p id="confirmationMessage"></p>
+            <button class="confirm-btn" onclick="confirmAction()">Yes</button>
+            <button class="cancel-btn" onclick="hideConfirmation()">No</button>
+        </div>
     </div>
-  </div>
 
-  <div id="confirmationModal" class="confirmation-modal">
-    <div class="modal-content">
-      <p id="confirmationMessage"></p>
-      <button class="confirm-btn" onclick="confirmAction()">Yes</button>
-      <button class="cancel-btn" onclick="hideConfirmation()">No</button>
-    </div>
-  </div>
+    <script>
+        let actionForm;
 
-  <script>
-    let actionForm;
+        function showConfirmation(userId, action) {
+            actionForm = document.createElement('form');
+            actionForm.method = 'POST';
+            actionForm.action = `/admin/users/${action}/${userId}`;
+            document.getElementById('confirmationMessage').textContent = 
+                `Are you sure you want to ${action} this user?`;
+            document.getElementById('confirmationModal').style.display = 'block';
+        }
 
-    function showConfirmation(userId, action) {
-      actionForm = document.createElement('form');
-      actionForm.method = 'POST';
-      actionForm.action = `/admin/users/${action}/${userId}`;
-      document.getElementById('confirmationMessage').textContent = 
-        `Are you sure you want to ${action} this user?`;
-      document.getElementById('confirmationModal').style.display = 'block';
-    }
+        function hideConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            actionForm = null;
+        }
 
-    function hideConfirmation() {
-      document.getElementById('confirmationModal').style.display = 'none';
-      actionForm = null;
-    }
-
-    function confirmAction() {
-      if (actionForm) {
-        document.body.appendChild(actionForm);
-        actionForm.submit();
-      }
-    }
-  </script>
+        function confirmAction() {
+            if (actionForm) {
+                document.body.appendChild(actionForm);
+                actionForm.submit();
+            }
+        }
+    </script>
 </body>
 </html>

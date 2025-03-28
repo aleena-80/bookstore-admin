@@ -4,8 +4,532 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Books - <%= product.name %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/styles/product-details.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FFFFFF;
+            color: #1C2526;
+            line-height: 1.6;
+            padding-top: 120px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 a {
+            color: #58CC02;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            color: #1C2526;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-links li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            color: #58CC02;
+        }
+
+        .breadcrumbs {
+            padding: 20px 20px;
+            font-size: 14px;
+            color: #1C2526;
+            background-color: #E5E5E5;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .breadcrumbs a {
+            color: #58CC02;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .breadcrumbs a:hover {
+            color: #4AB302;
+        }
+
+        .breadcrumbs span {
+            color: #1C2526;
+        }
+
+        .breadcrumbs a::after {
+            content: "›";
+            margin: 0 8px;
+            color: #A0A0A0;
+            font-weight: bold;
+        }
+
+        .breadcrumbs span::after {
+            content: "";
+        }
+
+        .product-details-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-images {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+            position: relative;
+        }
+
+        .main-image img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .thumbnail {
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .thumbnail img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            border: 2px solid #E5E5E5;
+            transition: border 0.3s ease;
+        }
+
+        .thumbnail img:hover, .thumbnail img.active {
+            border: 2px solid #58CC02;
+        }
+
+        .drift-zoom-pane {
+            width: 200px !important; /* Force zoom size */
+            height: 200px !important;
+            border-radius: 50%;
+            border: 2px solid #58CC02;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-info {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .product-category {
+            font-size: 18px;
+            color: #1C2526;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .product-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1C2526;
+            margin-bottom: 10px;
+        }
+
+        .size-flavor {
+            display: flex;
+            justify-content: space-between;
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+
+        .size, .flavor {
+            background: #1C2526;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #E5E5E5;
+            font-size: 14px;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .product-rating p {
+            font-size: 16px;
+            color: #1C2526;
+        }
+
+        .product-description {
+            margin: 15px 0;
+        }
+
+        .product-description h3 {
+            font-size: 18px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .product-description p {
+            font-size: 14px;
+            color: #1C2526;
+        }
+
+        .actual_price {
+            font-size: 16px;
+            color: #A0A0A0;
+        }
+
+        .actual_price .price {
+            text-decoration: line-through;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #58CC02;
+            margin-top: 5px;
+        }
+
+        .product-price .discount {
+            font-size: 16px;
+            color: #FF4D4D;
+            margin-left: 5px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .quantity-selector label {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .quantity-selector input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            font-size: 16px;
+            margin-left: 10px;
+            border: 2px solid #E5E5E5;
+            border-radius: 6px;
+        }
+
+        .stock-status .in-stock {
+            color: #58CC02;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+
+        .stock-status .out-of-stock {
+            color: #FF4D4D;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            background: #58CC02;
+            color: #FFFFFF;
+        }
+
+        .action-buttons button:hover {
+            background: #4AB302;
+        }
+
+        .action-buttons button:disabled {
+            background: #A0A0A0;
+            cursor: not-allowed;
+        }
+
+        .container {
+            max-width: 941px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .container h1 {
+            font-size: 28px;
+            color: #1C2526;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .product-card {
+            background: #FFFFFF;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E5E5;
+            text-align: center;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 199px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .product-card h3 a {
+            font-size: 14px;
+            color: #1C2526;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .product-card h3 a:hover {
+            color: #58CC02;
+        }
+
+        .product-card p {
+            font-size: 12px;
+            color: #58CC02;
+            font-weight: 700;
+        }
+
+        .container.mt-5 {
+            margin-bottom: 40px;
+        }
+
+        .card {
+            border: 2px solid #E5E5E5;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h4 {
+            font-size: 20px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .col-md-8 {
+            max-width: 700px;
+        }
+
+        .progress-bar {
+            background-color: #58CC02;
+        }
+
+        .btn {
+            background-color: #58CC02;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #4AB302;
+        }
+
+        .badge {
+            background-color: #58CC02;
+            color: #FFFFFF;
+        }
+
+        footer {
+            background: #FFFFFF;
+            padding: 20px;
+            color: #1C2526;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .footer-section p {
+            font-size: 14px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-section ul li a:hover {
+            color: #58CC02;
+        }
+
+        .social-links a {
+            color: #1C2526;
+            margin: 0 10px;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #58CC02;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 10px 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                margin-top: 10px;
+            }
+
+            .product-details-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .product-info {
+                text-align: center;
+            }
+
+            .size-flavor {
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .action-buttons button {
+                width: 100%;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .product-card img {
+                height: 60px;
+            }
+
+            .product-card h3 a {
+                font-size: 12px;
+            }
+
+            .product-card p {
+                font-size: 10px;
+            }
+
+            .col-md-8 {
+                max-width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -22,205 +546,206 @@
         </nav>
     </header>
     <main>
-        <section class="product-details">
-          <div class="breadcrumbs">
-            <a href="/users/products">Shop</a> > 
-            <a href="/users/products?category=<%= encodeURIComponent(product.category && product.category._id ? product.category._id : product.category) %>"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></a> > 
+        <div class="breadcrumbs">
+            <a href="/users/products">Shop</a>
+            <a href="/users/products?category=<%= encodeURIComponent(product.category && product.category._id ? product.category._id : product.category) %>"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></a>
             <span><%= product.name %></span>
         </div>
 
-            <div class="product-content">
-                <div class="product-image">
-                    <div class="thumbnails">
-                        <% if (product.images && product.images.length > 0) { %>
-                            <% product.images.slice(0, 3).forEach((img, index) => { %>
-                                <img src="/images/<%= img %>" alt="Thumbnail <%= index + 1 %>" onclick="changeImage(this, '/images/<%= img %>')" class="<%= index === 0 ? 'active' : '' %>">
-                            <% }); %>
-                        <% } %>
-                    </div>
-                    <div class="main-image">
-                        <img src="/images/<%= product.images[0] || '/images/default.jpg' %>" alt="<%= product.name %>" id="mainImage">
-                        <div class="zoom-result"></div>
-                    </div>
+        <div class="product-details-container">
+            <div class="product-images">
+                <div class="main-image">
+                    <img 
+                        src="/images/<%= product.images[0] || '/images/default.jpg' %>" 
+                        alt="<%= product.name %>" 
+                        id="mainImage" 
+                        class="drift-trigger" 
+                        data-zoom="/images/<%= product.images[0] || '/images/default.jpg' %>"
+                    >
                 </div>
-                <div class="product-info">
-                    <h1><%= product.name %></h1>
-                    <p class="price">₹<%= (product.price * (1 - product.discount / 100)).toFixed(2) %>
-                        <% if (product.discount > 0) { %>
-                            <span class="original-price">₹<%= product.price.toFixed(2) %></span> (<%= product.discount %>% off)
-                        <% } %>
-                    </p>
-                    <p class="stock <%= product.stock > 0 ? 'stock-in' : 'stock-out' %>">
-                        <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
-                    </p>
-                    <% if (product.stock === 0) { %>
-                        <p class="error">This product is currently unavailable.</p>
+                <div class="thumbnail-gallery">
+                    <% if (product.images && product.images.length > 0) { %>
+                        <% product.images.slice(0, 3).forEach((img, index) => { %>
+                            <div class="thumbnail">
+                                <img 
+                                    src="/images/<%= img %>" 
+                                    alt="Thumbnail <%= index + 1 %>" 
+                                    onclick="changeImage(this, '/images/<%= img %>')" 
+                                    class="<%= index === 0 ? 'active' : '' %>"
+                                >
+                            </div>
+                        <% }); %>
                     <% } %>
-                    <div class="button-group">
-                      <button id="add-to-cart" class="yellow-btn" <%= product.stock === 0 ? 'disabled' : '' %>>Add to Cart</button>
-                      <button id="buy-now" class="yellow-btn" <%= product.stock === 0 ? 'disabled' : '' %>>Buy Now</button>
-                  </div>
-                    <div class="ratings">
-                        <% if (product.ratings && product.ratings.length > 0) { %>
-                            <% const avgRating = product.ratings.reduce((sum, r) => sum + r.rating, 0) / product.ratings.length; %>
-                            <p>Average Rating: <%= avgRating.toFixed(1) %> / 5</p>
+                </div>
+            </div>
+
+            <div class="product-info">
+                <div class="product-category"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></div>
+                <h1 class="productmn-name"><%= product.name %></h1>
+                <div class="product-rating">
+                    <% if (product.ratings && product.ratings.length > 0) { %>
+                        <% const avgRating = product.ratings.reduce((sum, r) => sum + r.rating, 0) / product.ratings.length; %>
+                        <p><strong>Average Rating:</strong> <%= avgRating.toFixed(1) %> / 5 (<%= product.ratings.length %> Reviews)</p>
+                    <% } else { %>
+                        <p><strong>Average Rating:</strong> 4.5 ★ (0 Reviews)</p>
+                    <% } %>
+                </div>
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p><%= product.description || 'No description available.' %></p>
+                </div>
+                <div class="actual_price">
+                    <span class="mrp">MRP:</span>
+                    <span class="price">₹<%= product.price.toFixed(2) %></span>
+                </div>
+                <div class="product-price">
+                    Price: ₹<%= (product.price * (1 - product.discount / 100)).toFixed(2) %>
+                    <% if (product.discount > 0) { %>
+                        <span class="discount">(<%= product.discount %>% off)</span>
+                    <% } %>
+                </div>
+                <div class="quantity-selector">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" min="1" max="<%= product.stock %>" value="1">
+                    <span class="stock-status">
+                        <% if (product.stock > 0) { %>
+                            <span class="in-stock">In Stock</span>
                         <% } else { %>
-                            <p class="no-ratings">4.5 ★</p>
+                            <span class="out-of-stock">Out of Stock</span>
                         <% } %>
-                    </div>
-                    <p>Discount: <%= product.discount %>%</p>
-                    <div class="highlights">
-                        <h3>Highlights</h3>
-                        <p><%= product.description || 'No description available.' %></p>
-                    </div>
+                    </span>
+                </div>
+                <div class="action-buttons">
+                    <button id="add-to-cart" class="add-to-cart" data-product-id="<%= product._id %>" <%= product.stock === 0 ? 'disabled' : '' %>>Add to Cart</button>
+                    <button id="buy-now" data-product-id="<%= product._id %>">Buy Now</button>
                 </div>
             </div>
+        </div>
 
-            <div class="related-products">
-                <h2>Related Products</h2>
-                <div class="product-grid">
-                    <% relatedProducts.forEach(related => { %>
-                        <div class="product-card">
-                            <img src="/images/<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
-                            <h3><a href="/users/products/<%= related._id %>"><%= related.name %></a></h3>
-                            <p>₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></p>
-                        </div>
-                    <% }) %>
-                </div>
+        <div class="container">
+            <h1>Related Products</h1>
+            <div class="products-grid">
+                <% relatedProducts.forEach(related => { %>
+                    <div class="product-card">
+                        <img src="/images/<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
+                        <h3><a href="/users/products/<%= related._id %>"><%= related.name %></a></h3>
+                        <p>₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></p>
+                    </div>
+                <% }) %>
             </div>
+        </div>
 
-
-
-
-            <div class="container mt-5">
-                <h1> Review</h1>
-                <div class="row">
-                    <!-- LEFT SECTION: Review Summary -->
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <h4>Customer Reviews</h4>
-                            <p><strong>Average Rating:</strong> <%= averageRating %> ⭐</p>
-                            <p><strong>Total Reviews:</strong> <%= totalReviews %></p>
-              
-                            <!-- Rating Breakdown -->
-                            <div>
-                                <% for (let i = 5; i >= 1; i--) { %>
-                                    <div class="d-flex align-items-center">
-                                        <span><%= i %> ⭐</span>
-                                        <div class="progress flex-grow-1 mx-2" style="height: 10px;">
-                                            <% let percentage = (ratingCounts[i] / totalReviews) * 100 || 0; %>
-                                            <div class="progress-bar" style="width: '<%= percentage %>%';"></div>
-                                        </div>
-                                        <span>(<%= ratingCounts[i] || 0 %>)</span>
+        <div class="container mt-5">
+            <h1>Review</h1>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h4>Customer Reviews</h4>
+                        <p><strong>Average Rating:</strong> <%= averageRating %> ⭐</p>
+                        <p><strong>Total Reviews:</strong> <%= totalReviews %></p>
+                        <div>
+                            <% for (let i = 5; i >= 1; i--) { %>
+                                <div class="d-flex align-items-center">
+                                    <span><%= i %> ⭐</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 10px;">
+                                        <% let percentage = (ratingCounts[i] / totalReviews) * 100 || 0; %>
+                                        <div class="progress-bar" style="width: <%= percentage %>%;"></div>
                                     </div>
-                                <% } %>
+                                    <span>(<%= ratingCounts[i] || 0 %>)</span>
+                                </div>
+                            <% } %>
+                        </div>
+                        <button class="btn mt-3" id="openModalBtn">Add Review</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card p-3">
+                        <h4>All Reviews</h4>
+                        <div id="reviewsContainer">
+                            <% if (reviews.length === 0) { %>
+                                <p>No reviews yet.</p>
+                            <% } else { %>
+                                <% reviews.forEach(review => { %>
+                                    <div class="border p-2 my-2">
+                                        <strong><%= review.user.name %></strong>
+                                        <span class="badge"><%= review.rating %> ⭐</span>
+                                        <p><%= review.comment %></p>
+                                        <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+                                        <% if (user && reviews.user && reviews.user._id && user._id.toString() === reviews.user._id.toString()) { %>
+                                            <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
+                                                Edit
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button id="prevPage" class="btn me-2" disabled>Previous</button>
+                            <span id="pageInfo">Page 1 of <%= totalPages %></span>
+                            <button id="nextPage" class="btn ms-2">Next</button>
+                        </div>
+                        <input type="hidden" id="productId" value="<%= product._id %>">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reviewModalLabel">Add Review</h5>
+                        <button type="button" class="close btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="reviewForm">
+                            <div class="form-group">
+                                <label for="rating">Rating:</label>
+                                <select class="form-control" id="rating">
+                                    <option value="5">5 ⭐</option>
+                                    <option value="4">4 ⭐</option>
+                                    <option value="3">3 ⭐</option>
+                                    <option value="2">2 ⭐</option>
+                                    <option value="1">1 ⭐</option>
+                                </select>
                             </div>
-              
-                            <!-- Add Review Button -->
-                            <button class="btn  mt-3" style="background-color: #ffcc00; color: black;" id="openModalBtn">Add Review</button>
-                        </div>
-                    </div>
-              
-                    <!-- RIGHT SECTION: Customer Reviews -->
-                    <div class="col-md-8">
-                        <div class="card p-3">
-                            <h4>All Reviews</h4>
-              
-                            <div id="reviewsContainer">
-                                <% if (reviews.length === 0) { %>
-                                    <p>No reviews yet.</p>
-                                <% } else { %>
-                                    <% reviews.forEach(review => { %>
-                                        <div class="border p-2 my-2">
-                                            <strong><%= review.user.name %></strong>
-                                            <span class="badge bg-warning text-dark"><%= review.rating %> ⭐</span>
-                                            <p><%= review.comment %></p>
-                                            <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
-              
-                                            <% if (user && reviews.user && reviews.user._id && user._id.toString() === reviews.user._id.toString()) { %>
-                                                <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
-                                                    Edit
-                                                </button>
-                                            <% } %>
-                                        </div>
-                                    <% }); %>
-                                <% } %>
+                            <div class="form-group">
+                                <label for="comment">Review:</label>
+                                <textarea class="form-control" id="comment" rows="3" required></textarea>
                             </div>
-              
-                          
-                            <div class="d-flex justify-content-center mt-3">
-                              <button id="prevPage" class="btn btn-primary me-2" style="background-color: #ffcc00; color: black;" disabled>Previous</button>
-                              
-                              <span id="pageInfo">Page 1 of <%= totalPages %></span>
-                              
-                              <button id="nextPage" class="btn  ms-2" style="background-color: #ffcc00; color: black;">Next</button>
-                          </div>
-                          <input type="hidden" id="productId" value="<%= product._id %>">
-                          
-                          
-                        </div>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
                     </div>
                 </div>
-              </div>
-              
-              <!-- Review Modal -->
-              <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="reviewModalLabel">Add Review</h5>
-                            <button type="button" class="close btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="reviewForm">
-                                <div class="form-group">
-                                    <label for="rating">Rating:</label>
-                                    <select class="form-control" id="rating">
-                                        <option value="5">5 ⭐</option>
-                                        <option value="4">4 ⭐</option>
-                                        <option value="3">3 ⭐</option>
-                                        <option value="2">2 ⭐</option>
-                                        <option value="1">1 ⭐</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="comment">Review:</label>
-                                    <textarea class="form-control" id="comment" rows="3" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit Review</button>
-                            </form>
-                        </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editReviewForm">
+                            <input type="hidden" id="editReviewId">
+                            <div class="mb-3">
+                                <label for="editRating" class="form-label">Rating:</label>
+                                <input type="number" id="editRating" class="form-control" min="1" max="5" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editComment" class="form-label">Comment:</label>
+                                <textarea id="editComment" class="form-control" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Review</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Close</button>
+                        </form>
                     </div>
                 </div>
-              </div>
-              
-              <!-- Edit Review Modal -->
-              <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="editReviewForm">
-                                <input type="hidden" id="editReviewId">
-                                <div class="mb-3">
-                                    <label for="editRating" class="form-label">Rating:</label>
-                                    <input type="number" id="editRating" class="form-control" min="1" max="5" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editComment" class="form-label">Comment:</label>
-                                    <textarea id="editComment" class="form-control" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Update Review</button>
-                                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Close</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-              </div>
-        </section>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -246,207 +771,209 @@
         </div>
         <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
     </footer>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>   
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/drift-zoom@1.5.0/dist/Drift.min.js"></script>
     <script>
         function changeImage(element, src) {
-  console.log("Clicked thumbnail, changing to:", src);
-  const mainImage = document.getElementById('mainImage');
-  mainImage.src = src;
-  document.querySelectorAll('.thumbnails img').forEach(img => img.classList.remove('active'));
-  element.classList.add('active');
-}
-        document.getElementById('add-to-cart').addEventListener('click', () => {
-            alert('Add to cart not implemented yet!');
+            console.log("Clicked thumbnail, changing to:", src);
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = src;
+            mainImage.dataset.zoom = src;
+            document.querySelectorAll('.thumbnail img').forEach(img => img.classList.remove('active'));
+            element.classList.add('active');
+            new Drift(mainImage, {
+                paneContainer: document.body,
+                inlinePane: 400, // Trigger inline pane at 400px image width
+                zoomFactor: 3,
+                hoverDelay: 200
+            });
+        }
+
+        document.getElementById('add-to-cart').addEventListener('click', async () => {
+                const productId = document.getElementById('add-to-cart').dataset.productId;
+                const response = await fetch(`/users/cart/add/${productId}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                const cartCountElement = document.querySelector('.cart-count');
+                if (cartCountElement) {
+                    cartCountElement.textContent = data.cartCount;
+                }
+                showMessage('Added to cart!');
+            } else {
+                showMessage(data.message || 'Already in cart!');
+            }
         });
-        document.getElementById('buy-now').addEventListener('click', () => {
-  alert('Buy Now not implemented yet!');
+
+        document.getElementById('buy-now').addEventListener('click', async () => {
+    const productId = document.getElementById('buy-now').dataset.productId;
+    const response = await fetch(`/users/order/buy-now/${productId}`, {
+        method: 'POST',
+        credentials: 'include', // Same as Add to Cart
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const data = await response.json();
+    if (data.success) {
+        // Redirect to existing checkout page with orderId
+        window.location.href = `/users/checkout?orderId=${data.orderId}`;
+    } else {
+        alert(data.message || 'Failed to proceed to checkout');
+    }
 });
-        const mainImage = document.getElementById('mainImage');
-        const zoomResult = document.querySelector('.zoom-result');
 
-        mainImage.addEventListener('mouseover', () => {
-            zoomResult.style.display = 'block';
-            zoomResult.style.backgroundImage = `url(${mainImage.src})`;
-            zoomResult.style.backgroundSize = `${mainImage.width * 3}px ${mainImage.height * 3}px`;
+        document.addEventListener('DOMContentLoaded', () => {
+            new Drift(document.querySelector('.drift-trigger'), {
+                paneContainer: document.body,
+                inlinePane: 400, // Inline pane kicks in at 400px
+                zoomFactor: 3,
+                hoverDelay: 200
+            });
+
+            document.getElementById("openModalBtn").addEventListener("click", function () {
+                var modal = new bootstrap.Modal(document.getElementById("reviewModal"));
+                modal.show();
+            });
+
+            document.getElementById("reviewForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                const rating = document.getElementById("rating").value;
+                const comment = document.getElementById("comment").value;
+                const token = localStorage.getItem('token');
+                fetch(`/users/products/<%= product._id %>/review`, {
+                    method: "POST",
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Review added successfully!",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire("Error!", data.message, "error");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
         });
 
-        mainImage.addEventListener('mousemove', (e) => {
-            const rect = mainImage.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const lensWidth = 100;
-            const lensHeight = 100;
-            let lensX = x - lensWidth / 2;
-            let lensY = y - lensHeight / 2;
-            lensX = lensX < 0 ? 0 : lensX > mainImage.width - lensWidth ? mainImage.width - lensWidth : lensX;
-            lensY = lensY < 0 ? 0 : lensY > mainImage.height - lensHeight ? mainImage.height - lensHeight : lensY;
-            zoomResult.style.backgroundPosition = `-${lensX * 3}px -${lensY * 3}px`;
+        function openEditModal(reviewId, rating, comment) {
+            document.getElementById("editReviewId").value = reviewId;
+            document.getElementById("editRating").value = rating;
+            document.getElementById("editComment").value = comment;
+            var editModal = new bootstrap.Modal(document.getElementById("editReviewModal"));
+            editModal.show();
+        }
+
+        document.getElementById("editReviewForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const reviewId = document.getElementById("editReviewId").value;
+            const rating = document.getElementById("editRating").value;
+            const comment = document.getElementById("editComment").value;
+            const token = localStorage.getItem('token');
+            fetch(`/users/products/<%= product._id %>/review/edit`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ reviewId, rating, comment })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Review Updated!",
+                        text: "Your review has been successfully updated.",
+                        timer: 2000, 
+                        showConfirmButton: false
+                    }).then(() => {
+                        var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
+                        editModal.hide();
+                        location.reload(); 
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Update Failed",
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Something went wrong. Please try again."
+                });
+            });
         });
 
-        mainImage.addEventListener('mouseout', () => {
-            zoomResult.style.display = 'none';
-        });
+        function closeEditModal() {
+            var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
+            editModal.hide();
+        }
 
         document.addEventListener("DOMContentLoaded", function () {
-   
-       
+            document.getElementById("prevPage")?.addEventListener("click", function () {
+                loadReviews(currentPage - 1);
+            });
 
-   document.getElementById("openModalBtn").addEventListener("click", function () {
-       var modal = new bootstrap.Modal(document.getElementById("reviewModal"));
-       modal.show();
-   });
+            document.getElementById("nextPage")?.addEventListener("click", function () {
+                loadReviews(currentPage + 1);
+            });
+        });
 
-  
-   document.getElementById("reviewForm").addEventListener("submit", function (event) {
-       event.preventDefault();
-       
-       const rating = document.getElementById("rating").value;
-       const comment = document.getElementById("comment").value;
+        function loadReviews(page) {
+            const productId = document.getElementById("productId").value;
+            fetch(`/product-details?id=${productId}&page=${page}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.reviews) {
+                        updateReviewsUI(data.reviews, data.currentPage, data.totalPages);
+                    }
+                })
+                .catch(error => console.error("Error fetching reviews:", error));
+        }
 
-       const token = localStorage.getItem('token');
-
-       fetch(`/users/products/<%= product._id %>/review`, {
-           method: "POST",
-           headers: { 
-        'Content-Type': 'application/json', 
-         'Authorization': `Bearer ${token}` 
-      },
-           body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
-       })
-       .then(response => response.json())
-       .then(data => {
-           if (data.success) {
-               Swal.fire({
-                   title: "Success!",
-                   text: "Review added successfully!",
-                   icon: "success",
-                   confirmButtonText: "OK"
-               }).then(() => location.reload());
-           } else {
-               Swal.fire("Error!", data.message, "error");
-           }
-       })
-       .catch(error => console.error("Error:", error));
-   });
-});
-
-
-
-
-
-
-function openEditModal(reviewId, rating, comment) {
-document.getElementById("editReviewId").value = reviewId;
-document.getElementById("editRating").value = rating;
-document.getElementById("editComment").value = comment;
-
-
-var editModal = new bootstrap.Modal(document.getElementById("editReviewModal"));
-editModal.show();
-}
-
-document.getElementById("editReviewForm").addEventListener("submit", function (event) {
-event.preventDefault();
-
-const reviewId = document.getElementById("editReviewId").value;
-const rating = document.getElementById("editRating").value;
-const comment = document.getElementById("editComment").value;
-
-fetch(`/users/products/${productId}/review/edit`, {
-   method: "POST",
-   headers: { 
-        'Content-Type': 'application/json', 
-         'Authorization': `Bearer ${token}` 
-      },
-   body: JSON.stringify({ reviewId, rating, comment })
-})
-.then(response => response.json())
-.then(data => {
-   if (data.success) {
-      
-       Swal.fire({
-           icon: "success",
-           title: "Review Updated!",
-           text: "Your review has been successfully updated.",
-           timer: 2000, 
-           showConfirmButton: false
-       }).then(() => {
-          
-           var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
-           editModal.hide();
-           location.reload(); 
-       });
-   } else {
-       Swal.fire({
-           icon: "error",
-           title: "Update Failed",
-           text: data.message
-       });
-   }
-})
-.catch(error => {
-   console.error("Error:", error);
-   Swal.fire({
-       icon: "error",
-       title: "Error",
-       text: "Something went wrong. Please try again."
-   });
-});
-});
-
-
-
-function closeEditModal() {
-var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
-editModal.hide();
-}
-//---------------------------
-document.addEventListener("DOMContentLoaded", function () {
-document.getElementById("prevPage")?.addEventListener("click", function () {
-   loadReviews(currentPage - 1);
-});
-
-document.getElementById("nextPage")?.addEventListener("click", function () {
-   loadReviews(currentPage + 1);
-});
-});
-
-function loadReviews(page) {
-const productId = document.getElementById("productId").value; 
-
-fetch(`/product-details?id=${productId}&page=${page}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-   .then(response => response.json())
-   .then(data => {
-       if (data.reviews) {
-           updateReviewsUI(data.reviews, data.currentPage, data.totalPages);
-       }
-   })
-   .catch(error => console.error("Error fetching reviews:", error));
-}
-
-function updateReviewsUI(reviews, currentPage, totalPages) {
-const reviewsContainer = document.getElementById("reviewsList");
-reviewsContainer.innerHTML = ""; 
-
-reviews.forEach(review => {
-   const reviewElement = document.createElement("div");
-   reviewElement.innerHTML = `
-       <div class="review">
-           <p><strong>${review.userName}</strong> - ${review.rating}⭐</p>
-           <p>${review.comment}</p>
-       </div>
-   `;
-   reviewsContainer.appendChild(reviewElement);
-});
-
-
-document.getElementById("prevPage").disabled = currentPage === 1;
-document.getElementById("nextPage").disabled = currentPage === totalPages;
-}
-
-
+        function updateReviewsUI(reviews, currentPage, totalPages) {
+            const reviewsContainer = document.getElementById("reviewsContainer");
+            reviewsContainer.innerHTML = "";
+            reviews.forEach(review => {
+                const reviewElement = document.createElement("div");
+                reviewElement.innerHTML = `
+                    <div class="border p-2 my-2">
+                        <strong>${review.user.name}</strong>
+                        <span class="badge">${review.rating} ⭐</span>
+                        <p>${review.comment}</p>
+                        <small class="text-muted">${new Date(review.createdAt).toLocaleDateString()}</small>
+                    </div>
+                `;
+                reviewsContainer.appendChild(reviewElement);
+            });
+            document.getElementById("prevPage").disabled = currentPage === 1;
+            document.getElementById("nextPage").disabled = currentPage === totalPages;
+            document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+        }
+    </script>
+</body>
+</html>
+<!-- 
         // function toggleRating(rating) {
         //     const stars = document.querySelectorAll('.stars span');
         //     const currentRating = parseInt(document.getElementById('rating-value').value);
@@ -552,7 +1079,4 @@ document.getElementById("nextPage").disabled = currentPage === totalPages;
 //             } catch (error) {
 //                 alert("Error updating review: " + error.message);
 //             }
-//         });
-    </script>
-</body>
-</html>
+//         }); -->

@@ -4,24 +4,351 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Product - Ocean Books</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      margin: 0;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar-header {
+      padding: 20px 10px;
+      text-align: center;
+      background: rgb(32,31,49); /* Deep navy */
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.6em;
+      margin: 0;
+      color: #FFFFFF; /* White text */
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar ul {
+      padding: 10px 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar a, .sidebar button {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 12px 20px;
+      border-radius: 5px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover, .sidebar button:hover {
+      background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+    }
+
+    .sidebar a.active {
+      color: rgb(253, 252, 255);
+    }
+
+    .main-content {
+      margin-left: 220px;
+      flex: 1;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .add-form {
+      background: #FFFFFF;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+    }
+
+    .add-form form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .add-form input, .add-form textarea, .add-form select {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #E5E5E5;
+      font-size: 14px;
+      color: rgb(32,31,49);
+      background: #FFFFFF;
+    }
+
+    .add-form textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .add-form button {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .add-form button:hover {
+      background: rgba(255, 186, 222, 0.8);
+    }
+
+    .image-upload {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .image-upload p {
+      font-size: 0.9em;
+      color: rgb(32,31,49);
+      margin: 0;
+    }
+
+    .image-preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .image-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .crop-btn, .remove-btn {
+      position: absolute;
+      top: 5px;
+      padding: 5px 10px;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+
+    .crop-btn {
+      right: 45px;
+      background: #2ECC71; /* Green */
+    }
+
+    .crop-btn:hover {
+      background: #27AE60;
+    }
+
+    .remove-btn {
+      right: 5px;
+      background: #E74C3C; /* Red */
+    }
+
+    .remove-btn:hover {
+      background: #C0392B;
+    }
+
+    #cropModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #cropModal .modal-content {
+      background: #FFFFFF;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+      text-align: center;
+      color: rgb(32,31,49);
+    }
+
+    #cropImage {
+      max-width: 100%;
+      max-height: 400px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #cropModal button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    #cropConfirm {
+      background: #2ECC71; /* Green */
+      color: #FFFFFF;
+    }
+
+    #cropConfirm:hover {
+      background: #27AE60;
+    }
+
+    #cropCancel {
+      background: #E74C3C; /* Red */
+      color: #FFFFFF;
+    }
+
+    #cropCancel:hover {
+      background: #C0392B;
+    }
+
+    .field-error {
+      color: #E74C3C; /* Red */
+      font-size: 0.8em;
+      margin-top: -10px;
+      display: none;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background: #FFFFFF;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 5px;
+      text-align: center;
+      color: rgb(32,31,49);
+    }
+
+    #popupClose, #validationClose {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    #popupClose:hover, #validationClose:hover {
+      background: rgba(255, 186, 222, 0.8);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 180px;
+      }
+
+      .main-content {
+        margin-left: 180px;
+      }
+
+      .sidebar-header h2 {
+        font-size: 1.4em;
+      }
+
+      .sidebar a, .sidebar button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .add-form {
+        padding: 15px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
     <div class="sidebar-header">
-      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
     </div>
     <ul>
-      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
-      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
-      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
-      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
-      <li><a href="/admin/products-add" class="active"><i class="fas fa-plus-circle"></i> Add Product</a></li>
-      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+        <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+        <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+        <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+        <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+        <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+        <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+        <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
     </ul>
-  </div>
+</div>
   <div class="main-content">
     <h1>Add Product</h1>
     <div class="add-form">
@@ -56,7 +383,7 @@
         <div class="image-upload">
           <input type="file" name="images" id="imageInput" multiple accept="image/*">
           <span class="field-error" id="images-error">At least 3 images are required</span>
-          <p style="font-size: 0.9em; color: #666;">Select 3 to 5 images (Ctrl/Cmd + click).</p>
+          <p>Select 3 to 5 images (Ctrl/Cmd + click).</p>
           <div class="image-preview" id="imagePreview"></div>
         </div>
         <button type="submit" id="submitBtn">Add Product</button>
@@ -87,6 +414,7 @@
       <button id="validationClose">Close</button>
     </div>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script>
     const imageInput = document.getElementById('imageInput');
@@ -106,11 +434,9 @@
     let currentImageIdx = 0;
     let imageFiles = [];
 
-    
     popup.style.display = 'none';
     validationPopup.style.display = 'none';
 
-    
     popupClose.addEventListener('click', (e) => {
       popup.style.display = 'none';
       e.stopPropagation();
@@ -180,7 +506,7 @@
         reader.readAsDataURL(file);
       });
       currentImageIdx += files.length;
-      imageInput.value = ''; 
+      imageInput.value = '';
     });
 
     function startCrop(imgElement, idx) {
@@ -236,97 +562,98 @@
         if (cropper) cropper.destroy();
       }
     });
+
     productForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log("Form submit intercepted - sending via fetch");
+      e.preventDefault();
+      console.log("Form submit intercepted - sending via fetch");
 
-    document.querySelectorAll('.field-error').forEach(error => error.style.display = 'none');
-    let hasErrors = false;
+      document.querySelectorAll('.field-error').forEach(error => error.style.display = 'none');
+      let hasErrors = false;
 
-    const name = productForm.querySelector('[name="name"]').value.trim();
-    if (!name) { document.getElementById('name-error').style.display = 'block'; hasErrors = true; }
+      const name = productForm.querySelector('[name="name"]').value.trim();
+      if (!name) { document.getElementById('name-error').style.display = 'block'; hasErrors = true; }
 
-    const price = productForm.querySelector('[name="price"]').value;
-    if (!price) { document.getElementById('price-error').style.display = 'block'; hasErrors = true; }
+      const price = productForm.querySelector('[name="price"]').value;
+      if (!price) { document.getElementById('price-error').style.display = 'block'; hasErrors = true; }
 
-    const category = productForm.querySelector('[name="category"]').value;
-    if (!category) { document.getElementById('category-error').style.display = 'block'; hasErrors = true; }
+      const category = productForm.querySelector('[name="category"]').value;
+      if (!category) { document.getElementById('category-error').style.display = 'block'; hasErrors = true; }
 
-    const language = productForm.querySelector('[name="language"]').value;
-    if (!language) { document.getElementById('language-error').style.display = 'block'; hasErrors = true; }
+      const language = productForm.querySelector('[name="language"]').value;
+      if (!language) { document.getElementById('language-error').style.display = 'block'; hasErrors = true; }
 
-    const stock = productForm.querySelector('[name="stock"]').value;
-    if (stock && (stock < 0 || stock > 100)) {
-      document.getElementById('stock-error').style.display = 'block';
-      hasErrors = true;
-    }
-    if (!stock) { document.getElementById('stock-error').style.display = 'block'; hasErrors = true; }
+      const stock = productForm.querySelector('[name="stock"]').value;
+      if (stock && (stock < 0 || stock > 100)) {
+        document.getElementById('stock-error').style.display = 'block';
+        hasErrors = true;
+      }
+      if (!stock) { document.getElementById('stock-error').style.display = 'block'; hasErrors = true; }
 
-    const author = productForm.querySelector('[name="author"]').value.trim();
-    if (!author) { document.getElementById('author-error').style.display = 'block'; hasErrors = true; }
+      const author = productForm.querySelector('[name="author"]').value.trim();
+      if (!author) { document.getElementById('author-error').style.display = 'block'; hasErrors = true; }
 
-    const discount = productForm.querySelector('[name="discount"]').value;
-    if (discount && (discount < 0 || discount > 100)) {
-      document.getElementById('discount-error').style.display = 'block';
-      hasErrors = true;
-    }
+      const discount = productForm.querySelector('[name="discount"]').value;
+      if (discount && (discount < 0 || discount > 100)) {
+        document.getElementById('discount-error').style.display = 'block';
+        hasErrors = true;
+      }
 
-    const description = productForm.querySelector('[name="description"]').value.trim();
-    if (!description) { document.getElementById('description-error').style.display = 'block'; hasErrors = true; }
+      const description = productForm.querySelector('[name="description"]').value.trim();
+      if (!description) { document.getElementById('description-error').style.display = 'block'; hasErrors = true; }
 
-    if (imagePreview.children.length < 3) {
-      document.getElementById('images-error').style.display = 'block';
-      hasErrors = true;
-    }
+      if (imagePreview.children.length < 3) {
+        document.getElementById('images-error').style.display = 'block';
+        hasErrors = true;
+      }
 
-    if (hasErrors) {
-      showValidationPopup('Please fill in all required fields.');
-      return;
-    }
+      if (hasErrors) {
+        showValidationPopup('Please fill in all required fields.');
+        return;
+      }
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('price', price);
-    formData.append('category', category);
-    formData.append('language', language);
-    formData.append('stock', stock);
-    formData.append('author', author);
-    if (discount) formData.append('discount', discount);
-    formData.append('description', description);
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('price', price);
+      formData.append('category', category);
+      formData.append('language', language);
+      formData.append('stock', stock);
+      formData.append('author', author);
+      if (discount) formData.append('discount', discount);
+      formData.append('description', description);
 
-    imageFiles.forEach((fileObj, index) => {
-      console.log(`Appending image ${index}:`, fileObj.file.name, fileObj.file.size, fileObj.file.type);
-      formData.append('images', fileObj.file); // Must be "images"
-    });
-
-    console.log("FormData contents:", Array.from(formData.entries()));
-
-    try {
-      const response = await fetch('/admin/products-add', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
+      imageFiles.forEach((fileObj, index) => {
+        console.log(`Appending image ${index}:`, fileObj.file.name, fileObj.file.size, fileObj.file.type);
+        formData.append('images', fileObj.file); // Must be "images"
       });
 
-      const text = await response.text();
-      console.log("Raw server response:", text);
+      console.log("FormData contents:", Array.from(formData.entries()));
 
-      if (!response.ok) {
-        throw new Error('Server returned an error: ' + text);
-      }
+      try {
+        const response = await fetch('/admin/products-add', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
 
-      const data = JSON.parse(text);
-      if (data.success) {
-        showPopup('Product added successfully!');
-        setTimeout(() => window.location.href = '/admin/products', 1000);
-      } else {
-        showPopup(data.message || 'Failed to add product.');
+        const text = await response.text();
+        console.log("Raw server response:", text);
+
+        if (!response.ok) {
+          throw new Error('Server returned an error: ' + text);
+        }
+
+        const data = JSON.parse(text);
+        if (data.success) {
+          showPopup('Product added successfully!');
+          setTimeout(() => window.location.href = '/admin/products', 1000);
+        } else {
+          showPopup(data.message || 'Failed to add product.');
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showPopup('Error: ' + error.message);
       }
-    } catch (error) {
-      console.error('Fetch error:', error);
-      showPopup('Error: ' + error.message);
-    }
-  });
+    });
 
     function showPopup(message) {
       popupText.textContent = message;

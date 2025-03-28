@@ -3,6 +3,7 @@ import Product from '../../models/Product.js';
 import Category from "../../models/Category.js";
 import Language from "../../models/Language.js";
 import path from 'path'
+import fs from 'fs'
 
 
 const uploadDir = path.join(process.cwd(), "images");
@@ -156,27 +157,19 @@ export const getProducts = async (req, res) => {
       res.status(500).render("admin/error", { message: "Failed to load edit product page." });
     }
   };
-  export const deleteProduct = async (req, res) => {
+//-------------------------------------------------------------------------------------
+export const unlistProduct = async (req, res) => {
     try {
-      const { id } = req.params;
-      await Product.findByIdAndUpdate(id, { isDeleted: true });
-      res.redirect('/admin/products');
-    } catch (error) {
-      console.error("Delete Product Error:", error);
-      res.status(500).send("Failed to delete product");
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+        product.isListed = !product.isListed; // Toggle isListed (add this field if missing)
+        await product.save();
+        res.redirect('/admin/products'); // Refresh page after toggle
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
-  };
-
-
-
-
-
-
-
-
-
-
-
+};
 
 
 

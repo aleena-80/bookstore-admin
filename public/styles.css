@@ -1,4 +1,4 @@
-/*OTP VERIFICATION*/
+/*OTP VERIFICATION
 .modal {
   display: none;
   position: fixed;
@@ -19,7 +19,7 @@
 .error-message { color: red; }
 .success-message { color: green; }
 /*-------------------------Categories---------------------------*/
-    body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; }
+  /*  body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; }
     .sidebar { width: 220px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
     .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
     .sidebar-header h2 { font-size: 1.6em; margin: 0; }
@@ -60,7 +60,7 @@
     .confirm-btn { background: #e74c3c; color: #fff; }
     .cancel-btn { background: #3498db; color: #fff; }
 /*----------------------------------------Dashboard-------------------------------------------------*/
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+    /*    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
         body { background: #f0f2f5; color: #333; min-height: 100vh; display: flex; margin: 0; }
         .sidebar { width: 220px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
     .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
@@ -79,7 +79,7 @@
         .dashboard-info { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 /*-----------------------------languages---------------------------*/
 
-    body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; }
+ /*   body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; }
     .sidebar { width: 220px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
     .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
     .sidebar-header h2 { font-size: 1.6em; margin: 0; }
@@ -120,7 +120,7 @@
     .confirm-btn { background: #e74c3c; color: #fff; }
     .cancel-btn { background: #3498db; color: #fff; }
 /*------------------------login---------------------*/
-* {
+/* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -204,7 +204,7 @@ button:hover {
     background: #e6b800;
 }
 /*------------products-add------------*/
-body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
+/*body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
 .sidebar { width: 220px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
 .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
 .sidebar-header h2 { font-size: 1.6em; margin: 0; }
@@ -252,7 +252,7 @@ h1 { color: #2c3e50; margin-bottom: 20px; }
 #popupClose, #validationClose { background: #3498db; color: #fff; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; margin-top: 10px; }
 #popupClose:hover, #validationClose:hover { background: #2980b9; }
 /*-------------products--------------------------*/
-body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
+/*body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
 .sidebar { width: 205px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
 .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
 .sidebar-header h2 { font-size: 1.6em; margin: 0; }
@@ -339,7 +339,7 @@ color: #fff;
 }
 
 /*-------------------user---------------------*/
-body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
+/*body { display: flex; background: #f0f2f5; color: #333; min-height: 100vh; margin: 0; }
 .sidebar { width: 220px; background: #2c3e50; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; }
 .sidebar-header { padding: 20px 10px; text-align: center; background: #1a252f; }
 .sidebar-header h2 { font-size: 1.6em; margin: 0; }
@@ -381,7 +381,7 @@ padding: 8px 20px; margin: 10px 5px; border: none; border-radius: 5px; cursor: p
 }
 .confirm-btn { background: #e74c3c; color: #fff; }
 .cancel-btn { background: #3498db; color: #fff; }
-/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/*/
 
 
 
@@ -652,6 +652,7 @@ main {
     justify-content: center;
     align-items: center;
     min-height: 70vh;
+    margin: 0;
 }
 
 .form-container {

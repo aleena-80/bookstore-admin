@@ -4,8 +4,311 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ocean Books - OTP Verification</title>
-  <link rel="stylesheet" href="/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #FFFFFF;
+      color: #1C2526;
+      line-height: 1.6;
+      padding-top: 90px;
+    }
+
+    .navbar {
+      background-color: #FFFFFF;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      text-align: left;
+    }
+
+    .logo h1 a {
+      color: #58CC02;
+      text-decoration: none;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .tagline {
+      color: #1C2526;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links li a {
+      color: #58CC02;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #1C2526;
+    }
+
+    .otp-verification-form {
+      min-height: calc(100vh - 200px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-color: #FFFFFF;
+    }
+
+    .form-container {
+      background: #FFFFFF;
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 2px solid #E5E5E5;
+    }
+
+    .form-container h2 {
+      font-size: 24px;
+      color: #58CC02;
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #1C2526;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      color: #1C2526;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #1C2526;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: #58CC02;
+    }
+
+    .form-group input::placeholder {
+      color: #A0A0A0;
+    }
+
+    .error-message {
+      color: #FF4D4D;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .success-message {
+      color: #58CC02; /* Match green vibe */
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: #58CC02;
+      border: none;
+      border-radius: 25px;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background: #4AB302;
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #1C2526;
+    }
+
+    .form-footer button {
+      padding: 8px 16px; /* Smaller for resend */
+      background: #58CC02;
+      border: none;
+      border-radius: 20px;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .form-footer button:disabled {
+      background: #A0A0A0;
+      cursor: not-allowed;
+    }
+
+    .form-footer button:hover:not(:disabled) {
+      background: #4AB302;
+    }
+
+    .timer {
+      margin-bottom: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #FFFFFF;
+      padding: 20px;
+      border-radius: 12px; /* Match form */
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 2px solid #E5E5E5;
+    }
+
+    .modal-content h3 {
+      color: #58CC02;
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .modal-content p {
+      color: #1C2526;
+      font-size: 14px;
+    }
+
+    footer {
+      background: #FFFFFF;
+      padding: 20px;
+      color: #1C2526;
+      border-top: 1px solid #E5E5E5;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-section h4 {
+      font-size: 18px;
+      color: #58CC02;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .footer-section p {
+      font-size: 14px;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li a {
+      color: #1C2526;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-section ul li a:hover {
+      color: #58CC02;
+    }
+
+    .footer-section form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .footer-section input {
+      padding: 8px;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #1C2526;
+      outline: none;
+    }
+
+    .footer-section input::placeholder {
+      color: #A0A0A0;
+    }
+
+    .footer-section button {
+      padding: 8px 15px;
+      background: #58CC02;
+      border: none;
+      border-radius: 20px;
+      color: #FFFFFF;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s;
+    }
+
+    .footer-section button:hover {
+      background: #4AB302;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -140,13 +443,13 @@
     document.getElementById('otpForm')?.addEventListener('submit', async function (event) {
       event.preventDefault();
       otpError.textContent = "";
-      const otp = otpInput.value; // Get OTP directly from input
+      const otp = otpInput.value;
 
       try {
         const response = await fetch(event.target.action, {
           method: 'POST',
-          headers: { "Content-Type": "application/json" }, // Use JSON
-          body: JSON.stringify({ otp }) // Send as JSON
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otp })
         });
         const data = await response.json();
         if (data.success) {

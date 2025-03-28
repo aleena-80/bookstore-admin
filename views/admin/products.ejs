@@ -4,9 +4,454 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Ocean Books</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            text-align: center;
+            background: rgb(32,31,49); /* Deep navy */
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.6em;
+            margin: 0;
+            color: #FFFFFF; /* White text */
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar ul {
+            padding: 10px 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 5px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+        }
+
+        .sidebar a.active {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+        }
+
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter input, .filter button {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #E5E5E5;
+            font-size: 14px;
+            background: #FFFFFF;
+            color: rgb(32,31,49);
+        }
+
+        .filter button {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .filter button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            color: rgb(32,31,49);
+            vertical-align: middle;
+        }
+
+        th {
+            background: rgb(32,31,49);
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none; /* No line after last product */
+        }
+
+        /* Remove border from edit form row */
+        .edit-form-row td {
+            padding: 0;
+            border: none;
+        }
+
+        td img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 5px;
+            border-radius: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .toggle-list-btn, .edit-btn {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .toggle-list-btn:hover, .edit-btn:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        .edit-form {
+            display: none;
+            padding: 15px;
+            background: #F9F9F9;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .edit-form.active {
+            display: block;
+        }
+
+        .edit-form input, .edit-form textarea, .edit-form select {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            border: 1px solid #E5E5E5;
+            border-radius: 4px;
+            color: rgb(32,31,49);
+            font-size: 14px;
+        }
+
+        .edit-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .edit-form button {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .edit-form button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        .image-preview {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .crop-btn, .remove-btn {
+            position: absolute;
+            top: 5px;
+            padding: 3px 6px;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: background 0.2s;
+        }
+
+        .crop-btn {
+            right: 30px;
+            background: #2ECC71; /* Green */
+        }
+
+        .crop-btn:hover {
+            background: #27AE60;
+        }
+
+        .remove-btn {
+            right: 5px;
+            background: #E74C3C; /* Red */
+        }
+
+        .remove-btn:hover {
+            background: #C0392B;
+        }
+
+        #cropModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        #cropModal .modal-content {
+            background: #FFFFFF;
+            margin: 50px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #cropImage {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        #cropConfirm, #cropCancel {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #cropConfirm {
+            background: #2ECC71; /* Green */
+            color: #FFFFFF;
+        }
+
+        #cropCancel {
+            background: #E74C3C; /* Red */
+            color: #FFFFFF;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #FFBADE; /* Soft pink */
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .pagination a:hover {
+            background: rgba(255, 186, 222, 0.2);
+        }
+
+        .pagination a.active {
+            background: #FFBADE;
+            color: rgb(32,31,49);
+            border-radius: 5px;
+        }
+
+        .success-popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ECC71; /* Green */
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 14px;
+        }
+
+        .toggle-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .toggle-modal-content {
+            background: #FFFFFF;
+            margin: 20% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .toggle-modal-content p {
+            margin: 0 0 20px;
+            color: rgb(32,31,49);
+            font-size: 16px;
+        }
+
+        .toggle-modal-content button {
+            padding: 8px 16px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .toggle-yes {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+        }
+
+        .toggle-yes:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        .toggle-no {
+            background: #E74C3C; /* Red */
+            color: #FFFFFF;
+        }
+
+        .toggle-no:hover {
+            background: #C0392B;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1.4em;
+            }
+
+            .sidebar a, .sidebar button {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            td img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -18,6 +463,7 @@
             <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
             <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
             <li><a href="/admin/products" class="active"><i class="fas fa-book"></i> Products</a></li>
+            <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
             <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
             <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
         </ul>
@@ -59,21 +505,15 @@
                         <td><%= product.discount %>%</td>
                         <td><%= product.stock %></td>
                         <td class="actions">
-                          <form method="POST" action="/admin/products/delete/<%= product._id %>" id="deleteForm-<%= product._id %>" class="delete-form">
-                            <button type="button" class="delete-btn" onclick="showDeleteModal('<%= product._id %>', '<%= product.name %>')">Delete</button>
-                          </form>
-                            <div id="deleteModal" class="delete-modal">
-                              <div class="delete-modal-content">
-                                <p id="deleteMessage"></p>
-                                <button id="deleteYes" class="delete-yes">Yes</button>
-                                <button id="deleteNo" class="delete-no">No</button>
-                              </div>
-                            </div>
-                          
-                            <button class="edit-btn" onclick="toggleEdit('<%= product._id %>')">✏️</button>
+                            <form method="POST" action="/admin/products/toggle-list/<%= product._id %>" id="toggleForm-<%= product._id %>" class="toggle-form">
+                                <button type="button" class="toggle-list-btn" onclick="showToggleModal('<%= product._id %>', '<%= product.name %>', '<%= product.isListed ? 'unlist' : 'list' %>')">
+                                    <%= product.isListed ? 'Unlist' : 'List' %>
+                                </button>
+                            </form>
+                            <button class="edit-btn" onclick="toggleEdit('<%= product._id %>')">Edit</button>
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="edit-form-row">
                         <td colspan="6">
                             <form method="POST" action="/admin/products/edit/<%= product._id %>" enctype="multipart/form-data" id="editForm-<%= product._id %>" class="edit-form">
                                 <input type="text" name="name" value="<%= product.name %>" required placeholder="Name">
@@ -129,37 +569,45 @@
         </div>
     </div>
     <div id="successPopup" class="success-popup">Product updated successfully!</div>
+    <div id="toggleModal" class="toggle-modal">
+        <div class="toggle-modal-content">
+            <p id="toggleMessage"></p>
+            <button id="toggleYes" class="toggle-yes">Yes</button>
+            <button id="toggleNo" class="toggle-no">No</button>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
-      const deleteModal = document.getElementById('deleteModal');
-const deleteMessage = document.getElementById('deleteMessage');
-const deleteYes = document.getElementById('deleteYes');
-const deleteNo = document.getElementById('deleteNo');
-let currentForm;
+        const toggleModal = document.getElementById('toggleModal');
+        const toggleMessage = document.getElementById('toggleMessage');
+        const toggleYes = document.getElementById('toggleYes');
+        const toggleNo = document.getElementById('toggleNo');
+        let currentToggleForm;
 
-function showDeleteModal(productId, productName) {
-  currentForm = document.getElementById(`deleteForm-${productId}`);
-  deleteMessage.textContent = `Are you sure you want to delete ${productName}?`;
-  deleteModal.style.display = 'block';
-}
+        function showToggleModal(productId, productName, action) {
+            currentToggleForm = document.getElementById(`toggleForm-${productId}`);
+            toggleMessage.textContent = `Are you sure you want to ${action} "${productName}"?`;
+            toggleModal.style.display = 'block';
+        }
 
-deleteYes.addEventListener('click', () => {
-  if (currentForm) currentForm.submit();
-  deleteModal.style.display = 'none';
-});
+        toggleYes.addEventListener('click', () => {
+            if (currentToggleForm) currentToggleForm.submit();
+            toggleModal.style.display = 'none';
+        });
 
-deleteNo.addEventListener('click', () => {
-  deleteModal.style.display = 'none';
-  currentForm = null;
-});
+        toggleNo.addEventListener('click', () => {
+            toggleModal.style.display = 'none';
+            currentToggleForm = null;
+        });
 
-deleteModal.addEventListener('click', (e) => {
-  if (e.target === deleteModal) {
-    deleteModal.style.display = 'none';
-    currentForm = null;
-  }
-});
+        toggleModal.addEventListener('click', (e) => {
+            if (e.target === toggleModal) {
+                toggleModal.style.display = 'none';
+                currentToggleForm = null;
+            }
+        });
+
         function toggleEdit(productId) {
             const editForm = document.getElementById(`editForm-${productId}`);
             editForm.classList.toggle('active');

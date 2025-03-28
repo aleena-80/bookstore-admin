@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; padding-top: 100px; }
+        .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
+        .tagline { color: #1C2526; font-size: 14px; margin-top: 5px; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+        .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
+        .nav-links li a:hover { color: #58CC02; }
+        .breadcrumbs { padding: 20px; font-size: 14px; color: #1C2526; background-color: #E5E5E5;}
+        .breadcrumbs a { color: #1C2526; text-decoration: none; transition: color 0.3s;}
+        .breadcrumbs a:hover { color: #58CC02;}
+        .breadcrumbs span { margin: 0 5px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; gap: 20px; }
+        .product-grid { flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .product-card { background: #FFFFFF; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); text-align: center; }
+        .product-card img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .product-card h4 { font-size: 18px; margin: 10px 0; }
+        .original-price { text-decoration: line-through; color: #A0A0A0; margin-left: 5px; }
+        .quantity-controls { display: flex; gap: 10px; justify-content: center; align-items: center; margin: 10px 0; }
+        .quantity-controls button { padding: 5px 10px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; }
+        .quantity-controls button:disabled { background: #A0A0A0; }
+        .remove-btn { padding: 8px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; margin-top: 10px; }
+        .summary { flex: 1; background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); position: sticky; top: 120px; height: fit-content; }
+        .coupon-section { margin: 15px 0; }
+        .coupon-section input { width: 70%; padding: 8px; border: 1px solid #e0e0e0; border-radius: 5px; }
+        .coupon-section button { width: 25%; padding: 8px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 5px; cursor: pointer; }
+        .coupon-section button:hover { background: #46a802; }
+        .checkout-btn { padding: 8px 16px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; width: 100%; margin-top: 20px; cursor: pointer; }
+        .checkout-btn:disabled { background: #A0A0A0; }
+        .message { position: fixed; top: 20px; right: 20px; padding: 10px; background: #58CC02; color: #FFFFFF; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/users/landing">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/orders" class="active"><i class="fas fa-shopping-cart"></i></a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<span class="wishlist-count"><%= wishlistCount || 0 %></span>)</a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<span class="cart-count"><%= cartCount || 0 %></span>)</a></li>
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+                <% } else { %>
+                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i></a></li>
+                <% } %>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="breadcrumbs">
+        <a href="/users/home">Home</a> <span>›</span> <span>Cart</span>
+    </section>
+    <main>
+        <div class="container">
+            <div class="product-grid">
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <% cartItems.forEach(item => { %>
+                        <% const discountedPrice = item.productId.price * (1 - (item.productId.discount || 0) / 100); %>
+                        <div class="product-card" data-cart-id="<%= item._id %>">
+                            <img src="/images/<%= item.productId.images[0] || 'default.jpg' %>" alt="<%= item.productId.name %>">
+                            <h4><%= item.productId.name %></h4>
+                            <p>₹<%= discountedPrice.toFixed(2) %> <% if (item.productId.discount > 0) { %><span class="original-price">₹<%= item.productId.price.toFixed(2) %></span><% } %></p>
+                            <p>Stock: <%= item.productId.stock %></p>
+                            <div class="quantity-controls">
+                                <button class="decrement" id="decrement" data-cart-id="<%= item._id %>" <%= item.quantity <= 1 ? 'disabled' : '' %>>-</button>
+                                <span class="quantity" id="quantity"><%= item.quantity %></span>
+                                <button class="increment" id="increment" data-cart-id="<%= item._id %>" <%= item.quantity >= Math.min(item.productId.stock, 10) ? 'disabled' : '' %>>+</button>
+                            </div>
+                            <button class="remove-btn" data-cart-id="<%= item._id %>">Remove</button>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p style="text-align: center; grid-column: 1 / -1;">Your cart is empty.</p>
+                <% } %>
+            </div>
+
+            <% if (cartItems && cartItems.length > 0) { %>
+                <div class="summary">
+                    <h3>Cart Summary</h3>
+                    <p>Items: <span id="item-count"><%= cartCount %></span></p>
+                    <p>Subtotal: ₹<span id="subtotal"><%= subtotal %></span></p>
+                    <p>Taxes: ₹<span id="taxes"><%= taxes %></span></p>
+                    <p>Shipping: ₹<span id="shipping"><%= shipping %></span></p>
+                    <div class="coupon-section">
+                        <input type="text" id="coupon-code" placeholder="Enter coupon code">
+                        <button id="apply-coupon">Apply</button>
+                    </div>
+                    <p>Grand Total: ₹<span id="grand-total"><%= total %></span></p>
+                    <button class="checkout-btn" <%= cartItems.some(item => item.productId.stock <= 0) ? 'disabled' : '' %> onclick="window.location.href='/users/checkout'">Proceed to Checkout</button>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <div class="message" id="message"></div>
+
+    <script>
+        console.log('Cart page loaded');
+        const incrementButtons = document.querySelectorAll('.increment');
+        const decrementButtons = document.querySelectorAll('.decrement');
+        const removeButtons = document.querySelectorAll('.remove-btn');
+        console.log('Increment buttons:', incrementButtons.length, 'Decrement buttons:', decrementButtons.length);
+
+        function showMessage(text, isError = false) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.style.background = isError ? '#FF4D4D' : '#58CC02';
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+//-------------------------------------------------------
+async function updateQuantity(productId, action) {
+    try {
+        const response = await fetch(`/users/cart/update/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, action })
+        });
+
+        const data = await response.json();
+        console.log('Update Response:', data);
+
+        if (data.success) {
+            // Update quantity display
+            const card = document.querySelector(`[data-cart-id="${productId}"]`);
+            if (card) {
+                const qtySpan = card.querySelector('.quantity');
+                if (qtySpan) qtySpan.textContent = data.quantity;
+                
+                // Update button states
+                const incrementBtn = card.querySelector('.increment');
+                const decrementBtn = card.querySelector('.decrement');
+                
+                if (incrementBtn) {
+                    incrementBtn.disabled = data.quantity >= Math.min(data.stock, 10);
+                }
+                if (decrementBtn) {
+                    decrementBtn.disabled = data.quantity <= 1;
+                }
+            }
+
+            // Update all summary values
+            const updateElement = (selector, value) => {
+                const element = document.querySelector(selector);
+                if (element) element.textContent = value;
+            };
+
+            updateElement('#item-count', data.cartCount);
+            updateElement('#subtotal', data.subtotal);
+            updateElement('#taxes', data.taxes);
+            updateElement('#shipping', data.shipping);
+            updateElement('#grand-total', data.total);
+            
+            // Update header cart count
+            updateElement('.cart-count', data.cartCount);
+            
+        } else {
+            showMessage(data.message, true);
+        }
+    } catch (error) {
+        console.error('Update Quantity Error:', error);
+        showMessage('Error updating quantity', true);
+    }
+}
+
+document.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('increment') || e.target.classList.contains('decrement')) {
+        e.preventDefault();
+        const productId = e.target.getAttribute('data-cart-id');
+        const action = e.target.classList.contains('increment') ? 'increment' : 'decrement';
+        await updateQuantity(productId, action);
+    }
+});
+document.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('remove-btn')) {
+    e.preventDefault();
+    const cartId = e.target.getAttribute('data-cart-id');
+
+    try {
+      const response = await fetch(`/users/cart/remove/${cartId}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        e.target.closest('.product-card').remove();
+
+        const updateElement = (selector, value) => {
+          const element = document.querySelector(selector);
+          if (element) element.textContent = value;
+        };
+
+        updateElement('.cart-count', data.cartCount);
+        updateElement('#item-count', data.cartCount);
+        updateElement('#subtotal', `₹${data.subtotal}`);
+        updateElement('#taxes', `₹${data.taxes}`);
+        updateElement('#shipping', `₹${data.shipping}`);
+        updateElement('#grand-total', `₹${data.total}`);
+
+        if (!document.querySelector('.product-card')) {
+          document.querySelector('.product-grid').innerHTML = 
+            '<p style="text-align: center; grid-column: 1 / -1;">Your cart is empty.</p>';
+          document.querySelector('.summary').remove();
+        }
+      } else {
+        showMessage('Failed to remove item', true);
+      }
+    } catch (error) {
+      console.error('Remove Error:', error);
+      showMessage('Error removing item', true);
+    }
+  }
+});
+        document.getElementById('apply-coupon').addEventListener('click', async () => {
+            const couponCode = document.getElementById('coupon-code').value.trim();
+            if (!couponCode) return showMessage('Please enter a coupon code', true);
+            try {
+                const response = await fetch('/users/cart/apply-coupon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ couponCode })
+                });
+                const data = await response.json();
+                console.log('Coupon Response:', data);
+                if (data.success) {
+                    document.getElementById('subtotal').textContent = data.subtotal;
+                    document.getElementById('taxes').textContent = data.taxes;
+                    document.getElementById('shipping').textContent = data.shipping;
+                    document.getElementById('grand-total').textContent = data.total;
+                    showMessage('Coupon applied successfully');
+                } else {
+                    showMessage(data.message || 'Invalid coupon code', true);
+                }
+            } catch (error) {
+                console.error('Apply Coupon Error:', error);
+                showMessage('Error applying coupon', true);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+\<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; min-height: 100vh; display: flex; }
+        
+        /* Navbar */
+        .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
+        .tagline { color: #1C2526; font-size: 14px; margin-top: 5px; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+        .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
+        .nav-links li a:hover { color: #58CC02; }
+
+        /* Sidebar */
+        .sidebar { width: 220px; background: #FFFFFF; color: #1C2526; height: 100vh; position: fixed; top: 0; left: 0; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); padding-top: 80px; }
+        .sidebar ul { padding: 10px 0; }
+        .sidebar li { margin-bottom: 10px; }
+        .sidebar a, .sidebar button { color: #1C2526; text-decoration: none; font-size: 1em; padding: 12px 20px; border-radius: 5px; background: none; border: none; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.3s, color 0.3s; }
+        .sidebar a:hover, .sidebar button:hover { background: rgba(88, 204, 2, 0.1); color: #58CC02; }
+        .sidebar a.active { color: #181717; }
+
+        /* Main Content */
+        .main-content { margin-left: 220px; flex: 1; padding: 100px 20px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .profile-header { margin-bottom: 20px; }
+        .profile-header h2 { font-size: 28px; color: #58CC02; font-weight: 700; }
+        .section { background: #FFFFFF; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
+        .section h3 { font-size: 20px; color: #1C2526; margin-bottom: 15px; font-weight: 700; border-bottom: 2px solid #58CC02; padding-bottom: 5px; }
+        .info-card { padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .info-card p { font-size: 16px; color: #1C2526; }
+        .actions a { color: #58CC02; text-decoration: none; margin-left: 10px; font-weight: 700; }
+        .actions a:hover { text-decoration: underline; }
+        .address-list { display: flex; flex-direction: column; gap: 10px; }
+        .address-item { background: #F9F9F9; padding: 10px; border-radius: 5px; }
+        .order-list, .wallet-info, .coupon-list { color: #1C2526; }
+        .add-btn { background: #58CC02; color: #FFFFFF; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background 0.3s; }
+        .add-btn:hover { background: #46A802; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1001; justify-content: center; align-items: center; }
+        .modal-content { background: #FFFFFF; padding: 20px; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); color: #1C2526; }
+        .modal-content h3 { color: #1C2526; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 5px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 5px; font-size: 14px; }
+        .form-group input[type="checkbox"] { width: auto; }
+        .checkout-btn { width: 100%; padding: 12px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 5px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+        .checkout-btn:hover { background: #46A802; }
+        .error-message { color: #FF4D4D; text-align: center; margin-bottom: 20px; font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 180px; }
+            .main-content { margin-left: 180px; padding: 80px 15px 15px; }
+            .profile-header h2 { font-size: 24px; }
+            .section h3 { font-size: 18px; }
+            .info-card p { font-size: 14px; }
+            .modal-content { width: 90%; max-width: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="/users/landing">Ocean Books</a></h1>
+                <p class="tagline">Dive into a Sea of Stories</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<span class="wishlist-count"><%= wishlistCount %></span>)</a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<span class="cart-count"><%= cartCount %></span>)</a></li>
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="#personal-details"><i class="fas fa-user"></i> Personal Details</a></li>
+            <li><a href="#addresses"><i class="fas fa-map-marker-alt"></i>  Addresses</a></li>
+            <li><a href="#orders"><i class="fas fa-shopping-bag"></i>  My orders</a></li>
+            <li><a href="#wallet" class="active"><i class="fas fa-wallet"></i>My Wallet</a></li>
+            <li><a href="#coupons"><i class="fas fa-ticket-alt"></i> My Coupons</a></li>
+            <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="profile-header">
+                <h2>Your Profile</h2>
+            </div>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="error-message"><%= error %></p>
+            <% } else if (user) { %>
+                <div class="section" id="personal-details">
+                    <h3>Personal Details</h3>
+                    <div class="info-card">
+                        <p><strong>Name:</strong> <%= user.name %></p>
+                        <div class="actions">
+                            <a href="#" onclick="openModal('editProfileModal')">Edit</a>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <p><strong>Email:</strong> <%= user.email %></p>
+                        <div class="actions">
+                            <a href="#" onclick="openModal('changePasswordModal')">Change Password</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" id="addresses">
+                    <h3>Addresses</h3>
+                    <button class="add-btn" onclick="openModal('addAddressModal')">Add New Address</button>
+                    <div class="address-list">
+                        <% if (addresses && addresses.length > 0) { %>
+                            <% addresses.forEach(address => { %>
+                                <div class="address-item">
+                                    <p><strong><%= address.name %></strong></p>
+                                    <p><%= address.addressLine1 %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+                                    <p><%= address.isDefault ? '(Default)' : '' %></p>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p>No addresses added yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="section" id="orders">
+                    <h3>My Orders</h3>
+                    <div class="order-list">
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <div class="info-card">
+                                    <p><strong>Order ID:</strong> <%= order.orderId %> | <strong>Total:</strong> ₹<%= order.total.toFixed(2) %> | <strong>Status:</strong> <%= order.status %></p>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p>No orders placed yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="section" id="wallet">
+                    <h3>My Wallet</h3>
+                    <div class="wallet-info">
+                        <p>Wallet balance coming soon!</p>
+                        <!-- Placeholder for wallet implementation -->
+                    </div>
+                </div>
+
+                <div class="section" id="coupons">
+                    <h3>My Coupons</h3>
+                    <div class="coupon-list">
+                        <p>Coupon details coming soon!</p>
+                        <!-- Placeholder for coupon implementation -->
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Profile</h3>
+            <form action="/users/edit-profile" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" value="<%= user ? user.name : '' %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="<%= user ? user.email : '' %>" required>
+                </div>
+                <button type="submit" class="checkout-btn">Save Changes</button>
+                <button type="button" class="checkout-btn" onclick="closeModal('editProfileModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <h3>Change Password</h3>
+            <form action="/users/change-password" method="POST">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <button type="submit" class="checkout-btn">Change Password</button>
+                <button type="button" class="checkout-btn" onclick="closeModal('changePasswordModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addAddressModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Address</h3>
+            <form action="/users/address/add" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="addressLine1">Address Line 1</label>
+                    <input type="text" id="addressLine1" name="addressLine1" required>
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required>
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" required>
+                </div>
+                <div class="form-group">
+                    <label for="pincode">Pincode</label>
+                    <input type="text" id="pincode" name="pincode" required>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" name="isDefault" value="true"> Set as Default</label>
+                </div>
+                <button type="submit" class="checkout-btn">Add Address</button>
+                <button type="button" class="checkout-btn" onclick="closeModal('addAddressModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openEditAddressModal(id, name, addressLine1, city, state, pincode, isDefault) {
+            const form = document.getElementById('editAddressForm');
+            form.action = `/users/address/edit/${id}`;
+            document.getElementById('editName').value = name;
+            document.getElementById('editAddressLine1').value = addressLine1;
+            document.getElementById('editCity').value = city;
+            document.getElementById('editState').value = state;
+            document.getElementById('editPincode').value = pincode;
+            document.getElementById('editIsDefault').checked = isDefault;
+            openModal('editAddressModal');
+        }
+    </script>
+</body>
+</html>

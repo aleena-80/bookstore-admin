@@ -24,13 +24,6 @@ const productSchema = new mongoose.Schema({
         comment: { type: String, required: true },
         createdAt: { type: Date, default: Date.now }
     }]
-    // ratings: [{ 
-    //     user: { type: String, required: true },
-    //     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    //     _id: { type: mongoose.Schema.Types.ObjectId, default: mongoose.Types.ObjectId },
-    //     review: { type: String, required: true },
-    //     rating: { type: Number, min: 1, max: 5, required: true },
-    // }]
 
 });
 

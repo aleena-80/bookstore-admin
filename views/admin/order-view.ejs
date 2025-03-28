@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details - Ocean Books</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      margin: 0;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgb(32,31,49); /* Deep navy */
+      color: #FFFFFF;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar-header {
+      padding: 20px 10px;
+      text-align: center;
+      background: rgb(32,31,49); /* Deep navy */
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.6em;
+      margin: 0;
+      color: #FFFFFF; /* White text */
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .sidebar ul {
+      padding: 10px 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar a, .sidebar button {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 12px 20px;
+      border-radius: 5px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover, .sidebar button:hover {
+      background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+    }
+
+    .sidebar a.active {
+      background: #FFBADE; /* Soft pink */
+      color: rgb(32,31,49);
+    }
+
+    .main-content {
+      margin-left: 220px;
+      flex: 1;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .details {
+      background: #FFFFFF;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .details p {
+      margin: 10px 0;
+      color: rgb(32,31,49);
+      font-size: 16px;
+    }
+
+    .details h3 {
+      color: rgb(32,31,49);
+      margin: 20px 0 10px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      color: rgb(32,31,49);
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgb(32,31,49);
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 180px;
+      }
+
+      .main-content {
+        margin-left: 180px;
+      }
+
+      .sidebar-header h2 {
+        font-size: 1.4em;
+      }
+
+      .sidebar a, .sidebar button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .details {
+        padding: 15px;
+      }
+
+      .details p {
+        font-size: 14px;
+      }
+
+      .details h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+        <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    </div>
+    <ul>
+        <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+        <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+        <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+        <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+        <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+        <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+        <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+    </ul>
+</div>
+  <div class="main-content">
+    <h1>Order Details</h1>
+    <div class="details">
+      <p><strong>Order ID:</strong> <%= order.orderId %></p>
+      <p><strong>Date:</strong> <%= order.createdAt.toLocaleString() %></p>
+      <p><strong>User:</strong> <%= order.userId.name %> (<%= order.userId.email %>)</p>
+      <p><strong>Status:</strong> <%= order.status %></p>
+      <p><strong>Total:</strong> ₹<%= order.total.toFixed(2) %></p>
+      <h3>Items</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% order.items.forEach(item => { %>
+            <tr>
+              <td><%= item.productId.name %></td>
+              <td><%= item.quantity %></td>
+              <td>₹<%= (item.price * (1 - (item.discount || 0) / 100)).toFixed(2) %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

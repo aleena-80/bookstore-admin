@@ -1,123 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Category Management - Ocean Books</title>
-  
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Management - Ocean Books</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            text-align: center;
+            background: rgb(32,31,49);
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.6em;
+            margin: 0;
+            color: rgb(255, 255, 255);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar ul {
+            padding: 10px 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 5px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+        }
+
+        .sidebar a.active {
+            color: rgb(255, 255, 255);
+        }
+
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .error {
+            color: #E74C3C; /* Red */
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .filter, .add-form {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter input, .add-form input, .filter button, .add-form button {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #E5E5E5;
+            font-size: 14px;
+            background: #FFFFFF;
+            color: rgb(32,31,49);
+        }
+
+        .filter button, .add-form button {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .filter button:hover, .add-form button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E5E5;
+            color: rgb(32,31,49);
+        }
+
+        th {
+            background: rgb(32,31,49);
+            color: #FFFFFF;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+            transition: background 0.3s;
+        }
+
+        .actions button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #FFBADE; /* Soft pink */
+            transition: background 0.3s;
+        }
+
+        .pagination a:hover {
+            background: rgba(255, 186, 222, 0.2);
+        }
+
+        .pagination a.active {
+            background: #FFBADE;
+            color: rgb(32,31,49);
+            border-radius: 5px;
+        }
+
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .confirmation-modal .modal-content {
+            background: #FFFFFF;
+            margin: 20% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+            color: rgb(32,31,49);
+        }
+
+        .confirmation-modal button {
+            padding: 8px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .confirm-btn {
+            background: #E74C3C; /* Red */
+            color: #FFFFFF;
+        }
+
+        .cancel-btn {
+            background: #FFBADE; /* Soft pink */
+            color: rgb(32,31,49);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1.4em;
+            }
+
+            .sidebar a, .sidebar button {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        </div>
+        <ul>
+            <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+            <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+            <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+            <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+            <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+        </ul>
     </div>
-    <ul>
-      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
-      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
-      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li> <!-- Added -->
-      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
-      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
-      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
-    </ul>
-  </div>
-  <div class="main-content">
-    <h1>Categories</h1>
-    <% if (error) { %>
-      <p class="error"><%= error %></p>
-    <% } %>
-    <div class="add-form">
-      <form method="POST" action="/admin/categories/add">
-        <input type="text" name="name" placeholder="New Category" required>
-        <button type="submit">Add</button>
-      </form>
+    <div class="main-content">
+        <h1>Categories</h1>
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+        <div class="add-form">
+            <form method="POST" action="/admin/categories/add">
+                <input type="text" name="name" placeholder="New Category" required>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="filter">
+            <form method="GET" action="/admin/categories">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search categories">
+                <button type="submit">Search</button>
+                <button type="button" onclick="window.location.href='/admin/categories'">Clear</button>
+            </form>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% categories.forEach(category => { %>
+                    <tr>
+                        <td><%= category.name %></td>
+                        <td class="actions">
+                            <button onclick="toggleEditForm('<%= category._id %>')">Edit</button>
+                            <button onclick="showConfirmation('<%= category._id %>')">Delete</button>
+                            <form method="POST" action="/admin/categories/edit/<%= category._id %>" id="editForm-<%= category._id %>" style="display: none;">
+                                <input type="text" name="name" value="<%= category.name %>" required>
+                                <button type="submit">Save</button>
+                                <button type="button" onclick="toggleEditForm('<%= category._id %>')">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a href="/admin/categories?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+            <% } %>
+        </div>
     </div>
-    <div class="filter">
-      <form method="GET" action="/admin/categories">
-        <input type="text" name="search" value="<%= search %>" placeholder="Search categories">
-        <button type="submit">Search</button>
-        <button type="button" onclick="window.location.href='/admin/categories'">Clear</button>
-      </form>
+
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this category?</p>
+            <button class="confirm-btn" onclick="confirmDelete()">Yes</button>
+            <button class="cancel-btn" onclick="hideConfirmation()">No</button>
+        </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% categories.forEach(category => { %>
-          <tr>
-            <td><%= category.name %></td>
-            <td class="actions">
-              <button onclick="toggleEditForm('<%= category._id %>')">Edit</button>
-              <button onclick="showConfirmation('<%= category._id %>')">Delete</button>
-              <form method="POST" action="/admin/categories/edit/<%= category._id %>" id="editForm-<%= category._id %>" style="display: none;">
-                <input type="text" name="name" value="<%= category.name %>" required>
-                <button type="submit">Save</button>
-                <button type="button" onclick="toggleEditForm('<%= category._id %>')">Cancel</button>
-              </form>
-            </td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-    <div class="pagination">
-      <% for(let i = 1; i <= totalPages; i++) { %>
-        <a href="/admin/categories?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
-      <% } %>
-    </div>
-  </div>
 
-  <div id="confirmationModal" class="confirmation-modal">
-    <div class="modal-content">
-      <p>Are you sure you want to delete this category?</p>
-      <button class="confirm-btn" onclick="confirmDelete()">Yes</button>
-      <button class="cancel-btn" onclick="hideConfirmation()">No</button>
-    </div>
-  </div>
+    <script>
+        let deleteForm;
 
-  <script>
-    let deleteForm;
+        function toggleEditForm(categoryId) {
+            const editForm = document.getElementById(`editForm-${categoryId}`);
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        }
 
-    function toggleEditForm(categoryId) {
-      const editForm = document.getElementById(`editForm-${categoryId}`);
-      editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
-    }
+        function showConfirmation(categoryId) {
+            deleteForm = document.createElement('form');
+            deleteForm.method = 'POST';
+            deleteForm.action = `/admin/categories/delete/${categoryId}`;
+            document.getElementById('confirmationModal').style.display = 'block';
+        }
 
-    function showConfirmation(categoryId) {
-      deleteForm = document.createElement('form');
-      deleteForm.method = 'POST';
-      deleteForm.action = `/admin/categories/delete/${categoryId}`;
-      document.getElementById('confirmationModal').style.display = 'block';
-    }
+        function hideConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            deleteForm = null;
+        }
 
-    function hideConfirmation() {
-      document.getElementById('confirmationModal').style.display = 'none';
-      deleteForm = null;
-    }
+        function confirmDelete() {
+            if (deleteForm) {
+                document.body.appendChild(deleteForm);
+                deleteForm.submit();
+            }
+        }
 
-    function confirmDelete() {
-      if (deleteForm) {
-        document.body.appendChild(deleteForm);
-        deleteForm.submit();
-      }
-    }
+        window.onload = function() {
+            fetch('/admin/dashboard', { credentials: 'include' })
+                .then(response => {
+                    if (!response.ok) window.location.replace('/admin/login');
+                });
 
-    window.onload = function() {
-      fetch('/admin/dashboard', { credentials: 'include' })
-        .then(response => {
-          if (!response.ok) window.location.replace('/admin/login');
-        });
-
-      window.history.pushState(null, null, window.location.href);
-      window.onpopstate = function() {
-        fetch('/logout', { method: 'POST', credentials: 'include' })
-          .then(() => window.location.replace('/admin/login'));
-      };
-    };
-  </script>
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                fetch('/logout', { method: 'POST', credentials: 'include' })
+                    .then(() => window.location.replace('/admin/login'));
+            };
+        };
+    </script>
 </body>
 </html>

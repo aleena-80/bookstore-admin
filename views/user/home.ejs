@@ -4,9 +4,419 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Books - Home</title>
-    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FFFFFF;
+            color: #1C2526;
+            line-height: 1.6;
+            padding-top: 100px;
+        }
+
+        /* Header */
+        .navbar {
+            background-color: #FFFFFF;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo h1 a {
+            color: #58CC02; /* Green for Ocean Books */
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            color: #1C2526;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            width: 70%;
+        }
+
+        .nav-links li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            color: #58CC02;
+        }
+
+        .nav-links li a i {
+            margin-right: 5px;
+        }
+
+        .nav-links li.profile-link a {
+            color: #1C2526; /* Default dark gray, green on hover */
+        }
+
+        .search-bar {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            width: 300px; /* Longer */
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #58CC02;
+        }
+
+        .search-bar input::placeholder {
+            color: #A0A0A0;
+            text-align: center;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            padding: 20px 20px;
+            font-size: 14px;
+            color: #1C2526;
+            background-color: #E5E5E5;
+        }
+
+        /* Hero Banner */
+        .hero {
+            padding: 20px;
+        }
+
+        .banner {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        .search-bar button { padding: 8px 15px; background: #1C2526; border: none; border-radius: 20px; color: #FFFFFF; font-weight: 700; cursor: pointer; }
+        .search-bar button:hover { background: #58CC02; }
+        .banner-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #FFFFFF;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .banner-content h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .banner-content p {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .banner-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #58CC02;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 700;
+            transition: background 0.3s;
+        }
+
+        .banner-btn:hover {
+            background: #4AB302;
+        }
+
+        /* Featured Books */
+        .featured-books {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .featured-books h3 {
+            font-size: 28px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .book-card {
+            background: #FFFFFF;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 2px solid #E5E5E5;
+            text-align: center;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .book-card h4 {
+            font-size: 18px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-card p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .book-card button {
+            padding: 8px;
+            background: #58CC02;
+            border: none;
+            border-radius: 20px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .book-card .wishlist-btn {
+            background: none;
+            border: none;
+            color: #1C2526;
+            font-size: 18px;
+            padding: 2px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .book-card .wishlist-btn:hover {
+            color: #58CC02;
+        }
+
+        /* Footer */
+        footer {
+            background: #FFFFFF;
+            padding: 20px;
+            color: #1C2526;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            color: #1C2526;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .footer-section p {
+            font-size: 14px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-section ul li a:hover {
+            color: #58CC02;
+        }
+
+        .social-links a {
+            color: #1C2526;
+            margin: 0 10px;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #58CC02;
+        }
+
+        .footer-section form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .footer-section input {
+            padding: 8px;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: #1C2526;
+            outline: none;
+            width: 150px;
+        }
+
+        .footer-section input::placeholder {
+            color: #A0A0A0;
+        }
+
+        .footer-section button {
+            padding: 8px 15px;
+            background: #1C2526;
+            border: none;
+            border-radius: 20px;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.3s;
+        }
+
+        .footer-section button:hover {
+            background: #58CC02;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 10px 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .search-bar {
+                position: static;
+                transform: none;
+                margin-top: 10px;
+            }
+
+            .search-bar input {
+                width: 100%;
+            }
+
+            .nav-links li a {
+                font-size: 14px;
+            }
+
+            .banner-img {
+                height: 250px;
+            }
+
+            .banner-content h2 {
+                font-size: 24px;
+            }
+
+            .banner-content p {
+                font-size: 16px;
+            }
+
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-section form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-section input {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .book-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-bar input {
+                width: 250px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -15,17 +425,20 @@
                 <h1><a href="/">Ocean Books</a></h1>
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
-           
             <ul class="nav-links">
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> Wishlist (<%= wishlistCount || 0 %>)</a></li>
-                <li><a href="/users/profile"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <%= wishlistCount || 0 %></a></li>
+
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
                 <% if (user) { %>
-                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
                 <% } else { %>
-                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i> Signup</a></li>
+                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i></a></li>
+                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i></a></li>
                 <% } %>
+                <li class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search by title, author...">
+                    <button id="clearSearch">Clear</button>
+                </li>
             </ul>
         </nav>
     </header>
@@ -47,15 +460,18 @@
 
         <section class="featured-books">
             <h3>Featured Books</h3>
-            <div class="book-grid">
+            <div class="book-grid" id="bookGrid">
                 <% books.forEach(book => { %>
                     <div class="book-card">
                         <img src="/images/<%= book.coverImage %>" alt="<%= book.title %>">
                         <h4><%= book.title %></h4>
                         <p>by <%= book.author %></p>
                         <p>₹<%= book.price %></p>
-                        <button onclick="addToWishlist('<%= book.id %>')">Add to Wishlist</button>
-                        <button onclick="addToCart('<%= book.id %>')">Add to Cart</button>
+                        <p><%= book.language %> | <%= book.inStock !== false ? 'In Stock' : 'Out of Stock' %></p>
+                        <div>
+                            <button class="wishlist-btn" onclick="addToWishlist('<%= book.id %>')"><i class="fas fa-heart"></i></button>
+                            <button onclick="addToCart('<%= book.id %>')">Add to Cart</button>
+                        </div>
                     </div>
                 <% }); %>
             </div>
@@ -82,36 +498,87 @@
                     <li><a href="/privacy">Privacy Policy</a></li>
                 </ul>
             </div>
-          
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Subscribe for updates and offers!</p>
+                <form action="/users/subscribe" method="POST">
+                    <input type="email" placeholder="Enter your email" name="email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
         </div>
         <p class="footer-bottom">© 2025 Ocean Books. All rights reserved.</p>
     </footer>
 
     <script>
-    window.history.replaceState(null, null, window.location.href);
-    setTimeout(() => {
-    window.history.pushState(null, null, window.location.href);
-}, 100);
-window.onpopstate = function(event) {
-    window.history.pushState(null, null, window.location.href);
-};
+        window.history.replaceState(null, null, window.location.href);
+        setTimeout(() => {
+            window.history.pushState(null, null, window.location.href);
+        }, 100);
+        window.onpopstate = function(event) {
+            window.history.pushState(null, null, window.location.href);
+        };
 
-function logout() {
-    fetch('/logout', { method: 'POST', credentials: 'include' })
-        .then(() => {
-            window.location.replace('/users/login');
+        function logout() {
+            fetch('/users/logout', { method: 'POST', credentials: 'include' })
+                .then(() => {
+                    window.location.replace('/users/login');
+                    window.history.pushState(null, null, '/users/login');
+                })
+                .catch(err => console.error('Logout failed:', err));
+        }
 
-            window.history.pushState(null, null, '/users/login');
-        })
-        .catch(err => console.error('Logout failed:', err));
-}
-        
         function addToWishlist(bookId) {
-            console.log(`Added ${bookId} to wishlist`);
+            fetch(`/users/wishlist/add/${bookId}`, { method: 'POST', credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const count = parseInt(document.querySelector('.nav-links li:first-child a').textContent.match(/\d+/) || 0) + 1;
+                        document.querySelector('.nav-links li:first-child a').innerHTML = `<i class="fas fa-heart"></i> (${count})`;
+                    }
+                })
+                .catch(err => console.error('Wishlist add failed:', err));
         }
+
         function addToCart(bookId) {
-            console.log(`Added ${bookId} to cart`);
+            fetch(`/users/cart/add/${bookId}`, { method: 'POST', credentials: 'include' })
+                .then(res => res.json())
+                .then(data => console.log(data))
+                .catch(err => console.error('Cart add failed:', err));
         }
+
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            fetch(`/users/search?q=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Search response not OK');
+                    return res.json();
+                })
+                .then(data => {
+                    const bookGrid = document.getElementById('bookGrid');
+                    bookGrid.innerHTML = '';
+                    data.books.forEach(book => {
+                        bookGrid.innerHTML += `
+                            <div class="book-card">
+                                <img src="/images/${book.coverImage}" alt="${book.title}">
+                                <h4>${book.title}</h4>
+                                <p>by ${book.author}</p>
+                                <p>₹${book.price}</p>
+                                <p>${book.language} | ${book.inStock !== false ? 'In Stock' : 'Out of Stock'}</p>
+                                <div>
+                                    <button class="wishlist-btn" onclick="addToWishlist('${book.id}')"><i class="fas fa-heart"></i></button>
+                                    <button onclick="addToCart('${book.id}')">Add to Cart</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                })
+                .catch(err => console.error('Search failed:', err));
+        });
     </script>
 </body>
 </html>
