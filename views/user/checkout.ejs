@@ -15,9 +15,41 @@
         .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
         .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
         .nav-links li a:hover { color: #58CC02; }
-        .breadcrumbs { max-width: 1200px; margin: 10px auto; padding: 0 20px; font-size: 14px; color: #666; }
-        .breadcrumbs a { color: #58CC02; text-decoration: none; }
-        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        .breadcrumbs {
+            padding: 20px 20px;
+            font-size: 14px;
+            color: #1C2526;
+            background-color: #E5E5E5;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .breadcrumbs a {
+            color: #58CC02;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .breadcrumbs a:hover {
+            color: #4AB302;
+        }
+
+        .breadcrumbs span {
+            color: #1C2526;
+        }
+
+        .breadcrumbs a::after {
+            content: "›";
+            margin: 0 8px;
+            color: #A0A0A0;
+            font-weight: bold;
+        }
+
+        .breadcrumbs span::after {
+            content: "";
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; gap: 20px; }
         .left-panel { flex: 2; }
         .right-panel { flex: 1; background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); position: sticky; top: 120px; height: fit-content; }
@@ -42,6 +74,35 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1001; }
         .modal-content { background: #FFFFFF; padding: 20px; margin: 10% auto; width: 90%; max-width: 400px; border-radius: 12px; position: relative; }
         .modal-content button { margin: 5px; }
+        @media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+  .left-panel, .right-panel {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .right-panel {
+    position: static;
+  }
+  .cart-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .cart-item img {
+    width: 60px;
+    height: 80px;
+  }
+  .address-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .address-actions {
+    margin-top: 10px;
+  }
+}
     </style>
 </head>
 <body>
@@ -63,7 +124,7 @@
     </header>
 
     <div class="breadcrumbs">
-        <a href="/users/landing">Home</a> > <a href="/users/cart">Cart</a> > Checkout
+                <a href="/users/landing">Home</a> <a href="/users/cart">Cart</a>  Checkout
     </div>
 
     <div class="container">
@@ -71,64 +132,120 @@
             <div class="section">
                 <h3>Select Delivery Address</h3>
                 <% if (addresses && addresses.length > 0) { %>
-                    <div class="address-list">
-                        <% let hasChecked = false; %>
-                        <% addresses.forEach((address, index) => { %>
-                            <label class="address-item <%= address.isDefault && !hasChecked ? 'selected' : '' %>">
-                                <div>
-                                    <input type="radio" name="address" value="<%= address._id %>" <%= address.isDefault && !hasChecked ? 'checked' : '' %> onchange="document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected')); this.closest('.address-item').classList.add('selected');">
-                                    <span><%= address.name %>, <%= address.addressLine1 %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %> <%= address.isDefault ? '(Default)' : '' %></span>
-                                </div>
-                                <div class="address-actions">
-                                    <a href="#" onclick="openEditModal('<%= address._id %>', '<%= address.name %>', '<%= address.addressLine1 %>', '<%= address.city %>', '<%= address.state %>', '<%= address.pincode %>', <%= address.isDefault ? 'true' : 'false' %>)">Edit</a>
-                                </div>
-                            </label>
-                            <% if (address.isDefault && !hasChecked) hasChecked = true; %>
-                        <% }); %>
-                    </div>
+                  <div class="address-list">
+                    <% let hasChecked = false; %>
+                    <% addresses.forEach((address, index) => { %>
+                      <label class="address-item <%= address.isDefault && !hasChecked ? 'selected' : '' %>">
+                        <div>
+                          <input type="radio" name="address" value="<%= address._id %>" <%= address.isDefault && !hasChecked ? 'checked' : '' %> onchange="document.querySelectorAll('.address-item').forEach(el => el.classList.remove('selected')); this.closest('.address-item').classList.add('selected');">
+                          <span><%= address.name %>, <%= address.street %>, <%= address.city %>, <%= address.state %>, <%= address.postalCode %> <%= address.isDefault ? '(Default)' : '' %></span>
+                        </div>
+                        <div class="address-actions">
+                          <a href="#" onclick="openEditModal('<%= address._id %>', '<%= address.name %>', '<%= address.street %>', '<%= address.city %>', '<%= address.state %>', '<%= address.postalCode %>', <%= address.isDefault ? 'true' : 'false' %>)">Edit</a>
+                        </div>
+                      </label>
+                      <% if (address.isDefault && !hasChecked) hasChecked = true; %>
+                    <% }); %>
+                  </div>
                 <% } else { %>
-                    <p>No addresses found.</p>
+                  <p>No addresses found.</p>
                 <% } %>
                 <a href="#" style="color: #58CC02;" onclick="openAddModal()">+ Add New Address</a>
-            </div>
-
+              </div>
+              
+              <!-- Add Address Modal -->
+              <div id="addAddressModal" class="modal">
+                <div class="modal-content">
+                  <h3>Add New Address</h3>
+                  <form id="addAddressForm" method="POST">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="name">Name</label>
+                      <input type="text" id="name" name="name" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="street">Address</label>
+                      <input type="text" id="street" name="street" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="city">City</label>
+                      <input type="text" id="city" name="city" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="state">State</label>
+                      <input type="text" id="state" name="state" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="postalCode">Pincode</label>
+                      <input type="text" id="postalCode" name="postalCode" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label><input type="checkbox" name="isDefault" value="true"> Set as Default</label>
+                    </div>
+                    <button type="submit" style="padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px;">Save</button>
+                    <button type="button" onclick="closeAddModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
+                  </form>
+                </div>
+              </div>
+              
+              <!-- Edit Address Modal -->
+              <div id="editAddressModal" class="modal">
+                <div class="modal-content">
+                  <h3>Edit Address</h3>
+                  <form id="editAddressForm" method="POST">
+                    <input type="hidden" id="editAddressId" name="addressId">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="editName">Name</label>
+                      <input type="text" id="editName" name="name" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="editStreet">Street</label>
+                      <input type="text" id="editStreet" name="street" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="editCity">City</label>
+                      <input type="text" id="editCity" name="city" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="editState">State</label>
+                      <input type="text" id="editState" name="state" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label for="editPostalCode">Postal Code</label>
+                      <input type="text" id="editPostalCode" name="postalCode" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                      <label><input type="checkbox" id="editIsDefault" name="isDefault" value="true"> Set as Default</label>
+                    </div>
+                    <button type="submit" style="padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px;">Save</button>
+                    <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
+                  </form>
+                </div>
+              </div>
             <div class="section">
                 <h3>Your Order</h3>
-                <% cartItems.forEach(item => { %>
+                <% if (cartItems && cartItems.length > 0) { %>
+                  <% cartItems.forEach(item => { %>
                     <% const discountedPrice = item.productId.price * (1 - (item.productId.discount || 0) / 100); %>
                     <div class="cart-item">
-                        <img src="/images/<%= item.productId.images[0] || 'default.jpg' %>" alt="<%= item.productId.name %>">
-                        <div class="cart-item-details">
-                            <h4><%= item.productId.name %></h4>
-                            <p>Quantity: <%= item.quantity %> | ₹<%= discountedPrice.toFixed(2) %> each</p>
-                        </div>
+                      <img src="<%= item.productId.images[0] || '/images/default.jpg' %>" alt="<%= item.productId.name %>">
+                      <div class="cart-item-details">
+                        <h4><%= item.productId.name %></h4>
+                        <p>Quantity: <%= item.quantity %> | ₹<%= discountedPrice.toFixed(2) %> each</p>
+                      </div>
                     </div>
-                <% }); %>
-
-                <!-- DEBUG: Force-show direct product -->
-<% if (directProduct) { %>
-    <div style="border: 2px solid red; padding: 10px;">
-      <h3>DEBUG: Direct Product Data</h3>
-      <pre><%= JSON.stringify(directProduct, null, 2) %></pre>
-      <img src="/images/<%= directProduct.images[0] %>" width="100">
-      <h4><%= directProduct.name %></h4>
-      <p>₹<%= directProduct.price %></p>
-    </div>
-  <% } %>
-  
-  <!-- Original "Your Order" section -->
-  <div class="your-order">
-    <% if (directProduct) { %>
-      <!-- Direct Product Checkout -->
-      <div class="order-item">
-        <img src="/images/<%= directProduct.images[0] || 'default.jpg' %>">
-        <h4><%= directProduct.name %></h4>
-        <p>₹<%= (directProduct.price * (1 - (directProduct.discount || 0)/100)).toFixed(2) %></p>
-      </div>
-    <% } %>
-
-  </div>
-            </div>
+                  <% }); %>
+                <% } else if (directProduct) { %>
+                  <div class="cart-item">
+                    <img src="<%= directProduct.images[0] || '/images/default.jpg' %>" alt="<%= directProduct.name %>">
+                    <div class="cart-item-details">
+                      <h4><%= directProduct.name %></h4>
+                      <p>Quantity: 1 | ₹<%= (directProduct.price * (1 - (directProduct.discount || 0) / 100)).toFixed(2) %></p>
+                    </div>
+                  </div>
+                <% } else { %>
+                  <p>No items in your order.</p>
+                <% } %>
+              </div>
         </div>
 
         <div class="right-panel">
@@ -142,75 +259,6 @@
             <button id="place-order-btn" class="checkout-btn">Place Order</button>
         </div>
     </div>
-
-    <!-- Add/Edit Modals -->
-    <div id="addAddressModal" class="modal">
-        <div class="modal-content">
-            <h3>Add New Address</h3>
-            <form id="addAddressForm" action="/users/checkout/add-address" method="POST">
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="addressLine1">Address Line 1</label>
-                    <input type="text" id="addressLine1" name="addressLine1" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="city">City</label>
-                    <input type="text" id="city" name="city" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="state">State</label>
-                    <input type="text" id="state" name="state" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="pincode">Pincode</label>
-                    <input type="text" id="pincode" name="pincode" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label><input type="checkbox" name="isDefault" value="true"> Set as Default</label>
-                </div>
-                <button type="submit" style="padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px;">Save</button>
-                <button type="button" onclick="closeAddModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="editAddressModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Address</h3>
-            <form id="editAddressForm" method="POST">
-                <input type="hidden" id="editAddressId" name="addressId">
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="editName">Name</label>
-                    <input type="text" id="editName" name="name" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="editAddressLine1">Address Line 1</label>
-                    <input type="text" id="editAddressLine1" name="addressLine1" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="editCity">City</label>
-                    <input type="text" id="editCity" name="city" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="editState">State</label>
-                    <input type="text" id="editState" name="state" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="editPincode">Pincode</label>
-                    <input type="text" id="editPincode" name="pincode" required style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                </div>
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label><input type="checkbox" id="editIsDefault" name="isDefault" value="true"> Set as Default</label>
-                </div>
-                <button type="submit" style="padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px;">Save</button>
-                <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
-            </form>
-        </div>
-    </div>
-
     <div class="message" id="message"></div>
 
     <script>
@@ -248,95 +296,97 @@
             showMessage('Error initiating order', true);
         }
     });
+    function openAddModal() {
+    document.getElementById('addAddressModal').style.display = 'block';
+  }
 
-        function openAddModal() {
-            document.getElementById('addAddressModal').style.display = 'block';
-        }
+  function closeAddModal() {
+    document.getElementById('addAddressModal').style.display = 'none';
+  }
 
-        function closeAddModal() {
-            document.getElementById('addAddressModal').style.display = 'none';
-        }
+  function openEditModal(addressId, name, street, city, state, postalCode, isDefault) {
+    document.getElementById('editAddressId').value = addressId;
+    document.getElementById('editName').value = name || '';
+    document.getElementById('editStreet').value = street || '';
+    document.getElementById('editCity').value = city || '';
+    document.getElementById('editState').value = state || '';
+    document.getElementById('editPostalCode').value = postalCode || '';
+    document.getElementById('editIsDefault').checked = isDefault === 'true' || isDefault === true;
+    document.getElementById('editAddressModal').style.display = 'block';
+  }
 
-        function openEditModal(addressId, name, addressLine1, city, state, pincode, isDefault) {
-            document.getElementById('editAddressId').value = addressId;
-            document.getElementById('editName').value = name;
-            document.getElementById('editAddressLine1').value = addressLine1;
-            document.getElementById('editCity').value = city;
-            document.getElementById('editState').value = state;
-            document.getElementById('editPincode').value = pincode;
-            document.getElementById('editIsDefault').checked = isDefault;
-            document.getElementById('editAddressModal').style.display = 'block';
-        }
+  function closeEditModal() {
+    document.getElementById('editAddressModal').style.display = 'none';
+  }
 
-        function closeEditModal() {
-            document.getElementById('editAddressModal').style.display = 'none';
-        }
-        document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const formData = {
-            name: form.name.value,
-            addressLine1: form.addressLine1.value,
-            city: form.city.value,
-            state: form.state.value,
-            pincode: form.pincode.value,
-            isDefault: form.isDefault.checked ? 'true' : 'false'
-        };
-        console.log('Add Address Form Data:', formData); // Debug frontend data
+  document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = {
+      name: form.name.value,
+      street: form.street.value,
+      city: form.city.value,
+      state: form.state.value,
+      postalCode: form.postalCode.value,
+      country: 'India', // Hardcoded per schema
+      isDefault: form.isDefault.checked ? true : false
+    };
+    console.log('Add Address Form Data:', formData);
+    try {
+      const response = await fetch('/users/checkout/add-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      console.log('Add Address Response:', data);
+      if (data.success) {
+        closeAddModal();
+        window.location.reload();
+      } else {
+        showMessage(data.message || 'Failed to add address', true);
+      }
+    } catch (error) {
+      console.error('Add Address Error:', error);
+      showMessage('Error adding address', true);
+    }
+  });
 
-        try {
-            const response = await fetch('/users/checkout/add-address', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(formData)
-            });
-            const data = await response.json();
-            console.log('Add Address Response:', data);
-            if (data.success) {
-                window.location.reload();
-            } else {
-                showMessage(data.message || 'Failed to add address', true);
-            }
-        } catch (error) {
-            console.error('Add Address Error:', error);
-            showMessage('Error adding address', true);
-        }
-    });
-
-    document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const formData = {
-            name: form.name.value,
-            addressLine1: form.addressLine1.value,
-            city: form.city.value,
-            state: form.state.value,
-            pincode: form.pincode.value,
-            isDefault: form.isDefault.checked ? 'true' : 'false'
-        };
-        const addressId = document.getElementById('editAddressId').value;
-        console.log('Edit Address Form Data:', formData); // Debug frontend data
-
-        try {
-            const response = await fetch(`/users/checkout/edit-address/${addressId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(formData)
-            });
-            const data = await response.json();
-            console.log('Edit Address Response:', data);
-            if (data.success) {
-                window.location.reload();
-            } else {
-                showMessage(data.message || 'Failed to edit address', true);
-            }
-        } catch (error) {
-            console.error('Edit Address Error:', error);
-            showMessage('Error editing address', true);
-        }
-    });
+  document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = {
+      name: form.name.value,
+      street: form.street.value,
+      city: form.city.value,
+      state: form.state.value,
+      postalCode: form.postalCode.value,
+      country: 'India', // Hardcoded per schema
+      isDefault: form.isDefault.checked ? true : false
+    };
+    const addressId = document.getElementById('editAddressId').value;
+    console.log('Edit Address Form Data:', formData);
+    try {
+      const response = await fetch(`/users/checkout/edit-address/${addressId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      console.log('Edit Address Response:', data);
+      if (data.success) {
+        closeEditModal();
+        window.location.reload();
+      } else {
+        showMessage(data.message || 'Failed to edit address', true);
+      }
+    } catch (error) {
+      console.error('Edit Address Error:', error);
+      showMessage('Error editing address', true);
+    }
+  });
        
 
     </script>

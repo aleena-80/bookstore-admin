@@ -60,7 +60,7 @@ export const loginAdmin = async (req, res) => {
 
     // Generate token
     const newToken = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('token', newToken, {
+    res.cookie('adminToken', newToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

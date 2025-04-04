@@ -1,264 +1,387 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Books - Profile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; min-height: 100vh; display: flex; }
-        
-        /* Navbar */
-        .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-        .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
-        .tagline { color: #1C2526; font-size: 14px; margin-top: 5px; }
-        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
-        .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
-        .nav-links li a:hover { color: #58CC02; }
-
-        /* Sidebar */
-        .sidebar { width: 220px; background: #FFFFFF; color: #1C2526; height: 100vh; position: fixed; top: 0; left: 0; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); padding-top: 80px; }
-        .sidebar ul { padding: 10px 0; }
-        .sidebar li { margin-bottom: 10px; }
-        .sidebar a, .sidebar button { color: #1C2526; text-decoration: none; font-size: 1em; padding: 12px 20px; border-radius: 5px; background: none; border: none; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.3s, color 0.3s; }
-        .sidebar a:hover, .sidebar button:hover { background: rgba(88, 204, 2, 0.1); color: #58CC02; }
-        .sidebar a.active { color: #181717; }
-
-        /* Main Content */
-        .main-content { margin-left: 220px; flex: 1; padding: 100px 20px 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .profile-header { margin-bottom: 20px; }
-        .profile-header h2 { font-size: 28px; color: #58CC02; font-weight: 700; }
-        .section { background: #FFFFFF; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
-        .section h3 { font-size: 20px; color: #1C2526; margin-bottom: 15px; font-weight: 700; border-bottom: 2px solid #58CC02; padding-bottom: 5px; }
-        .info-card { padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .info-card p { font-size: 16px; color: #1C2526; }
-        .actions a { color: #58CC02; text-decoration: none; margin-left: 10px; font-weight: 700; }
-        .actions a:hover { text-decoration: underline; }
-        .address-list { display: flex; flex-direction: column; gap: 10px; }
-        .address-item { background: #F9F9F9; padding: 10px; border-radius: 5px; }
-        .order-list, .wallet-info, .coupon-list { color: #1C2526; }
-        .add-btn { background: #58CC02; color: #FFFFFF; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background 0.3s; }
-        .add-btn:hover { background: #46A802; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1001; justify-content: center; align-items: center; }
-        .modal-content { background: #FFFFFF; padding: 20px; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); color: #1C2526; }
-        .modal-content h3 { color: #1C2526; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 700; margin-bottom: 5px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 5px; font-size: 14px; }
-        .form-group input[type="checkbox"] { width: auto; }
-        .checkout-btn { width: 100%; padding: 12px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 5px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
-        .checkout-btn:hover { background: #46A802; }
-        .error-message { color: #FF4D4D; text-align: center; margin-bottom: 20px; font-size: 14px; }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 180px; }
-            .main-content { margin-left: 180px; padding: 80px 15px 15px; }
-            .profile-header h2 { font-size: 24px; }
-            .section h3 { font-size: 18px; }
-            .info-card p { font-size: 14px; }
-            .modal-content { width: 90%; max-width: 400px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Books - Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; }
+    .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
+    .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+    .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
+    .nav-links li a:hover { color: #58CC02; }
+    .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
+    .sidebar { position: fixed; top: 118px; left: 0; width: 250px; height: calc(100% - 70px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
+    .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
+    .sidebar ul li a:hover, .sidebar ul li a.active { color: #58CC02; background: #E5E5E5; width: 100%; }
+    .main-content { margin-left: 270px; padding: 70px 20px 20px; }
+    .breadcrumbs { position: fixed; top: 65px; left: 2px; right: 0; padding: 18px 20px; font-size: 14px; color: #1C2526; background: #E5E5E5; z-index: 999; }
+    .breadcrumbs a { color: #1C2526; text-decoration: none; }
+    .breadcrumbs a:hover { color: #58CC02; }
+    .breadcrumbs span { margin: 0 5px; }
+    .swal-z-index { z-index: 6000 !important; }
+    .profile-card { background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); text-align: center; margin: 115px auto; max-width: 500px; }
+    .profile-card h2 { color: #58CC02; font-size: 28px; margin-bottom: 20px; }
+    .profile-card p { font-size: 18px; margin: 10px 0; position: relative; }
+    .edit-icon { position: absolute; right: -20px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #58CC02; font-size: 16px; }
+    .btn { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; margin: 5px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn:hover { background: #46a802; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
+    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .modal-content { 
+      background: #FFFFFF; 
+      padding: 20px; 
+      margin: 15% auto; 
+      width: 90%; 
+      max-width: 450px; /* Increased from 400px */
+      border-radius: 12px; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+    }
+    #otpSection { 
+      text-align: center; 
+      padding: 20px 0; /* Added padding for more vertical space */
+      min-height: 220px; /* Ensure enough height */
+    }
+    #otpMessage { font-size: 16px; margin-bottom: 15px; } /* Spacing for message */
+    #otpForm .form-group { margin-bottom: 10px; } /* Space below OTP input */
+    #otpForm .btn-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; } /* Align buttons */
+    #timer { font-size: 14px; color: #1C2526; margin: 10px 0; } /* Timer styling */
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links { display: none; }
+      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); }
+      .sidebar.active { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 70px 10px 10px; }
+      .breadcrumbs { left: 0; }
+      .profile-card { padding: 20px; margin: 30px auto; max-width: 100%; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <h1><a href="/users/landing">Ocean Books</a></h1>
-                <p class="tagline">Dive into a Sea of Stories</p>
-            </div>
-            <ul class="nav-links">
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<span class="wishlist-count"><%= wishlistCount %></span>)</a></li>
-                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<span class="cart-count"><%= cartCount %></span>)</a></li>
-                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
-                <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
-            </ul>
-        </nav>
-    </header>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <h1><a href="/users/landing">Ocean Books</a></h1>
+      </div>
+      <div class="hamburger"><i class="fas fa-bars"></i></div>
+      <ul class="nav-links">
+        <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
+        <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <div class="sidebar">
-        <ul>
-            <li><a href="#personal-details"><i class="fas fa-user"></i> Personal Details</a></li>
-            <li><a href="#addresses"><i class="fas fa-map-marker-alt"></i>  Addresses</a></li>
-            <li><a href="#orders"><i class="fas fa-shopping-bag"></i>  My orders</a></li>
-            <li><a href="#wallet" class="active"><i class="fas fa-wallet"></i>My Wallet</a></li>
-            <li><a href="#coupons"><i class="fas fa-ticket-alt"></i> My Coupons</a></li>
-            <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
-        </ul>
+  <div class="sidebar">
+    <ul>
+      <li><i class="fas fa-user"></i><a href="/users/profile" class="active">Profile</a></li>
+      <li><i class="fas fa-map-marker-alt"></i><a href="/users/addresses">Addresses</a></li>
+      <li><i class="fas fa-shopping-bag"></i><a href="/users/orders">Orders</a></li>
+      <li><i class="fas fa-wallet"></i><a href="/users/wallet">Wallet</a></li>
+      <li><i class="fas fa-ticket-alt"></i><a href="/users/coupons">Coupons</a></li>
+      <li><i class="fas fa-sign-out-alt"></i><a href="/users/logout">Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="breadcrumbs">
+      <a href="/users/home">Home</a> <span>›</span> <a href="/users/profile">Profile</a>
     </div>
+    <div class="profile-card">
+      <h2>Welcome, <%= user.name %>!</h2>
+      <p><strong>Name:</strong> <%= user.name %> <i class="fas fa-edit edit-icon" onclick="openEditModal('name')"></i></p>
+      <p><strong>Email:</strong> <%= user.email %></p>
+      <p><strong>Phone:</strong> <%= user.phone || 'Not set' %> <i class="fas fa-edit edit-icon" onclick="openEditModal('phone')"></i></p>
+      <button class="btn" onclick="openEmailModal()"><i class="fas fa-envelope"></i> Change Email</button>
+      <button class="btn" onclick="openPasswordModal()"><i class="fas fa-lock"></i> Change Password</button>
+    </div>
+  </div>
 
-    <div class="main-content">
-        <div class="container">
-            <div class="profile-header">
-                <h2>Your Profile</h2>
-            </div>
-
-            <% if (typeof error !== 'undefined' && error) { %>
-                <p class="error-message"><%= error %></p>
-            <% } else if (user) { %>
-                <div class="section" id="personal-details">
-                    <h3>Personal Details</h3>
-                    <div class="info-card">
-                        <p><strong>Name:</strong> <%= user.name %></p>
-                        <div class="actions">
-                            <a href="#" onclick="openModal('editProfileModal')">Edit</a>
-                        </div>
-                    </div>
-                    <div class="info-card">
-                        <p><strong>Email:</strong> <%= user.email %></p>
-                        <div class="actions">
-                            <a href="#" onclick="openModal('changePasswordModal')">Change Password</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section" id="addresses">
-                    <h3>Addresses</h3>
-                    <button class="add-btn" onclick="openModal('addAddressModal')">Add New Address</button>
-                    <div class="address-list">
-                        <% if (addresses && addresses.length > 0) { %>
-                            <% addresses.forEach(address => { %>
-                                <div class="address-item">
-                                    <p><strong><%= address.name %></strong></p>
-                                    <p><%= address.addressLine1 %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
-                                    <p><%= address.isDefault ? '(Default)' : '' %></p>
-                                </div>
-                            <% }); %>
-                        <% } else { %>
-                            <p>No addresses added yet.</p>
-                        <% } %>
-                    </div>
-                </div>
-
-                <div class="section" id="orders">
-                    <h3>My Orders</h3>
-                    <div class="order-list">
-                        <% if (orders && orders.length > 0) { %>
-                            <% orders.forEach(order => { %>
-                                <div class="info-card">
-                                    <p><strong>Order ID:</strong> <%= order.orderId %> | <strong>Total:</strong> ₹<%= order.total.toFixed(2) %> | <strong>Status:</strong> <%= order.status %></p>
-                                </div>
-                            <% }); %>
-                        <% } else { %>
-                            <p>No orders placed yet.</p>
-                        <% } %>
-                    </div>
-                </div>
-
-                <div class="section" id="wallet">
-                    <h3>My Wallet</h3>
-                    <div class="wallet-info">
-                        <p>Wallet balance coming soon!</p>
-                        <!-- Placeholder for wallet implementation -->
-                    </div>
-                </div>
-
-                <div class="section" id="coupons">
-                    <h3>My Coupons</h3>
-                    <div class="coupon-list">
-                        <p>Coupon details coming soon!</p>
-                        <!-- Placeholder for coupon implementation -->
-                    </div>
-                </div>
-            <% } %>
+  <!-- Edit Name/Phone Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h3>Edit <span id="editField"></span></h3>
+      <form id="editProfileForm" enctype="multipart/form-data">
+        <div class="form-group" id="nameField">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" value="<%= user.name %>" required>
         </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="editProfileModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Profile</h3>
-            <form action="/users/edit-profile" method="POST">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" value="<%= user ? user.name : '' %>" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="<%= user ? user.email : '' %>" required>
-                </div>
-                <button type="submit" class="checkout-btn">Save Changes</button>
-                <button type="button" class="checkout-btn" onclick="closeModal('editProfileModal')">Cancel</button>
-            </form>
+        <div class="form-group" id="phoneField" style="display: none;">
+          <label for="phone">Phone</label>
+          <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
         </div>
+        <button type="submit" class="btn">Save</button>
+        <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
+      </form>
     </div>
+  </div>
 
-    <div id="changePasswordModal" class="modal">
-        <div class="modal-content">
-            <h3>Change Password</h3>
-            <form action="/users/change-password" method="POST">
-                <div class="form-group">
-                    <label for="currentPassword">Current Password</label>
-                    <input type="password" id="currentPassword" name="currentPassword" required>
-                </div>
-                <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" name="newPassword" required>
-                </div>
-                <button type="submit" class="checkout-btn">Change Password</button>
-                <button type="button" class="checkout-btn" onclick="closeModal('changePasswordModal')">Cancel</button>
-            </form>
+  <!-- Change Email Modal with OTP -->
+  <div id="emailModal" class="modal">
+    <div class="modal-content">
+      <h3>Change Email</h3>
+      <form id="changeEmailForm">
+        <div class="form-group">
+          <label for="newEmail">New Email</label>
+          <input type="email" id="newEmail" name="email" required>
         </div>
+        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Send OTP</button>
+        <button type="button" onclick="closeEmailModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
+      </form>
+      <div id="otpSection" style="display: none;">
+        <h3>Verify Email</h3>
+        <p id="verifyMessage" style="display: none; color: #58CC02; font-weight: 700;"></p>
+        <form id="otpForm">
+          <div class="form-group">
+            <label for="otp">Enter OTP</label>
+            <input type="text" id="otp" name="otp" required>
+          </div>
+          <p id="timer" class="timer">Time remaining: <span id="countdown">60</span> seconds</p>
+          <div class="btn-container">
+            <button type="submit" class="btn"><i class="fas fa-check"></i> Verify</button>
+            <button type="button" id="resendOtp" style="padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px;" disabled>Resend OTP</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <div id="addAddressModal" class="modal">
-        <div class="modal-content">
-            <h3>Add New Address</h3>
-            <form action="/users/address/add" method="POST">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="addressLine1">Address Line 1</label>
-                    <input type="text" id="addressLine1" name="addressLine1" required>
-                </div>
-                <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" id="city" name="city" required>
-                </div>
-                <div class="form-group">
-                    <label for="state">State</label>
-                    <input type="text" id="state" name="state" required>
-                </div>
-                <div class="form-group">
-                    <label for="pincode">Pincode</label>
-                    <input type="text" id="pincode" name="pincode" required>
-                </div>
-                <div class="form-group">
-                    <label><input type="checkbox" name="isDefault" value="true"> Set as Default</label>
-                </div>
-                <button type="submit" class="checkout-btn">Add Address</button>
-                <button type="button" class="checkout-btn" onclick="closeModal('addAddressModal')">Cancel</button>
-            </form>
+  <!-- Change Password Modal -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content">
+      <h3>Change Password</h3>
+      <form id="changePasswordForm">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" name="currentPassword" required>
         </div>
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+        <button type="submit" class="btn">Change</button>
+        <button type="button" onclick="closePasswordModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
+      </form>
     </div>
+  </div>
 
-    <script>
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    function openEditModal(field) {
+      document.getElementById('editField').textContent = field === 'name' ? 'Name' : 'Phone';
+      document.getElementById('nameField').style.display = field === 'name' ? 'block' : 'none';
+      document.getElementById('phoneField').style.display = field === 'phone' ? 'block' : 'none';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+    function openEmailModal() { document.getElementById('emailModal').style.display = 'flex'; }
+    function closeEmailModal() { document.getElementById('emailModal').style.display = 'none'; document.getElementById('otpSection').style.display = 'none'; document.getElementById('otpMessage').style.display = 'none'; }
+    function openPasswordModal() { document.getElementById('passwordModal').style.display = 'flex'; }
+    function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
+
+    document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'Save these changes?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#58CC02',
+        cancelButtonColor: '#FF4D4D',
+        confirmButtonText: 'Yes, save it!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch('/users/profile/edit', {
+              method: 'POST',
+              credentials: 'include',
+              body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+              closeEditModal();
+              Swal.fire('Success!', 'Profile updated!', 'success').then(() => location.reload());
+            } else {
+              Swal.fire('Error!', data.message, 'error');
+            }
+          } catch (error) {
+            console.error('Edit Profile Error:', error);
+            Swal.fire('Error!', 'Failed to update profile', 'error');
+          }
         }
+      });
+    });
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+    let countdown;
+    document.getElementById('changeEmailForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = { email: document.getElementById('newEmail').value };
+  try {
+    const response = await fetch('/users/profile/change-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(formData)
+    });
+    const data = await response.json();
+    if (data.success) {
+      document.getElementById('changeEmailForm').style.display = 'none';
+      document.getElementById('otpSection').style.display = 'block';
+      let timeLeft = 60;
+      document.getElementById('countdown').textContent = timeLeft;
+      document.getElementById('resendOtp').disabled = true;
+      countdown = setInterval(() => {
+        timeLeft--;
+        document.getElementById('countdown').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          document.getElementById('resendOtp').disabled = false;
         }
+      }, 1000);
+    } else {
+      Swal.fire({
+        title: 'Error!',
+        text: data.message,
+        icon: 'error',
+        customClass: { popup: 'swal-z-index' }
+      });
+    }
+  } catch (error) {
+    console.error('Change Email Error:', error);
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to send OTP',
+      icon: 'error',
+      customClass: { popup: 'swal-z-index' }
+    });
+  }
+});
+    document.getElementById('resendOtp').addEventListener('click', async () => {
+      const email = document.getElementById('newEmail').value;
+      try {
+        const response = await fetch('/users/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        if (data.success) {
+          Swal.fire({
+            title: 'Success!',
+            text: 'OTP resent!',
+            icon: 'success',
+            confirmButtonColor: '#58CC02',
+            customClass: { popup: 'swal-z-index' }
+          });
+          let timeLeft = 60;
+          document.getElementById('countdown').textContent = timeLeft;
+          document.getElementById('resendOtp').disabled = true;
+          countdown = setInterval(() => {
+            timeLeft--;
+            document.getElementById('countdown').textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(countdown);
+              document.getElementById('resendOtp').disabled = false;
+            }
+          }, 1000);
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: data.message,
+            icon: 'error',
+            customClass: { popup: 'swal-z-index' }
+          });
+        }
+      } catch (error) {
+        console.error('Resend OTP Error:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to resend OTP',
+          icon: 'error',
+          customClass: { popup: 'swal-z-index' }
+        });
+      }
+    });
 
-        function openEditAddressModal(id, name, addressLine1, city, state, pincode, isDefault) {
-            const form = document.getElementById('editAddressForm');
-            form.action = `/users/address/edit/${id}`;
-            document.getElementById('editName').value = name;
-            document.getElementById('editAddressLine1').value = addressLine1;
-            document.getElementById('editCity').value = city;
-            document.getElementById('editState').value = state;
-            document.getElementById('editPincode').value = pincode;
-            document.getElementById('editIsDefault').checked = isDefault;
-            openModal('editAddressModal');
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const otp = document.getElementById('otp').value;
+  try {
+    const response = await fetch('/users/verify-email-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ otp })
+    });
+    const data = await response.json();
+    if (data.success) {
+      clearInterval(countdown);
+      document.getElementById('verifyMessage').textContent = 'Email Verified OK!';
+      document.getElementById('verifyMessage').style.display = 'block';
+      setTimeout(() => {
+        closeEmailModal();
+        location.reload();
+      }, 2000); // Wait 2 seconds before closing and reloading
+    } else {
+      Swal.fire('Error!', data.message, 'error');
+    }
+  } catch (error) {
+    console.error('Verify OTP Error:', error);
+    Swal.fire('Error!', 'Failed to verify OTP', 'error');
+  }
+});
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'Change your password?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#58CC02',
+        cancelButtonColor: '#FF4D4D',
+        confirmButtonText: 'Yes, change it!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const form = e.target;
+          const formData = {
+            currentPassword: form.currentPassword.value,
+            newPassword: form.newPassword.value
+          };
+          try {
+            const response = await fetch('/users/profile/change-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            if (data.success) {
+              closePasswordModal();
+              Swal.fire('Success!', 'Password changed! Please log in again.', 'success').then(() => window.location.href = '/users/logout');
+            } else {
+              Swal.fire('Error!', data.message, 'error');
+            }
+          } catch (error) {
+            console.error('Change Password Error:', error);
+            Swal.fire('Error!', 'Failed to change password', 'error');
+          }
         }
-    </script>
+      });
+    });
+  </script>
 </body>
 </html>

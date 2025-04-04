@@ -48,12 +48,22 @@ export const addToWishlist = async (req, res) => {
         const { productId } = req.params;
         const existing = await Wishlist.findOne({ userId: req.user.id, productId });
         if (existing) {
-            return res.json({ success: false, message: 'Already in wishlist' });
+            const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
+            return res.json({ 
+                success: false, 
+                message: 'Already in wishlist',
+                wishlistCount 
+            });
         }
 
         const wishlistItem = new Wishlist({ userId: req.user.id, productId });
         await wishlistItem.save();
-        res.json({ success: true });
+        
+        const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
+        res.json({ 
+            success: true,
+            wishlistCount 
+        });
     } catch (error) {
         console.error('Add to Wishlist Error:', error);
         res.status(500).json({ success: false, message: 'Failed to add to wishlist' });

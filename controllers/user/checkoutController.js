@@ -10,35 +10,45 @@ import Coupon from '../../models/Coupon.js'
 export const getCheckout = async (req, res) => {
   try {
     if (!req.user) return res.redirect('/users/login');
-    
-    let directProduct = null;
-    if (req.query.direct_order) {
-      const order = await Order.findById(req.query.direct_order)
-        .populate('items.productId');
 
-      if (!order || order.userId.toString() !== req.user.id) {
-        return res.redirect('/users/checkout');
+    let order = null;
+    if (req.query.orderId) {
+      order = await Order.findById(req.query.orderId).populate('items.productId');
+      if (!order || order.userId.toString() !== req.user._id.toString()) {
+        return res.render('user/checkout', {
+          cartItems: [],
+          addresses: [],
+          user: req.user,
+          directProduct: null,
+          order: null,
+          wishlistCount: 0,
+          cartCount: 0,
+          subtotal: '0.00',
+          taxes: '0.00',
+          shipping: '0.00',
+          total: '0.00',
+          error: 'Invalid or unauthorized order'
+        });
       }
-
-      directProduct = order.items[0]; 
-      
+      const directProduct = order.items[0].productId;
       return res.render('user/checkout', {
         user: req.user,
-        cartItems: [], 
+        cartItems: [],
         directProduct,
-        addresses: await Address.find({ userId: req.user.id }),
-        wishlistCount: await Wishlist.countDocuments({ userId: req.user.id }),
-        cartCount: 0, 
-        subtotal: directProduct.productId.price.toFixed(2),
-        taxes: (directProduct.productId.price * 0.05).toFixed(2),
-        shipping: '100.00',
-        total: (directProduct.productId.price * 1.05 + 100).toFixed(2)
+        order,
+        addresses: await Address.find({ userId: req.user._id }),
+        wishlistCount: await Wishlist.countDocuments({ userId: req.user._id }),
+        cartCount: 1, // Single item for Buy Now
+        subtotal: order.subtotal ? order.subtotal.toFixed(2) : '0.00',
+        taxes: order.taxes ? order.taxes.toFixed(2) : '0.00',
+        shipping: order.shipping ? order.shipping.toFixed(2) : '0.00',
+        total: order.total ? order.total.toFixed(2) : '0.00'
       });
     }
 
-    const cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
-    const addresses = await Address.find({ userId: req.user.id });
-    const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
+    const cartItems = await Cart.find({ userId: req.user._id }).populate('productId');
+    const addresses = await Address.find({ userId: req.user._id });
+    const wishlistCount = await Wishlist.countDocuments({ userId: req.user._id });
     const cartCount = cartItems.length;
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.productId.price * item.quantity * (1 - (item.productId.discount || 0) / 100), 0);
@@ -46,18 +56,19 @@ export const getCheckout = async (req, res) => {
     const shipping = 100;
     const total = subtotal + taxes + shipping;
 
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !order) {
       return res.render('user/checkout', {
         cartItems: [],
         addresses,
         subtotal: '0.00',
-        directProduct,
         taxes: '0.00',
         shipping: '0.00',
         total: '0.00',
         user: req.user,
         wishlistCount,
         cartCount,
+        directProduct: null,
+        order: null,
         error: 'Your cart is empty'
       });
     }
@@ -72,7 +83,8 @@ export const getCheckout = async (req, res) => {
       user: req.user,
       wishlistCount,
       cartCount,
-      directProduct: null, // Ensure directProduct is null for cart checkout
+      directProduct: null,
+      order: null
     });
   } catch (error) {
     console.error('Get Checkout Error:', error);
@@ -81,8 +93,13 @@ export const getCheckout = async (req, res) => {
       addresses: [], 
       user: req.user, 
       directProduct: null,
+      order: null,
       wishlistCount: 0, 
       cartCount: 0, 
+      subtotal: '0.00',
+      taxes: '0.00',
+      shipping: '0.00',
+      total: '0.00',
       error: 'Failed to load checkout' 
     });
   }
@@ -157,30 +174,41 @@ export const getPaymentPage = async (req, res) => {
 export const confirmPayment = async (req, res) => {
   try {
     const { orderId, paymentMethod } = req.body;
-    const order = await Order.findOne({ orderId, userId: req.user.id });
+    const order = await Order.findOne({ orderId, userId: req.user.id }).populate('items.productId');
     if (!order) {
-      return res.json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
     if (order.status !== 'Pending') {
-      return res.json({ success: false, message: 'Order already processed' });
+      return res.status(400).json({ success: false, message: 'Order already processed' });
     }
 
-    // Update order based on payment method
     if (paymentMethod === 'COD') {
       order.paymentMethod = 'COD';
       order.status = 'Confirmed';
+      if (!order.expectedDelivery) {
+        const expectedDate = new Date();
+        expectedDate.setDate(expectedDate.getDate() + 7);
+        order.expectedDelivery = expectedDate;
+      }
+
+      // Decrease stock
+      for (const item of order.items) {
+        const product = item.productId;
+        if (product.stock < item.quantity) {
+          return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
+        }
+        product.stock -= item.quantity;
+        await product.save();
+      }
     } else {
-      return res.json({ success: false, message: `${paymentMethod} not implemented yet` });
+      return res.status(400).json({ success: false, message: `${paymentMethod} not implemented yet` });
     }
 
     await order.save();
-    console.log('Payment Confirmed:', orderId, paymentMethod);
+    await Cart.deleteMany({ userId: req.user.id });
+    console.log('Payment Confirmed & Cart Cleared:', orderId);
 
-    res.json({ 
-      success: true, 
-      redirect: '/users/order-success', // Redirect to success page
-      orderId 
-    });
+    res.json({ success: true, redirect: '/users/order-success', orderId });
   } catch (error) {
     console.error('Confirm Payment Error:', error);
     res.status(500).json({ success: false, message: 'Failed to confirm payment' });
@@ -189,8 +217,8 @@ export const confirmPayment = async (req, res) => {
 //------------------------------------------------------------------------------------------------
 export const addAddress = async (req, res) => {
   try {
-    const { name, addressLine1, city, state, pincode, isDefault } = req.body;
-    console.log('Add Address Request:', { name, addressLine1, city, state, pincode, isDefault, userId: req.user.id });
+    const { name, street, city, state, postalCode, isDefault } = req.body;
+    console.log('Add Address Request:', { name, street, city, state, postalCode, isDefault, userId: req.user.id });
 
     const existingAddresses = await Address.countDocuments({ userId: req.user.id });
     if (isDefault === 'true' || existingAddresses === 0) {
@@ -201,10 +229,10 @@ export const addAddress = async (req, res) => {
       userId: req.user.id,
       quartile: 0, // Default as per schema
       name,
-      street: addressLine1,
+      street,
       city,
       state,
-      postalCode: pincode,
+      postalCode,
       country: 'India', // Hardcode for now
       isDefault: isDefault === 'true' || existingAddresses === 0
     });
@@ -221,8 +249,8 @@ export const addAddress = async (req, res) => {
 export const editAddress = async (req, res) => {
   try {
     const addressId = req.params.addressId;
-    const { name, addressLine1, city, state, pincode, isDefault } = req.body;
-    console.log('Edit Address Request:', { addressId, name, addressLine1, city, state, pincode, isDefault, userId: req.user.id });
+    const { name, street, city, state, postalCode, isDefault } = req.body;
+    console.log('Edit Address Request:', { addressId, name, street, city, state, postalCode, isDefault, userId: req.user.id });
 
     if (isDefault === 'true') {
       await Address.updateMany({ userId: req.user.id, isDefault: true }, { isDefault: false });
@@ -232,10 +260,10 @@ export const editAddress = async (req, res) => {
       { _id: addressId, userId: req.user.id },
       { 
         name, 
-        street: addressLine1, 
+        street, 
         city, 
         state, 
-        postalCode: pincode, 
+        postalCode,
         country: 'India', 
         isDefault: isDefault === 'true' 
       },

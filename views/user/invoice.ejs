@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Books - Invoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: #F5F5F5; 
+            color: #1C2526; 
+            padding: 20px; 
+        }
+        .invoice-container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: #FFFFFF; 
+            border: 2px solid #58CC02; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 700; 
+            color: #58CC02; 
+            text-align: center; 
+        }
+        .tagline { 
+            font-size: 14px; 
+            color: #1C2526; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #58CC02; 
+            font-size: 24px; 
+            margin: 20px 0; 
+        }
+        p { 
+            font-size: 16px; 
+            margin: 10px 0; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        table, th, td { 
+            border: 1px solid #58CC02; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background: #58CC02; 
+            color: #FFFFFF; 
+            font-weight: 700; 
+        }
+        .total { 
+            font-weight: 700; 
+            text-align: right; 
+        }
+        .print-btn { 
+            display: block; 
+            margin: 20px auto; 
+            padding: 12px 25px; 
+            background: #58CC02; 
+            color: #FFFFFF; 
+            border: none; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 700; 
+        }
+        .print-btn:hover { 
+            background: #46a802; 
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="logo">Ocean Books</div>
+        <div class="tagline">Dive into a Sea of Stories</div>
+        <h2>INVOICE</h2>
+        <p><strong>Order ID:</strong> <%= order.orderId %></p>
+        <p><strong>Date:</strong> <%= new Date(order.createdAt).toLocaleString() %></p>
+        <p><strong>Customer:</strong> <%= user.name || 'N/A' %></p>
+        <p><strong>Payment Method:</strong> <%= order.paymentMethod || 'N/A' %></p>
+        <p><strong>Address:</strong> <%= order.address ? `${order.address.name || 'N/A'}, ${order.address.street || 'N/A'}, ${order.address.city || 'N/A'}, ${order.address.state || 'N/A'} - ${order.address.postalCode || 'N/A'}, ${order.address.country || 'India'}` : 'Address not available' %></p>
+        <p><strong>Status:</strong> <%= order.status %></p>
+
+        <h3>Order Details</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% order.items.forEach(item => { %>
+                    <tr>
+                        <td><%= item.productId.name %></td>
+                        <td><%= item.quantity %></td>
+                        <td><%= order.status %></td>
+                        <td>₹<%= (item.price * (1 - (item.discount || 0) / 100)).toFixed(2) %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <h3>Order Summary</h3>
+        <table>
+            <tr>
+                <td><strong>Total Amount:</strong></td>
+                <td>₹<%= order.total.toFixed(2) %></td>
+            </tr>
+            <tr>
+                <td><strong>Discount:</strong></td>
+                <td>₹<%= order.items.reduce((sum, item) => sum + (item.price * item.quantity * (item.discount || 0) / 100), 0).toFixed(2) %></td>
+            </tr>
+            <tr>
+                <td><strong>Shipping:</strong></td>
+                <td>₹<%= order.shipping.toFixed(2) %></td>
+            </tr>
+            <tr>
+                <td><strong>Taxes:</strong></td>
+                <td>₹<%= order.taxes.toFixed(2) %></td>
+            </tr>
+            <tr>
+                <td><strong>Final Amount:</strong></td>
+                <td class="total">₹<%= order.total.toFixed(2) %></td>
+            </tr>
+        </table>
+
+        <button class="print-btn" onclick="window.print()">Print Invoice</button>
+    </div>
+</body>
+</html>

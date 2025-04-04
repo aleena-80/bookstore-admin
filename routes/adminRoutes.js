@@ -6,15 +6,10 @@ import {
   renderCategories, addCategory, editCategory, deleteCategory,renderUsers,
   getLanguages, addLanguage, editLanguage, deleteLanguage,
   renderDashboard, logoutAdmin,getProducts,blockUser,unblockUser,
-  getAdminLogin,getOrders,updateOrderStatus,getOrderView,verifyReturn
+  getAdminLogin,getOrders,updateOrderStatus,getOrderView,verifyReturn,addBanner,getBanners,deleteBanner
 } from '../controllers/adminController.js';
 import multer from 'multer';
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'images/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-});
-const upload = multer({ storage });
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -42,8 +37,16 @@ router.post('/users/block/:id', protectAdmin, blockUser);
 router.post('/users/unblock/:id', protectAdmin, unblockUser);
 
 router.get('/orders', protectAdmin, getOrders);
-router.post('/orders/status/:orderId', protectAdmin,updateOrderStatus);
+router.post('/orders/status/:orderId', protectAdmin, updateOrderStatus);
 router.get('/orders/view/:orderId', protectAdmin, getOrderView);
 router.post('/orders/verify-return/:orderId', protectAdmin,verifyReturn);
+
+router.get('/banners', getBanners);
+router.post('/banners/add', addBanner);
+router.post('/banners/delete/:id', deleteBanner);
+
+//router.post('/', protectAdmin, cloudinaryUpload.single('image'), createBanner);
+//router.put('/:id', protectAdmin, cloudinaryUpload.single('image'), updateBanner);
+//router.delete('/:id', protectAdmin, deleteBanner);
 
 export default router;

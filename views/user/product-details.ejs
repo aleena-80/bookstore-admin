@@ -469,17 +469,27 @@
             margin-top: 20px;
             font-size: 12px;
         }
-
+        
         @media (max-width: 768px) {
             .navbar {
-                flex-direction: column;
+                flex-direction: row; /* Keep horizontal */
+                justify-content: space-between; /* Logo left, links right */
+                align-items: center; /* Vertically center */
                 padding: 10px 20px;
+                flex-wrap: wrap; /* Allow wrapping if needed */
             }
-
             .nav-links {
-                flex-direction: column;
-                margin-top: 10px;
+                flex-direction: row; /* Horizontal links */
+                justify-content: flex-end; /* Push to right */
+                gap: 10px; /* Space between links */
+                margin-top: 0; /* No extra top margin */
+                width: auto; /* Fit content */
+                text-align: right; /* Align text right */
             }
+            .nav-links li a {
+                font-size: 14px; /* Smaller on mobile */
+            }
+            
 
             .product-details-container {
                 flex-direction: column;
@@ -508,7 +518,7 @@
             }
 
             .product-card img {
-                height: 60px;
+                height: 120px;
             }
 
             .product-card h3 a {
@@ -556,23 +566,18 @@
             <div class="product-images">
                 <div class="main-image">
                     <img 
-                        src="/images/<%= product.images[0] || '/images/default.jpg' %>" 
+                        src="<%= product.images[0] || '/images/default.jpg' %>" 
                         alt="<%= product.name %>" 
                         id="mainImage" 
                         class="drift-trigger" 
-                        data-zoom="/images/<%= product.images[0] || '/images/default.jpg' %>"
+                        data-zoom="<%= product.images[0] || '/images/default.jpg' %>"
                     >
                 </div>
                 <div class="thumbnail-gallery">
                     <% if (product.images && product.images.length > 0) { %>
                         <% product.images.slice(0, 3).forEach((img, index) => { %>
                             <div class="thumbnail">
-                                <img 
-                                    src="/images/<%= img %>" 
-                                    alt="Thumbnail <%= index + 1 %>" 
-                                    onclick="changeImage(this, '/images/<%= img %>')" 
-                                    class="<%= index === 0 ? 'active' : '' %>"
-                                >
+                                <img src="<%= img %>" alt="Thumbnail <%= index + 1 %>" onclick="changeImage(this, '<%= img %>')" class="<%= index === 0 ? 'active' : '' %>">           
                             </div>
                         <% }); %>
                     <% } %>
@@ -583,11 +588,11 @@
                 <div class="product-category"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></div>
                 <h1 class="productmn-name"><%= product.name %></h1>
                 <div class="product-rating">
-                    <% if (product.ratings && product.ratings.length > 0) { %>
-                        <% const avgRating = product.ratings.reduce((sum, r) => sum + r.rating, 0) / product.ratings.length; %>
-                        <p><strong>Average Rating:</strong> <%= avgRating.toFixed(1) %> / 5 (<%= product.ratings.length %> Reviews)</p>
+                    <% if (product.ratings && product.reviews.length > 0) { %>
+                        <% const avgRating = product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length; %>
+                        <p><strong><%= avgRating.toFixed(1) %> ⭐</strong> (<%= product.reviews.length %> Reviews)</p>
                     <% } else { %>
-                        <p><strong>Average Rating:</strong> 4.5 ★ (0 Reviews)</p>
+                        <p><strong>0.0 ⭐</strong> (0 Reviews)</p>
                     <% } %>
                 </div>
                 <div class="product-description">
@@ -627,7 +632,7 @@
             <div class="products-grid">
                 <% relatedProducts.forEach(related => { %>
                     <div class="product-card">
-                        <img src="/images/<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
+                        <img src="<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
                         <h3><a href="/users/products/<%= related._id %>"><%= related.name %></a></h3>
                         <p>₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></p>
                     </div>
@@ -661,25 +666,26 @@
                 <div class="col-md-8">
                     <div class="card p-3">
                         <h4>All Reviews</h4>
+                      
                         <div id="reviewsContainer">
                             <% if (reviews.length === 0) { %>
-                                <p>No reviews yet.</p>
+                              <p>No reviews yet.</p>
                             <% } else { %>
-                                <% reviews.forEach(review => { %>
-                                    <div class="border p-2 my-2">
-                                        <strong><%= review.user.name %></strong>
-                                        <span class="badge"><%= review.rating %> ⭐</span>
-                                        <p><%= review.comment %></p>
-                                        <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
-                                        <% if (user && reviews.user && reviews.user._id && user._id.toString() === reviews.user._id.toString()) { %>
-                                            <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
-                                                Edit
-                                            </button>
-                                        <% } %>
-                                    </div>
-                                <% }); %>
+                              <% reviews.forEach(review => { %>
+                                <div class="border p-2 my-2">
+                                  <strong><%= review.user.name %></strong>
+                                  <span class="badge"><%= review.rating %> ⭐</span>
+                                  <p><%= review.comment %></p>
+                                  <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+                                  <% if (user && review.user && user._id.toString() === review.user._id.toString()) { %>
+                                    <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
+                                      Edit
+                                    </button>
+                                  <% } %>
+                                </div>
+                              <% }); %>
                             <% } %>
-                        </div>
+                          </div>
                         <div class="d-flex justify-content-center mt-3">
                             <button id="prevPage" class="btn me-2" disabled>Previous</button>
                             <span id="pageInfo">Page 1 of <%= totalPages %></span>
@@ -810,23 +816,19 @@
         });
 
         document.getElementById('buy-now').addEventListener('click', async () => {
-    const productId = document.getElementById('buy-now').dataset.productId;
-    const response = await fetch(`/users/order/buy-now/${productId}`, {
-        method: 'POST',
-        credentials: 'include', // Same as Add to Cart
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-    const data = await response.json();
-    if (data.success) {
-        // Redirect to existing checkout page with orderId
-        window.location.href = `/users/checkout?orderId=${data.orderId}`;
-    } else {
-        alert(data.message || 'Failed to proceed to checkout');
-    }
+  const productId = document.getElementById('buy-now').dataset.productId;
+  const response = await fetch(`/users/order/buy-now/${productId}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const data = await response.json();
+  if (data.success) {
+    window.location.href = `/users/checkout?orderId=${data.orderId}`; // Use _id
+  } else {
+    alert(data.message || 'Failed to proceed to checkout');
+  }
 });
-
         document.addEventListener('DOMContentLoaded', () => {
             new Drift(document.querySelector('.drift-trigger'), {
                 paneContainer: document.body,
@@ -839,96 +841,64 @@
                 var modal = new bootstrap.Modal(document.getElementById("reviewModal"));
                 modal.show();
             });
+});         
+const token = '<%= user ? user.token : "" %>'; // From server
+document.getElementById("reviewForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+  const rating = document.getElementById("rating").value;
+  const comment = document.getElementById("comment").value;
+  fetch(`/users/products/<%= product._id %>/review`, {
+    method: "POST",
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire("Success!", "Review added!", "success").then(() => location.reload());
+    } else {
+      Swal.fire("Error!", data.message, "error");
+    }
+  });
+});
 
-            document.getElementById("reviewForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-                const rating = document.getElementById("rating").value;
-                const comment = document.getElementById("comment").value;
-                const token = localStorage.getItem('token');
-                fetch(`/users/products/<%= product._id %>/review`, {
-                    method: "POST",
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${token}` 
-                    },
-                    body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Review added successfully!",
-                            icon: "success",
-                            confirmButtonText: "OK"
-                        }).then(() => location.reload());
-                    } else {
-                        Swal.fire("Error!", data.message, "error");
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-            });
-        });
-
-        function openEditModal(reviewId, rating, comment) {
-            document.getElementById("editReviewId").value = reviewId;
-            document.getElementById("editRating").value = rating;
-            document.getElementById("editComment").value = comment;
-            var editModal = new bootstrap.Modal(document.getElementById("editReviewModal"));
-            editModal.show();
-        }
-
-        document.getElementById("editReviewForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-            const reviewId = document.getElementById("editReviewId").value;
-            const rating = document.getElementById("editRating").value;
-            const comment = document.getElementById("editComment").value;
-            const token = localStorage.getItem('token');
-            fetch(`/users/products/<%= product._id %>/review/edit`, {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({ reviewId, rating, comment })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Review Updated!",
-                        text: "Your review has been successfully updated.",
-                        timer: 2000, 
-                        showConfirmButton: false
-                    }).then(() => {
-                        var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
-                        editModal.hide();
-                        location.reload(); 
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Update Failed",
-                        text: data.message
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "Something went wrong. Please try again."
-                });
-            });
-        });
-
-        function closeEditModal() {
+function closeEditModal() {
             var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
             editModal.hide();
         }
 
+        document.getElementById("editReviewForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const reviewId = document.getElementById("editReviewId").value;
+    const rating = document.getElementById("editRating").value;
+    const comment = document.getElementById("editComment").value;
+    const token = '<%= user && user.token ? user.token : "" %>';
+    fetch(`/users/products/<%= product._id %>/review/edit`, {
+      method: "POST",
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify({ reviewId, rating, comment })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire("Success!", "Review updated!", "success").then(() => {
+          const editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
+          editModal.hide();
+          location.reload();
+        });
+      } else {
+        Swal.fire("Error!", data.message, "error");
+      }
+    })
+    .catch(error => console.error("Error:", error));
+  });
+        
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("prevPage")?.addEventListener("click", function () {
                 loadReviews(currentPage - 1);

@@ -41,37 +41,6 @@ export const getOrders = async (req, res) => {
   }
 };
 
-export const updateOrderStatus = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { status } = req.body;
-
-    const validStatuses = ['Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
-    if (!validStatuses.includes(status)) {
-      return res.json({ success: false, message: 'Invalid status' });
-    }
-
-    const order = await Order.findById(orderId).populate('items.productId');
-    if (!order) return res.json({ success: false, message: 'Order not found' });
-
-    // Inventory management
-    if (status === 'Cancelled' && order.status !== 'Cancelled') {
-      for (const item of order.items) {
-        await Product.findByIdAndUpdate(item.productId._id, {
-          $inc: { stock: item.quantity }
-        });
-      }
-    }
-
-    order.status = status;
-    await order.save();
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Update Order Status Error:', error);
-    res.json({ success: false, message: 'Failed to update status' });
-  }
-};
-
 export const getOrderView = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -85,7 +54,7 @@ export const getOrderView = async (req, res) => {
     res.status(500).send('Failed to load order');
   }
 };
-
+//------------------------------------------------------
 export const verifyReturn = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -98,6 +67,7 @@ export const verifyReturn = async (req, res) => {
 
     if (action === 'approve') {
       order.status = 'Returned';
+      order.returnRequest = false; // Clear request
       const user = order.userId;
       user.wallet = (user.wallet || 0) + order.total;
       await user.save();
@@ -109,7 +79,7 @@ export const verifyReturn = async (req, res) => {
         });
       }
     } else if (action === 'reject') {
-      order.returnRequest = false;
+      order.returnRequest = false; // Clear request, keep original status
     }
 
     await order.save();
@@ -119,3 +89,33 @@ export const verifyReturn = async (req, res) => {
     res.json({ success: false, message: 'Failed to verify return' });
   }
 };
+//--------------------------------------------------------
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (['Cancelled', 'Returned'].includes(order.status)) {
+      return res.status(400).json({ success: false, message: 'Cannot modify cancelled or returned order' });
+    }
+
+    order.status = status;
+    if (!['Cancelled', 'Delivered', 'Returned'].includes(status)) {
+      const expectedDate = new Date();
+      expectedDate.setDate(expectedDate.getDate() + 7);
+      order.expectedDelivery = expectedDate;
+    }
+    await order.save();
+
+    res.json({ success: true, message: 'Order status updated successfully' });
+  } catch (error) {
+    console.error('Update Order Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update order' });
+  }
+};
+//-------------------------------------------------------------------

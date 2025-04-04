@@ -70,8 +70,7 @@
                     <% cartItems.forEach(item => { %>
                         <% const discountedPrice = item.productId.price * (1 - (item.productId.discount || 0) / 100); %>
                         <div class="product-card" data-cart-id="<%= item._id %>">
-                            <img src="/images/<%= item.productId.images[0] || 'default.jpg' %>" alt="<%= item.productId.name %>">
-                            <h4><%= item.productId.name %></h4>
+                            <img src="<%= item.productId.images && item.productId.images.length > 0 ? item.productId.images[0] : '/default.jpg' %>" alt="<%= item.productId.name %>">                            <h4><%= item.productId.name %></h4>
                             <p>₹<%= discountedPrice.toFixed(2) %> <% if (item.productId.discount > 0) { %><span class="original-price">₹<%= item.productId.price.toFixed(2) %></span><% } %></p>
                             <p>Stock: <%= item.productId.stock %></p>
                             <div class="quantity-controls">
@@ -94,10 +93,6 @@
                     <p>Subtotal: ₹<span id="subtotal"><%= subtotal %></span></p>
                     <p>Taxes: ₹<span id="taxes"><%= taxes %></span></p>
                     <p>Shipping: ₹<span id="shipping"><%= shipping %></span></p>
-                    <div class="coupon-section">
-                        <input type="text" id="coupon-code" placeholder="Enter coupon code">
-                        <button id="apply-coupon">Apply</button>
-                    </div>
                     <p>Grand Total: ₹<span id="grand-total"><%= total %></span></p>
                     <button class="checkout-btn" <%= cartItems.some(item => item.productId.stock <= 0) ? 'disabled' : '' %> onclick="window.location.href='/users/checkout'">Proceed to Checkout</button>
                 </div>

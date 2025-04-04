@@ -1,32 +1,14 @@
-import multer from 'multer';
 import Product from '../../models/Product.js';
 import Category from "../../models/Category.js";
 import Language from "../../models/Language.js";
-import path from 'path'
-import fs from 'fs'
-
-
-const uploadDir = path.join(process.cwd(), "images");
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    console.log("Saving file as:", path.join(uploadDir, uniqueName));
-    cb(null, uniqueName);
-  },
-});
-const upload = multer({ storage }).array("images", 5);
+import upload from '../../middleware/upload.js';
+import cloudinary from '../../config/cloudinary.js';
 
 
 //--------------------------------------------------------------------
 export const addProduct = (req, res) => {
   console.log("POST /admin/products-add");
-  upload(req, res, async (err) => {
+  upload.array('images', 10)(req, res, async (err) => { // Use Cloudinary upload
     if (err) {
       console.error("Multer Error:", err);
       return res.status(500).json({ success: false, message: "Upload error: " + err.message });
@@ -37,13 +19,20 @@ export const addProduct = (req, res) => {
       console.log("Body:", req.body);
 
       const { name, price, discount, category, language, stock, author, description } = req.body;
-      const images = req.files ? req.files.map(file => file.filename) : [];
+      const images = req.files ? req.files.map(file => file.path) : []; // Cloudinary URLs
 
       console.log("Images to save:", images);
 
       const product = new Product({
-        name, price: Number(price), discount: Number(discount || 0), category, language,
-        stock: Number(stock), author, description, images
+        name,
+        price: Number(price),
+        discount: Number(discount || 0),
+        category,
+        language,
+        stock: Number(stock),
+        author,
+        description,
+        images // Now stores Cloudinary URLs
       });
       await product.save();
 
@@ -56,44 +45,64 @@ export const addProduct = (req, res) => {
   });
 };
 //--------------------------------------------------------------------------------
-export const editProduct = (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) return res.status(500).json({ success: false, message: "Failed to upload images: " + err.message });
 
-    try {
-      const { id } = req.params;
-      const { name, price, discount, category, language, stock, author, description, existingImages } = req.body;
-      const newImages = req.files ? req.files.map(file => file.filename) : [];
-      const images = [
-        ...(existingImages ? (Array.isArray(existingImages) ? existingImages : [existingImages]) : []),
-        ...newImages
-      ];
-
-      if (!name || !price || !category || !language || !stock) {
-        return res.status(400).json({ success: false, message: "Required fields missing" });
-      }
-      if (price < 1 || stock < 0 || (discount && (discount < 0 || discount > 100))) {
-        return res.status(400).json({ success: false, message: "Invalid field values" });
-      }
-      if (images.length < 3) {
-        return res.status(400).json({ success: false, message: "At least 3 images required" });
-      }
-
-      const product = await Product.findByIdAndUpdate(
-        id,
-        { name, price: Number(price), discount: Number(discount || 0), category, language, stock: Number(stock), author, description, images },
-        { new: true }
-      );
-
-      if (!product) return res.status(404).json({ success: false, message: "Product not found" });
-      res.status(200).json({ success: true, message: "Product updated successfully!" });
-    } catch (error) {
-      console.error("Edit Product Error:", error);
-      res.status(500).json({ success: false, message: "Failed to update product: " + error.message });
+export const editProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, discount, category, language, stock, author, description, existingImages } = req.body;
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
     }
-  });
-};
 
+    // Update only provided fields
+    if (name !== undefined) product.name = name;
+    if (price !== undefined) product.price = price;
+    if (discount !== undefined) product.discount = discount || 0;
+    if (category !== undefined) product.category = category;
+    if (language !== undefined) product.language = language;
+    if (stock !== undefined) product.stock = stock;
+    if (author !== undefined) product.author = author || '';
+    if (description !== undefined) product.description = description || ''; // Ensure description updates
+
+    // Handle images
+    let images = existingImages ? (Array.isArray(existingImages) ? existingImages : [existingImages]) : product.images || [];
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file =>
+        cloudinary.uploader.upload(file.path, {
+          folder: 'ocean-books/products',
+          public_id: `${product._id}_${Date.now()}`,
+        })
+      );
+      const uploadedImages = await Promise.all(uploadPromises);
+      images = [...images, ...uploadedImages.map(img => img.secure_url)]; // Add new images
+    }
+    product.images = images; // Overwrite with updated array (removals stick)
+
+    console.log('Server Images:', { existingImages, newImages: req.files ? req.files.length : 0, total: images.length });
+    console.log('Updated Fields:', { name, price, discount, category, language, stock, author, description });
+
+    // Validation
+    if (price !== undefined && (price < 1)) {
+      return res.status(400).json({ success: false, message: 'Price must be > 0' });
+    }
+    if (stock !== undefined && (stock < 0)) {
+      return res.status(400).json({ success: false, message: 'Stock must be >= 0' });
+    }
+    if (discount !== undefined && (discount < 0 || discount > 100)) {
+      return res.status(400).json({ success: false, message: 'Discount must be 0-100' });
+    }
+    if (images.length < 3) {
+      return res.status(400).json({ success: false, message: 'At least 3 images required' });
+    }
+
+    await product.save();
+    res.json({ success: true, message: 'Product updated successfully' });
+  } catch (error) {
+    console.error('Edit Product Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update product' });
+  }
+};
 //-------------------------------------------------------------------------------
 export const getProducts = async (req, res) => {
     try {

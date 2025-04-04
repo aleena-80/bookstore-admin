@@ -3,10 +3,12 @@ import { sendOtp, verifyOtp, resendOtp, login, googleAuthCallback, forgotPasswor
     resetPassword, logout,addReview,editReview, getProductDetails,getProducts,getHome,subscribeNewsletter,
     searchBooks,getWishlist,addToWishlist,removeFromWishlist,removeFromCart,addToCart,getCart,updateCartQuantity,
     getCheckout,addAddress,editAddress,getOrderDetail,getOrders,
-    searchOrders,cancelOrder,returnOrder,downloadInvoice,getProfile,getEditProfile,
-    postEditProfile,postVerifyOtp,getChangePassword,postChangePassword,getAddAddress,
-    postAddAddress,getEditAddress,postEditAddress,deleteAddress,initiateOrder,getPaymentPage,confirmPayment,
-    getOrderView,requestReturn,buyNow,getOrderSuccess} from '../controllers/userController.js';
+    searchOrders,cancelOrder,returnOrder,downloadInvoice,
+    initiateOrder,getPaymentPage,confirmPayment,
+    getOrderView,requestReturn,buyNow,getOrderSuccess,
+    getProfile, editProfile, verifyEmailOtp, changePassword, getAddresses,
+    profileaddAddress, profileeditAddress, getWallet, addFundsToWallet,getCoupons,changeEmail
+} from '../controllers/userController.js';
 import passport from 'passport';
 import '../config/passportConfig.js';
 import autheMiddleware from '../middleware/autheMiddleware.js';
@@ -70,21 +72,35 @@ router.get('/orders/view/:orderId', protectUser, getOrderView);
 router.post('/orders/return/:orderId', protectUser, requestReturn);
 
 
-router.get('/profile', protectUser,getProfile);
-router.get('/edit-profile', protectUser,getEditProfile);
-router.post('/edit-profile', protectUser,postEditProfile);
-router.post('/verify-otp', protectUser,postVerifyOtp);
-router.get('/change-password',protectUser,getChangePassword);
-router.post('/change-password', protectUser,postChangePassword);
-router.get('/address/add', protectUser,getAddAddress);
-router.post('/address/add', protectUser,postAddAddress);
-router.get('/address/edit/:id', protectUser,getEditAddress);
-router.post('/address/edit/:id', protectUser,postEditAddress);
-router.get('/address/delete/:id', protectUser,deleteAddress);
+
+router.get('/profile', protectUser, getProfile);
+router.post('/profile/edit', protectUser, editProfile);
+router.post('/verify-email-otp', protectUser, verifyEmailOtp);
+router.post('/profile/change-password', protectUser, changePassword);
+router.get('/addresses', protectUser, getAddresses);
+router.post('/addresses/add', protectUser, profileaddAddress);
+router.post('/addresses/edit/:addressId', protectUser, profileeditAddress);
+router.get('/wallet', protectUser, getWallet);
+router.post('/wallet/add', protectUser, addFundsToWallet);
+router.get('/coupons', protectUser, getCoupons);
+router.post('/profile/change-email', protectUser, changeEmail);
+
+
+//router.post('/address/add', protectUser, addAddress);
+//router.post('/address/edit/:id', protectUser, editAddress);
+//router.post('/address/delete/:id', protectUser, deleteAddress);
+//router.post('/send-otp', protect, sendOTP);
+//router.post('/verify-email-otp', protect, verifyEmailOTP);
+//router.post('/change-password', protect, changePassword);
 
 
 router.post('/checkout/initiate-order', protectUser, initiateOrder);
 router.get('/checkout/payment', protectUser, getPaymentPage);
 // app.post('/users/checkout/add-address', protectUser, addAddress);
 // app.post('/users/checkout/edit-address/:addressId', protectUser, editAddress);
+
+
+
+// router.post('/', protectUser, cloudinaryUpload.array('images', 5), addProduct);
+// router.patch('/:id/images', protectUser, cloudinaryUpload.array('images', 3), updateProductImages);
 export default router;

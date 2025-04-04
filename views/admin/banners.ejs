@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banners - Ocean Books Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { font-family: 'Roboto', sans-serif; background: #201F31; color: #FFF; display: flex; min-height: 100vh; }
+    .sidebar {
+            width: 220px;
+            background: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            text-align: center;
+            background: rgb(32,31,49);
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.6em;
+            margin: 0;
+            color: rgb(255, 255, 255);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar ul {
+            padding: 10px 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 5px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+        }
+
+        .sidebar a.active {
+            color: rgb(255, 255, 255);
+        }
+
+    .main-content { margin-left: 220px; flex: 1; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; background: #FFF; padding: 20px; border-radius: 8px; color: #201F31; }
+    h1 { font-size: 28px; text-align: center; margin-bottom: 20px; }
+    .banner-box { display: flex; gap: 20px; flex-wrap: wrap; }
+    .add-form, .banner-list { flex: 1; min-width: 300px; padding: 20px; background: #F5F5F5; border-radius: 5px; }
+    .add-form h2, .banner-list h2 { font-size: 20px; margin-bottom: 15px; }
+    .add-form label { font-weight: 700; display: block; margin-bottom: 5px; }
+    .add-form input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #E5E5E5; border-radius: 5px; }
+    .add-form button { width: 100%; padding: 10px; background: #FFBADE; color: #201F31; border: none; border-radius: 5px; cursor: pointer; }
+    .add-form button:hover { background: rgba(255, 186, 222, 0.8); }
+    .banner-item { display: flex; align-items: center; gap: 15px; background: #FFF; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+    .banner-item img { max-width: 150px; height: auto; border-radius: 5px; }
+    .delete-btn { background: #E74C3C; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+    .delete-btn:hover { background: #C0392B; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+    </div>
+    <ul>
+      <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+      <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+      <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+      <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+      <li><a href="/admin/banners" class="active"><i class="fas fa-images"></i> Banners</a></li>
+      <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <div class="container">
+      <h1>Banners</h1>
+      <div class="banner-box">
+        <div class="add-form">
+          <h2>Add Banner</h2>
+          <form action="/admin/banners/add" method="POST" enctype="multipart/form-data">
+            <label>Image:</label>
+            <input type="file" name="image" accept="image/*" required>
+            <label>Start Date:</label>
+            <input type="datetime-local" name="startDate" required>
+            <label>End Date:</label>
+            <input type="datetime-local" name="endDate" required>
+            <button type="submit">Add Banner</button>
+          </form>
+        </div>
+        <div class="banner-list">
+          <h2>Current Banners</h2>
+          <% if (banners && banners.length > 0) { %>
+            <% banners.forEach(banner => { %>
+              <div class="banner-item">
+                <img src="<%= banner.image || '/images/default-banner.jpg' %>" alt="Banner">
+                <div>
+                  <p><strong>Active:</strong> <%= banner.active ? 'Yes' : 'No' %></p>
+                  <p><strong>Start:</strong> <%= banner.startDate.toLocaleString() %></p>
+                  <p><strong>End:</strong> <%= banner.endDate.toLocaleString() %></p>
+                </div>
+                <form action="/admin/banners/delete/<%= banner._id %>" method="POST">
+                  <button class="delete-btn" type="submit">Delete</button>
+                </form>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p>No banners found.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

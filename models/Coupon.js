@@ -2,10 +2,10 @@
 import mongoose from "mongoose";
 
 const couponSchema = new mongoose.Schema({
-  code: { type: String, required: true, unique: true },
-  discount: { type: Number, required: true, min: 0, max: 100 },
-  isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  code: { type: String, required: true },
+  discount: { type: Number, required: true },
+  minAmount: { type: Number, required: true },
+  expiryDate: { type: Date, required: true }
 });
-
 export default mongoose.model('Coupon', couponSchema);

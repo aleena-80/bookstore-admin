@@ -3,6 +3,7 @@ import Category from '../../models/Category.js'
 import Address from '../../models/Address.js';  
 import Order from '../../models/Order.js';  
 import Wishlist from '../../models/Wishlist.js'
+import Banner from '../../models/Banner.js'
 import Cart from '../../models/Carts.js'
 import Language from '../../models/Language.js'
 import mongoose from 'mongoose';
@@ -149,59 +150,40 @@ export const getProductDetails = async (req, res) => {
 export const buyNow = async (req, res) => {
   try {
     const { productId } = req.params;
-    const userId = req.user.id;
-
-    // Fetch product
+    const userId = req.user._id; // Use _id from middleware
     const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
-    }
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    if (product.stock <= 0) return res.status(400).json({ success: false, message: 'Out of stock' });
 
-    // Get user's default or first address
     const address = await Address.findOne({ userId, isDefault: true }) || await Address.findOne({ userId });
-    if (!address) {
-      return res.status(400).json({ success: false, message: 'Please add an address to proceed' });
-    }
+    if (!address) return res.status(400).json({ success: false, message: 'Please add an address' });
 
-    // Prepare order items (single product for Buy Now)
-    const items = [{
-      productId: product._id,
-      quantity: 1, // Default to 1 for Buy Now
-      price: product.price,
-      discount: product.discount || 0
-    }];
-
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100), 0);
-    const taxes = subtotal * 0.05;
-    const shipping = 100;
-    const total = subtotal + taxes + shipping;
-
-    // Create temporary order
     const order = new Order({
       userId,
-      items,
+      items: [{
+        productId: product._id,
+        quantity: 1,
+        price: product.price,
+        discount: product.discount || 0
+      }],
       address: {
         name: address.name,
-        street: address.street,
+        street: address.street || address.addressLine1,
         city: address.city,
         state: address.state,
-        postalCode: address.postalCode,
-        country: address.country || 'India'
+        postalCode: address.pincode || address.postalCode,
+        country: 'India'
       },
-      subtotal,
-      taxes,
-      shipping,
-      total,
+      subtotal: product.price * (1 - (product.discount || 0) / 100),
+      taxes: product.price * (1 - (product.discount || 0) / 100) * 0.05,
+      shipping: 100,
+      total: product.price * (1 - (product.discount || 0) / 100) * 1.05 + 100,
       paymentMethod: 'Pending',
       status: 'Pending',
-      orderId: `ORD${Date.now()}`,
-      createdAt: new Date()
+      orderId: `ORD${Date.now()}`
     });
-
     await order.save();
-    console.log('Buy Now Order Created:', order.orderId);
-
-    res.json({ success: true, orderId: order.orderId });
+    res.json({ success: true, orderId: order._id }); // Use _id for MongoDB
   } catch (error) {
     console.error('Buy Now Error:', error);
     res.status(500).json({ success: false, message: 'Failed to process Buy Now' });
@@ -303,53 +285,68 @@ export const editReview = async (req, res) => {
 //-------------------------------------------------------------------------------------------------------------------------
 export const getHome = async (req, res) => {
   try {
-      const books = await Product.find({ 
-          isListed: true, 
-          isDeleted: false 
-      })
-      .sort({ createdAt: -1 })
-      .limit(15)
-      .select('name images price author language inStock');
+    const books = await Product.find({ 
+      isListed: true, 
+      isDeleted: false 
+    })
+    .sort({ createdAt: -1 })
+    .limit(15)
+    .select('name images price author language stock');
 
-      const formattedBooks = books.map(book => ({
-          id: book._id.toString(),
-          title: book.name,
-          coverImage: book.images[0] || '/images/default.jpg',
-          author: book.author,
-          price: book.price,
-          language: book.language || 'English',
-          inStock: book.stock !== false 
-      }));
-      
-      let wishlistCount = 0;
-      let cartCount = 0;
-      let cartItems = [];
+    console.log('Home books:', books.map(b => b.images));
 
-      if (req.user) {
-          cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
-          wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
-          cartCount = cartItems.length;
-      }
-      console.log('cartCount:', cartCount, 'wishlistCount:', wishlistCount);
+    const formattedBooks = books.map(book => ({
+      id: book._id.toString(),
+      title: book.name,
+      coverImage: book.images[0] || 'https://res.cloudinary.com/dlxnlxmaz/image/upload/images/default-product',
+      author: book.author,
+      price: book.price,
+      language: book.language || 'English',
+      inStock: book.stock > 0
+    }));
+   
 
-      res.render('user/home', { 
-          books: formattedBooks, 
-          user: req.user || null, 
-          wishlistCount, 
-          cartItems,
-          cartCount,
-          success: req.query.success || null 
-      });
+    const banners = await Banner.find({ 
+      active: true,
+      startDate: { $lte: new Date() },
+      $or: [{ endDate: { $gte: new Date() } }, { endDate: null }]
+    }).sort({ startDate: -1 });
+    const bannersToShow = banners.length > 0 ? banners : [{ image: '/images/default-banner.jpg' }];
+    console.log('Banners to show:', bannersToShow);
+
+
+
+    let wishlistCount = 0;
+    let cartCount = 0;
+    let cartItems = [];
+
+    if (req.user) {
+      cartItems = await Cart.find({ userId: req.user._id }).populate('productId');
+      wishlistCount = await Wishlist.countDocuments({ userId: req.user._id });
+      cartCount = cartItems.length;
+    }
+
+    res.render('user/home', { 
+      books: formattedBooks, 
+      banners: bannersToShow, // Pass bannersToShow as 'banners'
+      user: req.user || null, 
+      wishlistCount, 
+      cartItems,
+      cartCount,
+      success: req.query.success || null 
+    });
   } catch (error) {
-      console.error('Home Page Error:', error);
-      res.render('user/home', { 
-          books: [], 
-          user: req.user || null, 
-          wishlistCount: 0, 
-          cartCount: 0,
-          success: null, 
-          error: 'Failed to load products' 
-      });
+    console.error('Home Page Error:', error);
+    res.render('user/home', { 
+      books: [], 
+      banners: [{ image: '/images/default-banner.jpg' }], // Consistent fallback
+      user: req.user || null, 
+      wishlistCount: 0, 
+      cartCount: 0,
+      cartItems: [],
+      success: null, 
+      error: 'Failed to load products' 
+    });
   }
 };
 //---------------------------------------------------------------------
@@ -369,15 +366,15 @@ export const searchBooks = async (req, res) => {
         .select('name images price author language inStock');
 
         const formattedBooks = books.map(book => ({
-            id: book._id.toString(),
-            title: book.name,
-            coverImage: book.images[0] || '/images/default.jpg',
-            author: book.author,
-            price: book.price,
-            language: book.language || 'English',
-            inStock: book.inStock !== false
+          id: book._id.toString(),
+          title: book.name,
+          coverImage: book.images[0] || 'https://res.cloudinary.com/dlxnlxmaz/image/upload/images/default-product',
+          author: book.author,
+          price: book.price,
+          language: book.language || 'English',
+          inStock: book.stock > 0
         }));
-
+    
         res.json({ books: formattedBooks });
     } catch (error) {
         console.error('Search Error:', error);

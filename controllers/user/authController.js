@@ -55,7 +55,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-    res.status(200).json({ success: true, token, redirect: '/home' });
+    res.status(200).json({ success: true, token, redirect: '/users/home' });
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ error: 'Something went wrong. Please try again later.' });
@@ -66,7 +66,7 @@ export const sendOtp = async (req, res) => {
   if (req.method === 'GET') {
     return res.render('user/signup', { error: null });
   }
-  const { name, email, password, phone } = req.body;
+  const { name, email, password, phone = ''} = req.body;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -211,7 +211,7 @@ export const googleAuthCallback = async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-    res.redirect('/home');
+    res.redirect('/users/home');
   } catch (error) {
     console.error('Google Auth Callback Error:', error);
     res.redirect('/users/login?message=Server error');

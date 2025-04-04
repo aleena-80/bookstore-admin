@@ -133,7 +133,7 @@
                         <% products.forEach(product => { %>
                             <% const discountedPrice = product.price * (1 - (product.discount || 0) / 100); %>
                             <div class="product-card">
-                                <img src="/images/<%= product.images[0] || 'default.jpg' %>" alt="<%= product.name %>">
+                                <img src="<%= product.images && product.images.length > 0 ? product.images[0] : '/default.jpg' %>" alt="<%= product.name %>">
                                 <a href="/users/products/<%= product._id %>" class="product-title"><%= product.name %></a>
                                 <p>Language: <%= product.language %></p>
                                 <p>₹<%= discountedPrice.toFixed(2) %>
@@ -211,7 +211,7 @@
                     const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
                     productList.innerHTML += `
                         <div class="product-card">
-                            <img src="/images/${product.images[0] || 'default.jpg'}" alt="${product.name}">
+                            <img src="${product.images && product.images.length > 0 ? product.images[0] : '/default.jpg'}" alt="${product.name}">
                             <a href="/users/products/${product._id}" class="product-title">${product.name}</a>
                             <p>Language: ${product.language}</p>
                             <p>₹${discountedPrice.toFixed(2)} ${product.discount > 0 ? `<span class="original-price">₹${product.price.toFixed(2)}</span>` : ''}</p>
@@ -244,7 +244,6 @@
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.cart-count').textContent = data.cartCount;
-                        document.querySelector('.wishlist-count').textContent = data.wishlistCount;
                         showMessage('Added to cart!');
                     } else {
                         showMessage(data.message || 'Already in cart!');

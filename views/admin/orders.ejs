@@ -319,6 +319,7 @@
       <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
       <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
       <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+      <li><a href="/admin/banners" class="active"><i class="fas fa-images"></i> Banners</a></li>
       <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
     </ul>
   </div>
@@ -333,7 +334,7 @@
         <input type="text" name="search" value="<%= search || '' %>" placeholder="Search by Order ID or User">
         <select name="status">
           <option value="">All Statuses</option>
-          <option value="Pending" <%= status === 'Pending' ? 'selected' : '' %>>Pending</option>
+          <option value="Pending" <%= status === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
           <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
           <option value="Out for Delivery" <%= status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
           <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
@@ -360,13 +361,17 @@
             <td><%= order.createdAt.toLocaleDateString() %></td>
             <td><%= order.userId.name %> (<%= order.userId.email %>)</td>
             <td>
-              <select class="status-select" onchange="updateStatus('<%= order._id %>', this.value)">
-                <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                <option value="Out for Delivery" <%= order.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-              </select>
+              <% if (order.status === 'Cancelled' || order.status === 'Returned') { %>
+                <span><%= order.status %></span> <!-- No dropdown for final states -->
+              <% } else { %>
+                <select class="status-select" onchange="updateStatus('<%= order._id %>', this.value)">
+                  <option value="Confirmed" <%= order.status === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                  <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                  <option value="Out for Delivery" <%= order.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                  <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                  <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                </select>
+              <% } %>
             </td>
             <td class="actions">
               <button class="view-btn" onclick="viewOrder('<%= order._id %>')">View</button>
@@ -396,22 +401,40 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     let currentOrderId;
 
     function updateStatus(orderId, status) {
-      fetch(`/admin/orders/status/${orderId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.success) alert('Failed to update status');
-      })
-      .catch(err => console.error('Status Update Error:', err));
-    }
-
+    fetch(`/admin/orders/status/${orderId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.reload(); // Refresh to reflect changes
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: data.message || 'Failed to update status',
+          confirmButtonColor: '#58CC02'
+        });
+      }
+    })
+    .catch(err => {
+      console.error('Status Update Error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong!',
+        confirmButtonColor: '#58CC02'
+      });
+    });
+  }
     function viewOrder(orderId) {
       window.location.href = `/admin/orders/view/${orderId}`;
     }
@@ -441,6 +464,7 @@
       fetch(`/admin/orders/verify-return/${currentOrderId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials:'include',
         body: JSON.stringify({ action })
       })
       .then(res => res.json())

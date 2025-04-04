@@ -138,23 +138,24 @@
 
         .wishlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
+            justify-items: center; /* This will center the cards */
         }
 
         .wishlist-card {
-            background: #FFFFFF;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 2px solid #E5E5E5;
-            text-align: center;
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
+    background: #FFFFFF;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 2px solid #E5E5E5;
+    text-align: center;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 200px; /* Add this fixed width */
+}
         .wishlist-card img {
             width: 100%;
             height: 150px;
@@ -391,7 +392,7 @@
                     <% wishlistItems.forEach(item => { %>
                         <% const discountedPrice = item.product.price * (1 - (item.product.discount || 0) / 100); %>
                         <div class="wishlist-card">
-                            <img src="/images/<%= item.product.images[0] || 'default.jpg' %>" alt="<%= item.product.name %>">
+                            <img src="<%= item.product.images[0] || 'default.jpg' %>" alt="<%= item.product.name %>">
                             <h4><%= item.product.name %></h4>
                             <p>by <%= item.product.author %></p>
                             <p>₹<%= discountedPrice.toFixed(2) %> 
@@ -447,11 +448,15 @@
 
     <script>
         function addToCart(productId) {
-            fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' })
-                .then(res => res.json())
-                .then(data => console.log(data))
-                .catch(err => console.error('Cart add failed:', err));
-        }
+          fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' })
+               .then(res => res.json())
+               .then(data => {
+            if (data.success) {
+                removeFromWishlist(productId);
+            }
+        })
+        .catch(err => console.error('Cart add failed:', err));
+}
 
         function removeFromWishlist(productId) {
             fetch(`/users/wishlist/remove/${productId}`, { method: 'POST', credentials: 'include' })
@@ -461,7 +466,6 @@
                         const card = document.querySelector(`.wishlist-card button[onclick="removeFromWishlist('${productId}')"]`).parentElement.parentElement;
                         card.remove();
                         const count = parseInt(document.querySelector('.nav-links li:nth-child(3) a').textContent.match(/\d+/) || 0) - 1;
-                        document.querySelector('.nav-links li:nth-child(3) a').innerHTML = `<i class="fas fa-heart"></i> (${count})`;
                         if (document.querySelectorAll('.wishlist-card').length === 0) {
                             document.getElementById('wishlistGrid').innerHTML = '<p class="no-items">Your wishlist is empty.</p>';
                         }
