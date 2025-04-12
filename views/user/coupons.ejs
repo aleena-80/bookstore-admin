@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; }
     .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
     .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
@@ -15,42 +15,46 @@
     .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
     .nav-links li a:hover { color: #58CC02; }
     .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
-    .sidebar { position: fixed; top: 70px; left: 0; width: 250px; height: 100%; background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
+    .sidebar { position: fixed; top: 118px; left: 0; width: 250px; height: calc(100% - 70px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
     .sidebar ul { list-style: none; }
     .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
-    .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; }
-    .sidebar ul li a:hover, .sidebar ul li a.active { color: #58CC02; }
-    .main-content { margin-left: 270px; padding: 90px 20px 20px; max-width: 800px; }
-    .breadcrumbs { margin-bottom: 20px; font-size: 14px; color: #666; }
-    .breadcrumbs a { color: #58CC02; text-decoration: none; }
-    .profile-card { background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); text-align: center; }
-    .profile-card h2 { color: #58CC02; font-size: 28px; margin-bottom: 20px; }
-    .profile-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 3px solid #58CC02; }
-    .profile-card p { font-size: 18px; margin: 10px 0; position: relative; }
-    .edit-icon { position: absolute; right: -30px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #58CC02; font-size: 16px; }
-    .btn { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; margin: 5px; }
-    .btn:hover { background: #46a802; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
-    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
+    .sidebar ul li a:hover, .sidebar ul li a.active { color: #58CC02; background: #E5E5E5; width: 100%; }
+    .main-content { margin-left: 270px; padding: 70px 20px 20px; max-width: 800px; }
+    .breadcrumbs { position: fixed; top: 65px; left: 2px; right: 0; padding: 18px 20px; font-size: 14px; color: #1C2526; background: #E5E5E5; z-index: 999; }
+    .breadcrumbs a { color: #1C2526; text-decoration: none; }
+    .breadcrumbs a:hover { color: #58CC02; }
+    .breadcrumbs span { margin: 0 5px; }
+    .search-filter { margin-top: 77px; margin-bottom: 20px; display: flex; gap: 10px; }
+    .search-filter input { padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; width: 70%; }
+    .search-filter select { padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; width: 30%; }
+    .coupon-card { 
+  background: linear-gradient(135deg, #58CC02, #46a802); 
+  padding: 20px; 
+  border-radius: 12px; 
+  color: #FFFFFF; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+  margin-bottom: 20px; 
+  width: 100%; 
+  position: relative; 
+}
+     .coupon-container { margin-top: 77px; }
+    .coupon-container h2 { color: #58CC02; font-size: 28px; margin-bottom: 10px; }
+    .coupon-card-content { position: relative; z-index: 2; }
+    .coupon-card p { font-size: 16px; margin: 5px 0; }
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; }
+      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px);  }
       .sidebar.active { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 70px 10px 10px; }
-      .profile-card { padding: 20px; }
-      .profile-card img { width: 100px; height: 100px; }
+      .coupon-card { padding: 15px;}
+      .search-filter { flex-direction: column; }
+      .search-filter input, .search-filter select { width: 100%; }
     }
-    .coupon-card { background: linear-gradient(135deg, #58CC02, #46a802); padding: 20px; border-radius: 12px; color: #FFFFFF; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); margin-bottom: 20px; max-width: 100%; }
-    .coupon-card p { font-size: 16px; margin: 5px 0; }
-    .coupon-card { background: linear-gradient(135deg, #58CC02, #46a802); padding: 20px; border-radius: 12px; color: #FFFFFF; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); margin-bottom: 20px; max-width: 100%; }
-    .coupon-card p { font-size: 16px; margin: 5px 0; }
     @media (min-width: 769px) {
-      .main-content { display: flex; flex-wrap: wrap; gap: 20px; }
-      .coupon-card { flex: 1 1 calc(50% - 20px); }
+      .main-content { max-width: 1200px; } /* Wider content */
+      .coupon-card { width: 100%; } /* Full width */
     }
   </style>
 </head>
@@ -81,25 +85,62 @@
 
   <div class="main-content">
     <div class="breadcrumbs">
-      <a href="/users/landing">Home</a> > Coupons
+      <a href="/users/landing">Home</a> <span>›</span> <span>Coupons</span>
     </div>
-    <h2 style="color: #58CC02; font-size: 28px; margin-bottom: 20px;">Your Coupons</h2>
-    <% if (coupons && coupons.length > 0) { %>
-      <% coupons.forEach(coupon => { %>
-        <div class="coupon-card">
-          <p><strong><%= coupon.code %></strong> - <%= coupon.discount %>% off</p>
-          <p>Min: ₹<%= coupon.minAmount %> | Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></p>
-        </div>
-      <% }); %>
-    <% } else { %>
-      <p>No coupons available.</p>
-    <% } %>
+    <div style="margin-top: 77px;">
+      <h2 style="color: #58CC02; font-size: 28px; margin-bottom: 20px;">Your Coupons</h2>
+      <div class="search-filter">
+        <input type="text" id="searchInput" placeholder="Search by coupon code...">
+        <select id="categoryFilter">
+          <option value="">All Discounts</option>
+          <option value="10">10% Off</option>
+          <option value="20">20% Off</option>
+          <option value="30">30% Off</option>
+          <option value="50">50% Off</option>
+        </select>
+      </div>
+      <% if (coupons && coupons.length > 0) { %>
+        <% coupons.forEach(coupon => { %>
+          <div class="coupon-card" data-code="<%= coupon.code %>" data-discount="<%= coupon.discount %>">
+            <div class="coupon-card-content">
+              <p><strong><%= coupon.code %></strong> - <%= coupon.discount %>% off</p>
+              <p> Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></p>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p>No coupons available.</p>
+      <% } %>
+    </div>
   </div>
 
   <script>
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
-  </script>
+  const hamburger = document.querySelector('.hamburger');
+  const sidebar = document.querySelector('.sidebar');
+  hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+
+  const searchInput = document.getElementById('searchInput');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const couponCards = document.querySelectorAll('.coupon-card');
+
+  function filterCoupons() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const discountFilter = categoryFilter.value;
+
+    couponCards.forEach(card => {
+      const code = card.dataset.code.toLowerCase();
+      const discount = card.dataset.discount;
+
+      const matchesSearch = code.includes(searchTerm);
+      const matchesDiscount = !discountFilter || discount === discountFilter;
+
+      card.style.display = (matchesSearch && matchesDiscount) ? 'block' : 'none';
+    });
+  }
+
+  searchInput.addEventListener('input', filterCoupons);
+  categoryFilter.addEventListener('change', filterCoupons);
+</script>
 </body>
 </html>

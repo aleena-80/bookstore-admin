@@ -58,11 +58,12 @@
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); }
+      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px);   z-index: 50; 
+        background-color: white; }
       .sidebar.active { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 70px 10px 10px; }
       .breadcrumbs { left: 0; }
-      .profile-card { padding: 20px; margin: 30px auto; max-width: 100%; }
+      .profile-card { padding: 20px;}
     }
   </style>
 </head>

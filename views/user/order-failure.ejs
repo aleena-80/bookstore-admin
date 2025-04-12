@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Failure - Ocean Books</title>
+  <style>
+    body { font-family: 'Roboto', sans-serif; text-align: center; padding: 50px; background: #F5F5F5; }
+    .failure { color: #FF4D4D; }
+    button { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; margin: 10px; cursor: pointer; }
+    button:hover { background: #46a802; }
+  </style>
+</head>
+<body>
+  <div>
+    <h1 class="failure">Payment Failed!</h1>
+    <p>Sorry, there was an issue processing your payment for order #<%= order.orderId %>.</p>
+    <img src="https://epay.upnm.edu.my/assets/img/cards/fail_anim.gif" alt="Failure" style="max-width: 300px;">
+    <div>
+      <a href="/users/checkout/payment?orderId=<%= order.orderId %>"><button>Retry Payment</button></a>
+      <a href="/users/orders/<%= order.orderId %>"><button>Order Details</button></a>
+    </div>
+  </div>
+</body>
+</html>

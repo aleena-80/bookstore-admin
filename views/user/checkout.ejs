@@ -74,6 +74,81 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1001; }
         .modal-content { background: #FFFFFF; padding: 20px; margin: 10% auto; width: 90%; max-width: 400px; border-radius: 12px; position: relative; }
         .modal-content button { margin: 5px; }
+        .coupon-section { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 20px; 
+}
+.coupon-section input { 
+  padding: 10px; 
+  border: 2px solid #58CC02; 
+  border-radius: 8px; 
+  width: 70%; 
+  font-size: 14px; 
+  background: #F5F5F5; 
+  transition: all 0.3s; 
+}
+.coupon-section input:focus { 
+  outline: none; 
+  background: #FFFFFF; 
+  border-color: #46a802; 
+}
+.coupon-section button { 
+  padding: 10px 15px; 
+  background: #58CC02; 
+  color: #FFFFFF; 
+  border: none; 
+  border-radius: 20px; 
+  cursor: pointer; 
+  font-weight: 700; 
+  width: 30%; 
+}
+.coupon-section button:hover { 
+  background: #46a802; 
+}
+.coupon-modal { 
+  display: none; 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: rgba(0, 0, 0, 0.5); 
+  z-index: 1001; 
+}
+.coupon-modal-content { 
+  background: #FFFFFF; 
+  padding: 20px; 
+  margin: 10% auto; 
+  width: 90%; 
+  max-width: 500px; 
+  border-radius: 12px; 
+  max-height: 80vh; 
+  overflow-y: auto; 
+}
+.coupon-modal-content h3 { 
+  color: #58CC02; 
+  margin-bottom: 15px; 
+}
+.coupon-option { 
+  padding: 10px; 
+  border: 2px dashed #58CC02; 
+  border-radius: 8px; 
+  margin-bottom: 10px; 
+  cursor: pointer; 
+  transition: all 0.3s; 
+}
+.coupon-option:hover { 
+  background: #F5F5F5; 
+  border-color: #46a802; 
+}
+.coupon-option p { 
+  margin: 5px 0; 
+}
+.price-details .discount { 
+  color: #58CC02; 
+  font-weight: 700; 
+}
         @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -124,7 +199,7 @@
     </header>
 
     <div class="breadcrumbs">
-                <a href="/users/landing">Home</a> <a href="/users/cart">Cart</a>  Checkout
+                <a href="/users/home">Home</a> <a href="/users/cart">Cart</a>  Checkout
     </div>
 
     <div class="container">
@@ -247,63 +322,74 @@
                 <% } %>
               </div>
         </div>
-
         <div class="right-panel">
+          <div class="right-panel">
             <h3>Order Summary</h3>
+            <div class="coupon-section">
+              <input type="text" id="couponCode" placeholder="Enter coupon code" <% if (appliedCoupon && appliedCoupon.code) { %>value="<%= appliedCoupon.code %>" disabled<% } %>>
+              <% if (appliedCoupon && appliedCoupon.code) { %>
+                <button id="removeCouponBtn">Remove</button>
+              <% } else { %>
+                <button id="applyCouponBtn">Apply</button>
+              <% } %>
+            </div>
             <div class="price-details">
-                <p>Subtotal (<%= cartCount %> items): ₹<%= subtotal %></p>
-                <p>Taxes: ₹<%= taxes %></p>
-                <p>Shipping: ₹<%= shipping %></p>
-                <p class="total">Total: ₹<%= total %></p>
+              <p>Subtotal (<%= cartCount %> items): ₹<%= subtotal %></p>
+              <p>Taxes: ₹<%= taxes %></p>
+              <p>Shipping: ₹<%= shipping %></p>
+              <% if (appliedCoupon && appliedCoupon.code) { %>
+                <p class="discount">Discount (<%= appliedCoupon.discount %>%): -₹<%= (subtotal * appliedCoupon.discount / 100).toFixed(2) %></p>
+              <% } %>
+              <p class="total">Total: ₹<%= total %></p>
             </div>
             <button id="place-order-btn" class="checkout-btn">Place Order</button>
-        </div>
+            <div id="couponModal" class="coupon-modal">
+              <div class="coupon-modal-content">
+                <h3>Available Coupons</h3>
+                <div id="couponList"></div>
+                <button onclick="closeCouponModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px; margin-top: 10px;">Close</button>
+              </div>
+            </div>
+          </div>
     </div>
     <div class="message" id="message"></div>
 
     <script>
-        function showMessage(text, isError = false) {
-            const msg = document.getElementById('message');
-            msg.textContent = text;
-            msg.style.background = isError ? '#FF4D4D' : '#58CC02';
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
-        }
-
-        document.getElementById('place-order-btn').addEventListener('click', async (e) => {
-        e.preventDefault();
-        const selectedAddress = document.querySelector('input[name="address"]:checked');
-        if (!selectedAddress) return showMessage('Please select an address', true);
-        const addressId = selectedAddress.value;
-        console.log('Initiating Order with Address ID:', addressId);
-
-        try {
-            const response = await fetch('/users/checkout/initiate-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ addressId })
-            });
-            const data = await response.json();
-            console.log('Initiate Order Response:', data);
-            if (data.success) {
-                window.location.href = `/users/checkout/payment?orderId=${data.orderId}`;
-            } else {
-                showMessage(data.message || 'Failed to initiate order', true);
-            }
-        } catch (error) {
-            console.error('Initiate Order Error:', error);
-            showMessage('Error initiating order', true);
-        }
-    });
-    function openAddModal() {
-    document.getElementById('addAddressModal').style.display = 'block';
+     function showMessage(text, isError = false) {
+    const msg = document.getElementById('message');
+    msg.textContent = text;
+    msg.style.background = isError ? '#FF4D4D' : '#58CC02';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
   }
 
-  function closeAddModal() {
-    document.getElementById('addAddressModal').style.display = 'none';
-  }
+  document.getElementById('place-order-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const selectedAddress = document.querySelector('input[name="address"]:checked');
+    if (!selectedAddress) return showMessage('Please select an address', true);
+    const addressId = selectedAddress.value;
 
+    try {
+      const response = await fetch('/users/checkout/initiate-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ addressId })
+      });
+      const data = await response.json();
+      if (data.success) {
+        window.location.href = `/users/checkout/payment?orderId=${data.orderId}`;
+      } else {
+        showMessage(data.message || 'Failed to initiate order', true);
+      }
+    } catch (error) {
+      console.error('Initiate Order Error:', error);
+      showMessage('Error initiating order', true);
+    }
+  });
+
+  function openAddModal() { document.getElementById('addAddressModal').style.display = 'block'; }
+  function closeAddModal() { document.getElementById('addAddressModal').style.display = 'none'; }
   function openEditModal(addressId, name, street, city, state, postalCode, isDefault) {
     document.getElementById('editAddressId').value = addressId;
     document.getElementById('editName').value = name || '';
@@ -314,10 +400,7 @@
     document.getElementById('editIsDefault').checked = isDefault === 'true' || isDefault === true;
     document.getElementById('editAddressModal').style.display = 'block';
   }
-
-  function closeEditModal() {
-    document.getElementById('editAddressModal').style.display = 'none';
-  }
+  function closeEditModal() { document.getElementById('editAddressModal').style.display = 'none'; }
 
   document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -328,10 +411,9 @@
       city: form.city.value,
       state: form.state.value,
       postalCode: form.postalCode.value,
-      country: 'India', // Hardcoded per schema
+      country: 'India',
       isDefault: form.isDefault.checked ? true : false
     };
-    console.log('Add Address Form Data:', formData);
     try {
       const response = await fetch('/users/checkout/add-address', {
         method: 'POST',
@@ -340,7 +422,6 @@
         body: JSON.stringify(formData)
       });
       const data = await response.json();
-      console.log('Add Address Response:', data);
       if (data.success) {
         closeAddModal();
         window.location.reload();
@@ -362,11 +443,10 @@
       city: form.city.value,
       state: form.state.value,
       postalCode: form.postalCode.value,
-      country: 'India', // Hardcoded per schema
+      country: 'India',
       isDefault: form.isDefault.checked ? true : false
     };
     const addressId = document.getElementById('editAddressId').value;
-    console.log('Edit Address Form Data:', formData);
     try {
       const response = await fetch(`/users/checkout/edit-address/${addressId}`, {
         method: 'POST',
@@ -375,7 +455,6 @@
         body: JSON.stringify(formData)
       });
       const data = await response.json();
-      console.log('Edit Address Response:', data);
       if (data.success) {
         closeEditModal();
         window.location.reload();
@@ -387,8 +466,115 @@
       showMessage('Error editing address', true);
     }
   });
-       
 
-    </script>
+  async function fetchCoupons() {
+    const response = await fetch('/users/coupons', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+    const data = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(data, 'text/html');
+    return Array.from(doc.querySelectorAll('.coupon-card')).map(card => ({
+      code: card.dataset.code,
+      discount: card.dataset.discount,
+      expiryDate: card.querySelector('p:nth-child(2)').textContent.replace('Expires: ', '')
+    }));
+  }
+
+  function openCouponModal(coupons) {
+    const modal = document.getElementById('couponModal');
+    const couponList = document.getElementById('couponList');
+    couponList.innerHTML = '';
+    coupons.forEach(coupon => {
+      const div = document.createElement('div');
+      div.className = 'coupon-option';
+      div.innerHTML = `
+        <p><strong>${coupon.code}</strong> - ${coupon.discount}% off</p>
+        <p>Expires: ${coupon.expiryDate}</p>
+      `;
+      div.onclick = () => applyCoupon(coupon.code);
+      couponList.appendChild(div);
+    });
+    modal.style.display = 'block';
+  }
+
+  function closeCouponModal() {
+    document.getElementById('couponModal').style.display = 'none';
+  }
+
+  document.getElementById('applyCouponBtn')?.addEventListener('click', async () => {
+    const couponInput = document.getElementById('couponCode').value.trim();
+    if (couponInput) {
+      applyCoupon(couponInput);
+    } else {
+      const coupons = await fetchCoupons();
+      if (coupons.length > 0) {
+        openCouponModal(coupons);
+      } else {
+        showMessage('No coupons available', true);
+      }
+    }
+  });
+
+  async function applyCoupon(code) {
+    console.log('Applying coupon:', code); // Debug log
+    const response = await fetch('/users/coupons/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ code })
+    });
+    const data = await response.json();
+    console.log('Response:', data); // Debug log
+    if (data.success) {
+      closeCouponModal();
+      showMessage(`Coupon ${code} applied! Discount: ${data.discount}%`);
+      updatePriceDetails(data.discount);
+      location.reload(); // Reload to show Remove button
+    } else {
+      showMessage(data.message || 'Failed to apply coupon', true);
+    }
+  }
+
+  document.getElementById('removeCouponBtn')?.addEventListener('click', async () => {
+    const response = await fetch('/users/coupons/remove', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+    const data = await response.json();
+    if (data.success) {
+      showMessage('Coupon removed');
+      updatePriceDetails(0);
+      location.reload(); // Reload to show Apply button
+    } else {
+      showMessage(data.message, true);
+    }
+  });
+
+  function updatePriceDetails(discount) {
+    const subtotal = parseFloat('<%= subtotal %>');
+    const taxes = parseFloat('<%= taxes %>');
+    const shipping = parseFloat('<%= shipping %>');
+    const discountAmount = discount ? (subtotal * discount / 100) : 0;
+    const total = subtotal + taxes + shipping - discountAmount;
+
+    const priceDetails = document.querySelector('.price-details');
+    priceDetails.innerHTML = `
+      <p>Subtotal (<%= cartCount %> items): ₹${subtotal.toFixed(2)}</p>
+      <p>Taxes: ₹${taxes.toFixed(2)}</p>
+      <p>Shipping: ₹${shipping.toFixed(2)}</p>
+      ${discount ? `<p class="discount">Discount (${discount}%): -₹${discountAmount.toFixed(2)}</p>` : ''}
+      <p class="total">Total: ₹${total.toFixed(2)}</p>
+    `;
+  }
+
+  // Initial price update if coupon is applied
+  <% if (appliedCoupon && appliedCoupon.code) { %>
+    updatePriceDetails(<%= appliedCoupon.discount %>);
+  <% } %>
+  </script>
 </body>
 </html>

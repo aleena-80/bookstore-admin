@@ -12,10 +12,13 @@ export const addToCart = async (req, res) => {
       if (!product || !product.isListed || (product.category && product.category.isListed === false) || product.stock <= 0) {
         return res.json({ success: false, message: 'Product unavailable' });
       }
-  
+
+
       let cartItem = await Cart.findOne({ userId: req.user.id, productId });
+
+
       if (cartItem) {
-        if (cartItem.quantity >= product.stock || cartItem.quantity >= 10) {
+        if (cartItem.quantity >= product.stock || cartItem.quantity >= 5) {
           return res.json({ success: false, message: 'Max quantity reached' });
         }
         cartItem.quantity += 1;

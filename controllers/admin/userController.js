@@ -3,18 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 
-export const renderDashboard = (req, res) => {
-  try {
-    if (res.headersSent) {
-      return;
-    }
-    res.render("admin/dashboard"); 
-  } catch (error) {
-    if (!res.headersSent) {
-      res.status(500).send("Internal Server Error"); 
-    }
-  }
-};
 
 export const renderUsers = async (req, res) => {
 

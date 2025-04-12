@@ -6,7 +6,7 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'products', // Store in 'products' folder on Cloudinary
+    folder: 'products', 
     allowed_formats: ['jpg', 'jpeg', 'png'],
     public_id: (req, file) => `${Date.now()}-${file.originalname.split('.')[0].replace(/[^a-zA-Z0-9-]/g, '_')}`
   }

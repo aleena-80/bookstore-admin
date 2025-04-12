@@ -14,12 +14,13 @@ import Newsletter from '../../models/Newsletter.js'
 export const getProducts = async (req, res) => {
   try {
     const user = req.user || null;
-    const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 10 } = req.query;
+    const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 10 ,language=''} = req.query;
     const skip = (page - 1) * limit;
 
     let query = { isListed: true, isDeleted: false };
     if (search) query.name = { $regex: search, $options: 'i' };
     if (category) query.category = category;
+    if (language) query.language = language;
     if (priceMin) query.price = { ...query.price, $gte: Number(priceMin) };
     if (priceMax) query.price = { ...query.price, $lte: Number(priceMax) };
 

@@ -15,16 +15,24 @@
         .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
         .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
         .nav-links li a:hover { color: #58CC02; }
-        .breadcrumbs { padding: 20px; font-size: 14px; color: #1C2526; background-color: #E5E5E5; }
+        .breadcrumbs { padding: 20px; font-size: 14px; color: #1C2526; background-color: #E5E5E5; position: fixed; top: 83px; left: 0; right: 0; z-index: 999; }
         .breadcrumbs a { color: #1C2526; text-decoration: none; transition: color 0.3s; }
         .breadcrumbs a:hover { color: #58CC02; }
+        .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
+        .sidebar { position: fixed; top: 140px; width: 250px; height: calc(100% - 100px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: left 0.3s ease; z-index: 999; }
+        .sidebar.active { left: 0; }
+        .sidebar ul { list-style: none; }
+        .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { color: #58CC02; background: #E5E5E5; width: 100%; }
         .breadcrumbs span { margin: 0 5px; }
-        .order-list { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .main-content { margin-left: 270px; padding: 70px 20px 20px; max-width: 1200px; }
+        .order-list { padding: 20px; }
         h2 { color: #58CC02; margin-bottom: 20px; font-size: 28px; }
         .order-card { background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; }
         .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; }
         .order-header p { margin: 0; font-size: 16px; }
-        .status { font-weight: 700; } /* Moved color logic to HTML */
+        .status { font-weight: 700; }
         .order-items { display: flex; flex-direction: column; gap: 10px; }
         .order-item { display: flex; align-items: center; gap: 15px; }
         .order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
@@ -35,16 +43,33 @@
         .btn-cancel { background: #e74c3c; }
         .btn-cancel:hover { background: #c0392b; }
         .btn-return { background: #f39c12; }
-        .return-reasons { margin: 10px 0;}
-        .return-reasons label {display: block; margin: 5px 0;}
+        .return-reasons { margin: 10px 0; }
+        .return-reasons label { display: block; margin: 5px 0; }
         .btn-return:hover { background: #e08e0b; }
         .message { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #58CC02; color: #FFFFFF; border-radius: 5px; display: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: #FFFFFF; padding: 20px; border-radius: 12px; width: 400px; text-align: center; }
+        .modal-content { background: #FFFFFF; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
         .modal-content h3 { color: #e74c3c; font-size: 20px; margin-bottom: 15px; }
         .modal-content p { color: #1C2526; margin-bottom: 10px; }
         #cancel-reason { width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 8px; resize: none; font-family: 'Roboto', sans-serif; }
         .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .pagination button { padding: 8px 12px; background: #FFFFFF; color: #1C2526; border: 2px solid #58CC02; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .pagination button.active { background: #58CC02; color: #FFFFFF; }
+        .pagination button:hover:not(.active) { background: #E5E5E5; }
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; }
+            .hamburger { display: block; }
+            .nav-links { display: none; }
+            .main-content { margin-left: 0; padding: 70px 10px 10px; }
+            .order-list { padding: 10px; }
+            .order-card { padding: 15px; }
+            .order-header { flex-direction: column; align-items: flex-start; }
+            .order-item { flex-direction: column; align-items: flex-start; }
+            .order-item img { width: 50px; height: 50px; }
+            .actions { flex-direction: column; align-items: flex-start; }
+            .breadcrumbs { padding: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -54,6 +79,7 @@
                 <h1><a href="/users/landing">Ocean Books</a></h1>
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
             <ul class="nav-links">
                 <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
                 <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
@@ -72,49 +98,65 @@
         <span>Orders</span>
     </section>
 
+    <div class="sidebar">
+        <ul>
+            <li><i class="fas fa-user"></i><a href="/users/profile">Profile</a></li>
+            <li><i class="fas fa-map-marker-alt"></i><a href="/users/addresses">Addresses</a></li>
+            <li><i class="fas fa-shopping-bag"></i><a href="/users/orders" class="active">Orders</a></li>
+            <li><i class="fas fa-wallet"></i><a href="/users/wallet">Wallet</a></li>
+            <li><i class="fas fa-ticket-alt"></i><a href="/users turkeys">Coupons</a></li>
+            <li><i class="fas fa-sign-out-alt"></i><a href="/users/logout">Logout</a></li>
+        </ul>
+    </div>
+
     <main>
-        <div class="order-list">
-            <h2>Your Orders</h2>
-            <% if (orders.length === 0) { %>
-                <p>No orders found.</p>
-            <% } %>
-            <% orders.forEach(order => { %>
-                <div class="order-card">
-                    <div class="order-header">
-                        <p><strong>Order #<%= order.orderId %></strong></p>
-                        <p>Date: <%= order.createdAt.toLocaleDateString() %></p>
-                        <p>Status: <span class="status" style="color: <%= order.status === 'Delivered' ? '#58CC02' : order.status === 'Cancelled' ? '#e74c3c' : '#1C2526' %>"><%= order.status %></span></p>
-                        <p>Total: ₹<%= order.total.toFixed(2) %></p>
-                    </div>
-                    <div class="order-items">
-                        <% order.items.forEach(item => { %>
+        <div class="main-content">
+            <div class="order-list" id="order-list">
+                <h2>Your Orders</h2>
+                <% if (orders.length === 0) { %>
+                    <p>No orders found.</p>
+                <% } %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <p><strong>Order #<%= order.orderId %></strong></p>
+                            <p>Date: <%= order.createdAt.toLocaleDateString() %></p>
+                            <p>Status: <span class="status" style="color: <%= order.status === 'Delivered' ? '#58CC02' : order.status === 'Cancelled' ? '#e74c3c' : '#1C2526' %>"><%= order.status %></span></p>
+                            <p>Total: ₹<%= order.total.toFixed(2) %></p>
+                        </div>
+                        <div class="order-items">
                             <% order.items.forEach(item => { %>
                                 <div class="order-item">
-                                  <img src="<%= item.productId && item.productId.images && item.productId.images.length > 0 ? item.productId.images[0] : '/default.jpg' %>" alt="<%= item.productId ? item.productId.name : 'Product Removed' %>">
-                                  <div class="item-details">
-                                    <p><%= item.productId ? item.productId.name : 'Product Removed' %> (Qty: <%= item.quantity %>)</p>
-                                    <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>
-                                      <p>Expected Delivery: <%= order.expectedDelivery ? new Date(order.expectedDelivery).toLocaleDateString() : 'TBD' %></p>
-                                    <% } %>
-                                  </div>
+                                    <img src="<%= item.productId && item.productId.images && item.productId.images.length > 0 ? item.productId.images[0] : '/default.jpg' %>" alt="<%= item.productId ? item.productId.name : 'Product Removed' %>">
+                                    <div class="item-details">
+                                        <p><%= item.productId ? item.productId.name : 'Product Removed' %> (Qty: <%= item.quantity %>)</p>
+                                        <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>
+                                            <p>Expected Delivery: <%= order.expectedDelivery ? new Date(order.expectedDelivery).toLocaleDateString() : 'TBD' %></p>
+                                        <% } %>
+                                    </div>
                                 </div>
-                              <% }); %>
-                        <% }); %>
+                            <% }); %>
+                        </div>
+                        <div class="actions">
+                            <a href="/users/orders/view/<%= order._id %>" class="btn">View Details</a>
+                            <% if (order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Returned') { %>
+                                <button class="btn btn-cancel" onclick="showCancelModal('<%= order._id %>')">Cancel Order</button>
+                            <% } %>
+                            <% if (order.status === 'Delivered' && !order.returnRequest) { %>
+                                <button class="btn btn-return" onclick="showReturnModal('<%= order._id %>')">Request Return</button>
+                            <% } %>
+                            <% if (order.returnRequest) { %>
+                                <p>Return Requested</p>
+                            <% } %>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <a href="/users/orders/view/<%= order._id %>" class="btn">View Details</a>
-                        <% if (order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Returned') { %>
-                          <button class="btn btn-cancel" onclick="showCancelModal('<%= order._id %>')">Cancel Order</button>
-                        <% } %>
-                        <% if (order.status === 'Delivered' && !order.returnRequest) { %>
-                            <button class="btn btn-return" onclick="showReturnModal('<%= order._id %>')">Request Return</button>
-                          <% } %>
-                        <% if (order.returnRequest) { %>
-                          <p>Return Requested</p>
-                        <% } %>
-                      </div>
-                </div>
-            <% }); %>
+                <% }); %>
+            </div>
+            <div class="pagination" id="pagination">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <button class="<%= i === page ? 'active' : '' %>" onclick="loadPage(<%= i %>)"><%= i %></button>
+                <% } %>
+            </div>
         </div>
     </main>
 
@@ -133,20 +175,20 @@
 
     <div id="return-modal" class="modal">
         <div class="modal-content">
-          <h3>Request Return</h3>
-          <p>Select a reason (optional):</p>
-          <div class="return-reasons">
-            <label><input type="checkbox" name="returnReason" value="Defective Product"> Defective Product</label><br>
-            <label><input type="checkbox" name="returnReason" value="Changed My Mind"> Changed My Mind</label><br>
-            <label><input type="checkbox" name="returnReason" value="Wrong Item"> Wrong Item</label><br>
-            <label><input type="checkbox" name="returnReason" value="Other"> Other</label>
-          </div>
-          <div class="modal-actions">
-            <button class="btn btn-return" onclick="confirmReturn()">Confirm</button>
-            <button class="btn" onclick="closeReturnModal()">Close</button>
-          </div>
+            <h3>Request Return</h3>
+            <p>Select a reason (optional):</p>
+            <div class="return-reasons">
+                <label><input type="checkbox" name="returnReason" value="Defective Product"> Defective Product</label><br>
+                <label><input type="checkbox" name="returnReason" value="Changed My Mind"> Changed My Mind</label><br>
+                <label><input type="checkbox" name="returnReason" value="Wrong Item"> Wrong Item</label><br>
+                <label><input type="checkbox" name="returnReason" value="Other"> Other</label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-return" onclick="confirmReturn()">Confirm</button>
+                <button class="btn" onclick="closeReturnModal()">Close</button>
+            </div>
         </div>
-      </div>
+    </div>
 
     <script>
         let currentOrderId;
@@ -169,11 +211,9 @@
             document.getElementById('cancel-modal').style.display = 'none';
         }
 
-
         function showReturnModal(orderId) {
             currentOrderId = orderId;
             document.getElementById('return-modal').style.display = 'flex';
-            // Reset checkboxes
             document.querySelectorAll('.return-reasons input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
@@ -201,7 +241,7 @@
                 if (data.success) {
                     showMessage('Order cancelled successfully');
                     closeCancelModal();
-                    setTimeout(() => location.reload(), 1000);
+                    loadPage(<%= page %>); // Refresh current page
                 } else {
                     showMessage(data.message || 'Failed to cancel order', true);
                 }
@@ -213,30 +253,90 @@
 
         async function confirmReturn() {
             const reasons = Array.from(document.querySelectorAll('.return-reasons input[type="checkbox"]:checked'))
-            .map(cb => cb.value)
-            .join(', ') || 'No reason provided'; // Optional, defaults if none selected
+                .map(cb => cb.value)
+                .join(', ') || 'No reason provided';
             try {
-            const res = await fetch(`/users/orders/return/${currentOrderId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ reason: reasons })
-            });
-            const data = await res.json();
-            if (data.success) {
-                showMessage('Return requested successfully');
-                closeReturnModal();
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                showMessage(data.message || 'Failed to request return', true);
-            }
+                const res = await fetch(`/users/orders/return/${currentOrderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ reason: reasons })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showMessage('Return requested successfully');
+                    closeReturnModal();
+                    loadPage(<%= page %>); // Refresh current page
+                } else {
+                    showMessage(data.message || 'Failed to request return', true);
+                }
             } catch (error) {
-            console.error('Request Return Error:', error);
-            showMessage('Error requesting return', true);
+                console.error('Request Return Error:', error);
+                showMessage('Error requesting return', true);
             }
         }
 
-        // async function requestReturn(orderId) {
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+        hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+        async function loadPage(page) {
+            try {
+                const response = await fetch(`/users/orders?page=${page}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' } // Signal AJAX
+                });
+                const data = await response.json();
+                const orderList = document.getElementById('order-list');
+                orderList.innerHTML = '<h2>Your Orders</h2>';
+
+                if (data.orders.length === 0) {
+                    orderList.innerHTML += '<p>No orders found.</p>';
+                } else {
+                    data.orders.forEach(order => {
+                        const itemsHtml = order.items.map(item => `
+                            <div class="order-item">
+                                <img src="${item.productId && item.productId.images && item.productId.images.length > 0 ? item.productId.images[0] : '/default.jpg'}" alt="${item.productId ? item.productId.name : 'Product Removed'}">
+                                <div class="item-details">
+                                    <p>${item.productId ? item.productId.name : 'Product Removed'} (Qty: ${item.quantity})</p>
+                                    ${order.status !== 'Cancelled' && order.status !== 'Returned' ? `<p>Expected Delivery: ${order.expectedDelivery ? new Date(order.expectedDelivery).toLocaleDateString() : 'TBD'}</p>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                        const actionsHtml = `
+                            <a href="/users/orders/view/${order._id}" class="btn">View Details</a>
+                            ${order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Returned' ? `<button class="btn btn-cancel" onclick="showCancelModal('${order._id}')">Cancel Order</button>` : ''}
+                            ${order.status === 'Delivered' && !order.returnRequest ? `<button class="btn btn-return" onclick="showReturnModal('${order._id}')">Request Return</button>` : ''}
+                            ${order.returnRequest ? '<p>Return Requested</p>' : ''}
+                        `;
+                        orderList.innerHTML += `
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <p><strong>Order #${order.orderId}</strong></p>
+                                    <p>Date: ${new Date(order.createdAt).toLocaleDateString()}</p>
+                                    <p>Status: <span class="status" style="color: ${order.status === 'Delivered' ? '#58CC02' : order.status === 'Cancelled' ? '#e74c3c' : '#1C2526'}">${order.status}</span></p>
+                                    <p>Total: ₹${order.total.toFixed(2)}</p>
+                                </div>
+                                <div class="order-items">${itemsHtml}</div>
+                                <div class="actions">${actionsHtml}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                for (let i = 1; i <= data.totalPages; i++) {
+                    pagination.innerHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadPage(${i})">${i}</button>`;
+                }
+            } catch (error) {
+                console.error('Load Page Error:', error);
+                showMessage('Error loading orders', true);
+            }
+        }
+    </script>
+</body>
+</html>
+        <!-- // async function requestReturn(orderId) {
         //     if (!confirm('Are you sure you want to request a return?')) return;
         //     try {
         //         const res = await fetch(`/users/orders/return/${orderId}`, {
@@ -256,6 +356,4 @@
         //         showMessage('Error requesting return', true);
         //     }
         // }
-    </script>
-</body>
-</html>
+    -->

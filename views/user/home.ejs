@@ -357,22 +357,45 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                padding: 10px 20px;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                align-items: center;
-                margin-top: 10px;
-                width: 100%;
-            }
+    
             .banner { position: relative; }
             .banner-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
             .dot { width: 10px; height: 10px; background: #FFF; border-radius: 50%; cursor: pointer; opacity: 0.5; }
             .dot.active { opacity: 1; }
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack logo and nav vertically */
+        align-items: flex-start; /* Align items to the left */
+    }
 
+    .nav-links {
+        flex-direction: row; /* Stack links vertically */
+        align-items: flex-end; /* Align links to the left */
+    }
+
+    .nav-links li a {
+        font-size: 14px; /* Slightly smaller text */
+        justify-content: flex-start; /* Align icons and text to the left */
+    }
+
+    .search-bar {
+        position: static; /* Remove absolute positioning */
+        transform: none; /* Remove transform */
+        margin-top: 15px; /* Space above search */
+        display: flex; /* Flex for input and button */
+        gap: 10px; /* Space between input and button */
+    }
+
+    .search-bar input {
+        width: 100%; /* Full width for input */
+        font-size: 14px; /* Match link size */
+    }
+
+    .search-bar button {
+        padding: 8px 12px; /* Slightly smaller button */
+        font-size: 14px; /* Match link size */
+    }
+}
             .search-bar {
                 position: static;
                 transform: none;
@@ -381,10 +404,6 @@
 
             .search-bar input {
                 width: 100%;
-            }
-
-            .nav-links li a {
-                font-size: 14px;
             }
 
             .banner-img {
@@ -437,8 +456,9 @@
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
             <ul class="nav-links">
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
-                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
+
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
 
                 <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
                 <% if (user) { %>

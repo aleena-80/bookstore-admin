@@ -76,7 +76,7 @@
                             <div class="quantity-controls">
                                 <button class="decrement" id="decrement" data-cart-id="<%= item._id %>" <%= item.quantity <= 1 ? 'disabled' : '' %>>-</button>
                                 <span class="quantity" id="quantity"><%= item.quantity %></span>
-                                <button class="increment" id="increment" data-cart-id="<%= item._id %>" <%= item.quantity >= Math.min(item.productId.stock, 10) ? 'disabled' : '' %>>+</button>
+                                <button class="increment" id="increment" data-cart-id="<%= item._id %>" <%= item.quantity >= Math.min(item.productId.stock, 5) ? 'disabled' : '' %>>+</button>
                             </div>
                             <button class="remove-btn" data-cart-id="<%= item._id %>">Remove</button>
                         </div>
@@ -140,7 +140,7 @@ async function updateQuantity(productId, action) {
                 const decrementBtn = card.querySelector('.decrement');
                 
                 if (incrementBtn) {
-                    incrementBtn.disabled = data.quantity >= Math.min(data.stock, 10);
+                    incrementBtn.disabled = data.quantity >= Math.min(data.stock, 5);
                 }
                 if (decrementBtn) {
                     decrementBtn.disabled = data.quantity <= 1;
@@ -220,31 +220,6 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
-        document.getElementById('apply-coupon').addEventListener('click', async () => {
-            const couponCode = document.getElementById('coupon-code').value.trim();
-            if (!couponCode) return showMessage('Please enter a coupon code', true);
-            try {
-                const response = await fetch('/users/cart/apply-coupon', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ couponCode })
-                });
-                const data = await response.json();
-                console.log('Coupon Response:', data);
-                if (data.success) {
-                    document.getElementById('subtotal').textContent = data.subtotal;
-                    document.getElementById('taxes').textContent = data.taxes;
-                    document.getElementById('shipping').textContent = data.shipping;
-                    document.getElementById('grand-total').textContent = data.total;
-                    showMessage('Coupon applied successfully');
-                } else {
-                    showMessage(data.message || 'Invalid coupon code', true);
-                }
-            } catch (error) {
-                console.error('Apply Coupon Error:', error);
-                showMessage('Error applying coupon', true);
-            }
-        });
     </script>
 </body>
 </html>

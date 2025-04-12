@@ -311,6 +311,24 @@
             margin-top: 20px;
             font-size: 12px;
         }
+        @media (max-width: 768px) {
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-section form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-section input {
+                width: 100%;
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -380,7 +398,7 @@
             <div class="footer-section">
                 <h4>Newsletter</h4>
                 <p>Subscribe for updates and offers!</p>
-                <form action="/subscribe" method="POST">
+                <form action="/users/subscribe" method="POST">
                     <input type="email" placeholder="Enter your email" name="email">
                     <button type="submit">Subscribe</button>
                 </form>

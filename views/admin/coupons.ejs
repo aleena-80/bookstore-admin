@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ocean Books</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Your existing styles unchanged... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: rgb(32,31,49); /* Deep navy */
+            color: #FFFFFF;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 20px 10px;
+            text-align: center;
+            background: rgb(32,31,49);
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.6em;
+            margin: 0;
+            color: rgb(255, 255, 255);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar ul {
+            padding: 10px 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 20px;
+            border-radius: 5px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+        }
+
+        .sidebar a.active {
+            color: rgb(255, 255, 255);
+        }
+
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .dashboard-info {
+            background: #FFFFFF;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: rgb(32,31,49);
+        }
+
+        .dashboard-info form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-info input {
+            padding: 8px;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .dashboard-info button {
+            padding: 8px 15px;
+            background: rgb(255, 186, 222); /* Pink */
+            color: rgb(32,31,49);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dashboard-info button:hover {
+            background: rgba(255, 186, 222, 0.8);
+        }
+
+        .coupon-list {
+            list-style: none;
+        }
+
+        .coupon-item {
+            background: rgb(32,31,49); /* Navy */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 60px; /* Ensure space for content */
+        }
+
+        .coupon-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .coupon-details span {
+            font-size: 16px;
+            color: #FFFFFF;
+        }
+
+        .coupon-item .status {
+            padding: 4px 8px;
+            background: rgba(255, 186, 222, 0.8); /* Pink */
+            color: rgb(32,31,49);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px; /* Align with text */
+        }
+
+        .coupon-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .coupon-actions button {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .coupon-actions .btn-delete {
+            background: rgb(255, 186, 222); /* Pink */
+        }
+
+        .coupon-actions .btn-unlist {
+            background: rgba(255, 186, 222, 0.6); /* Slightly darker pink */
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1.4em;
+            }
+
+            .sidebar a, .sidebar button {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .dashboard-info form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        </div>
+        <ul>
+            <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
+            <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
+            <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+            <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+            <li><a href="/admin/banners"><i class="fas fa-images"></i> Banners</a></li>
+            <li><a href="/admin/coupons" class="active"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
+            <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <h1>Coupons</h1>
+        <div class="dashboard-info">
+          <form id="createCouponForm">
+            <input type="text" name="code" placeholder="Coupon Code" required>
+            <input type="number" name="discount" placeholder="Discount (%)" min="0" max="100" required>
+            <input type="date" name="expiryDate" required>
+            <button type="submit"><i class="fas fa-plus"></i> Create Coupon</button>
+          </form>
+          <ul class="coupon-list" id="couponList">
+            <% coupons.forEach(coupon => { %>
+              <li class="coupon-item">
+                <div class="coupon-details">
+                  <span><%= coupon.code %> - <%= coupon.discount %>% <span class="status">Active</span></span>
+                  <span>Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></span>
+                </div>
+                <div class="coupon-actions">
+                  <button class="btn-delete" onclick="deleteCoupon('<%= coupon._id %>')"><i class="fas fa-trash"></i> Delete</button>
+                  <button class="btn-unlist" onclick="unlistCoupon('<%= coupon._id %>')"><i class="fas fa-ban"></i> Unlist</button>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+      
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        document.getElementById('createCouponForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const response = await fetch('/admin/coupons/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              code: formData.get('code'), 
+              discount: formData.get('discount'),
+              expiryDate: formData.get('expiryDate')
+            })
+          });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Coupon created successfully!',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        });
+      
+        async function deleteCoupon(couponId) {
+          const response = await fetch(`/admin/coupons/${couponId}`, { 
+            method: 'DELETE' 
+          });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: 'Coupon deleted successfully!',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        }
+
+        async function unlistCoupon(couponId) {
+          const response = await fetch(`/admin/coupons/unlist/${couponId}`, { 
+            method: 'POST' 
+          });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Unlisted',
+              text: 'Coupon unlisted successfully!',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        }
+      </script>
+</body>
+</html>

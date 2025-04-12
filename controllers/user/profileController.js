@@ -210,17 +210,3 @@ export const changeEmail = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to send OTP' });
   }
 };
-
-
-export const getCoupons = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const coupons = await Coupon.find({ userId });
-    const wishlistCount = await Wishlist.countDocuments({ userId });
-    const cartCount = await Cart.countDocuments({ userId });
-    res.render('user/coupons', { coupons, wishlistCount, cartCount });
-  } catch (error) {
-    console.error('Coupons Error:', error);
-    res.render('user/coupons', { coupons: [], wishlistCount: 0, cartCount: 0, error: 'Failed to load coupons' });
-  }
-};

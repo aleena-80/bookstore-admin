@@ -20,7 +20,12 @@ export const addProduct = (req, res) => {
 
       const { name, price, discount, category, language, stock, author, description } = req.body;
       const images = req.files ? req.files.map(file => file.path) : []; // Cloudinary URLs
-
+    if (images) {
+        if (!images.mimetype.startsWith('image/')) {
+          return res.status(400).json({ success: false, message: 'Only image files are allowed' });
+        }
+      
+    }
       console.log("Images to save:", images);
 
       const product = new Product({
@@ -65,7 +70,7 @@ export const editProduct = async (req, res) => {
     if (author !== undefined) product.author = author || '';
     if (description !== undefined) product.description = description || ''; // Ensure description updates
 
-    // Handle images
+ 
     let images = existingImages ? (Array.isArray(existingImages) ? existingImages : [existingImages]) : product.images || [];
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map(file =>

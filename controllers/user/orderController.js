@@ -16,15 +16,17 @@ export const searchOrders = async (req, res) => {
 //-------------------------------------------------------------------------
 export const getOrderDetail = async (req, res) => {
   try {
+
     const order = await Order.findById(req.params.id)
-      .populate('items.productId'); 
+      .populate('items.productId');
     if (!order || order.userId.toString() !== req.user.id) {
       return res.status(404).send('Order not found');
     }
     const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
     const cartCount = await Cart.countDocuments({ userId: req.user.id });
+
     console.log('Order Address:', order.address);
-    res.render('user/order-details', { order, wishlistCount, cartCount, user: req.user });
+    res.render('user/order-details', { order, wishlistCount, cartCount, user: req.user , });
   } catch (error) {
     console.error('Get Order Details Error:', error);
     res.status(500).send('Server Error');
@@ -77,17 +79,51 @@ export const downloadInvoice = async (req, res) => {
 //------------------------------------------------------------------------------------------------
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user.id })
-      .populate('items.productId');
+    const userId = req.user._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; // Orders per page
+    const skip = (page - 1) * limit;
+
+    const totalOrders = await Order.countDocuments({ userId });
+    const totalPages = Math.ceil(totalOrders / limit);
+      const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 })
+      .populate('items.productId')
+      .skip(skip)
+      .limit(limit);
+
     const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
     const cartCount = await Cart.countDocuments({ userId: req.user.id });
-    res.render('user/orders', { orders, wishlistCount, cartCount, user: req.user });
+
+    if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
+      res.json({ orders, totalPages, page });
+    } else {
+      res.render('user/orders', {
+        orders,
+        user: req.user,
+        wishlistCount,
+        cartCount,
+        page,
+        totalPages
+      });
+    }
   } catch (error) {
     console.error('Get Orders Error:', error);
-    res.status(500).send('Server Error');
+    if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
+      res.status(500).json({ error: 'Failed to load orders' });
+    } else {
+      res.render('user/orders', {
+        orders: [],
+        user: req.user,
+        wishlistCount: 0,
+        cartCount: 0,
+        page: 1,
+        totalPages: 1,
+        error: 'Failed to load orders'
+      });
+    }
   }
 };
-//----------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -105,6 +141,14 @@ export const cancelOrder = async (req, res) => {
 
     order.status = 'Cancelled';
     order.cancelReason = reason;
+
+    if (order.paymentMethod === 'Razorpay' && order.paymentId) {
+      let wallet = await Wallet.findOne({ userId: req.user.id });
+      if (!wallet) wallet = new Wallet({ userId: req.user.id, balance: 0 });
+      wallet.balance += order.total;
+      await wallet.save();
+      console.log(`Refunded ₹${order.total} to wallet for Razorpay order ${orderId}`);
+    }
 
     // Increase stock on cancellation
     for (const item of order.items) {
