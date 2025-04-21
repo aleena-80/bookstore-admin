@@ -49,14 +49,52 @@
         .tagline {
             color: #1C2526;
             font-size: 14px;
-            margin-top: 5px;
         }
 
+        .wishlist-count, .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #58CC02; /* Match brand color */
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge:empty {
+            display: none; /* Hide if count is 0 */
+        }
+       
         .nav-links {
             list-style: none;
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            width: auto; /* Adjusted for better mobile fit */
         }
 
         .nav-links li a {
@@ -64,47 +102,27 @@
             text-decoration: none;
             font-size: 16px;
             font-weight: 700;
+            display: flex;
+            align-items: center;
             transition: color 0.3s;
+            position: relative;
         }
 
         .nav-links li a:hover {
             color: #58CC02;
         }
 
-        .breadcrumbs {
-            padding: 20px 20px;
-            font-size: 14px;
-            color: #1C2526;
-            background-color: #E5E5E5;
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .nav-links li a i {
+            margin-right: 5px;
         }
 
-        .breadcrumbs a {
-            color: #58CC02;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .breadcrumbs a:hover {
-            color: #4AB302;
-        }
-
-        .breadcrumbs span {
+        .nav-links li.profile-link a {
             color: #1C2526;
         }
-
-        .breadcrumbs a::after {
-            content: "›";
-            margin: 0 8px;
-            color: #A0A0A0;
-            font-weight: bold;
-        }
-
-        .breadcrumbs span::after {
-            content: "";
-        }
+        .breadcrumbs { padding: 15px 12px; font-size: 14px; color: #1C2526; background: #E5E5E5; }
+        .breadcrumbs a { color: #1C2526; text-decoration: none; }
+        .breadcrumbs a:hover { color: #58CC02; }
+        .breadcrumbs span { margin: 0 5px; }
 
         .product-details-container {
             display: flex;
@@ -160,7 +178,7 @@
         }
 
         .drift-zoom-pane {
-            width: 200px !important; /* Force zoom size */
+            width: 200px !important;
             height: 200px !important;
             border-radius: 50%;
             border: 2px solid #58CC02;
@@ -185,21 +203,6 @@
             font-weight: 700;
             color: #1C2526;
             margin-bottom: 10px;
-        }
-
-        .size-flavor {
-            display: flex;
-            justify-content: space-between;
-            max-width: 300px;
-            margin-bottom: 10px;
-        }
-
-        .size, .flavor {
-            background: #1C2526;
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: #E5E5E5;
-            font-size: 14px;
         }
 
         .product-rating {
@@ -260,16 +263,37 @@
         .quantity-selector label {
             font-size: 16px;
             font-weight: 700;
+            margin-right: 10px;
         }
 
-        .quantity-selector input {
-            width: 50px;
-            padding: 5px;
-            text-align: center;
+        .quantity-btn {
+            background: #58CC02;
+            color: #FFFFFF;
+            border: none;
+            padding: 5px 12px;
             font-size: 16px;
-            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 80px;
+            transition: background 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: #4AB302;
+        }
+
+        .quantity-btn:disabled {
+            background: #A0A0A0;
+            cursor: not-allowed;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
             border: 2px solid #E5E5E5;
-            border-radius: 6px;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 16px;
+            margin: 0 10px;
         }
 
         .stock-status .in-stock {
@@ -312,7 +336,7 @@
         }
 
         .container {
-            max-width: 941px;
+            max-width: 1100px;
             margin: 40px auto;
             padding: 0 20px;
         }
@@ -327,13 +351,13 @@
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
         }
 
         .product-card {
             background: #FFFFFF;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid #E5E5E5;
@@ -342,10 +366,10 @@
 
         .product-card img {
             width: 100%;
-            height: 199px;
-            object-fit: cover;
+            height: 150px;
+            object-fit: contain;
             border-radius: 6px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .product-card h3 a {
@@ -363,10 +387,21 @@
             color: #58CC02;
         }
 
-        .product-card p {
+        .product-card .price {
             font-size: 12px;
             color: #58CC02;
             font-weight: 700;
+        }
+
+        .product-card .discount {
+            font-size: 10px;
+            color: #FF4D4D;
+        }
+
+        .product-card .rating {
+            font-size: 10px;
+            color: #1C2526;
+            margin-top: 5px;
         }
 
         .container.mt-5 {
@@ -415,6 +450,7 @@
         footer {
             background: #FFFFFF;
             padding: 20px;
+            position: fixed;
             color: #1C2526;
             border-top: 1px solid #E5E5E5;
         }
@@ -469,27 +505,42 @@
             margin-top: 20px;
             font-size: 12px;
         }
-        
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast-success {
+            background-color: #58CC02;
+            color: #FFFFFF;
+        }
+
+        .toast-error {
+            background-color: #FF4D4D;
+            color: #FFFFFF;
+        }
+
         @media (max-width: 768px) {
             .navbar {
-                flex-direction: row; /* Keep horizontal */
-                justify-content: space-between; /* Logo left, links right */
-                align-items: center; /* Vertically center */
-                padding: 10px 20px;
-                flex-wrap: wrap; /* Allow wrapping if needed */
+                padding: 10px 15px;
+                flex-wrap: wrap;
             }
+
             .nav-links {
-                flex-direction: row; /* Horizontal links */
-                justify-content: flex-end; /* Push to right */
-                gap: 10px; /* Space between links */
-                margin-top: 0; /* No extra top margin */
-                width: auto; /* Fit content */
-                text-align: right; /* Align text right */
+                gap: 15px;
             }
+
             .nav-links li a {
-                font-size: 14px; /* Smaller on mobile */
+                font-size: 16px;
             }
-            
+
+            .breadcrumbs {
+                font-size: 12px;
+                padding: 10px 15px;
+            }
 
             .product-details-container {
                 flex-direction: column;
@@ -498,10 +549,6 @@
 
             .product-info {
                 text-align: center;
-            }
-
-            .size-flavor {
-                justify-content: center;
             }
 
             .action-buttons {
@@ -514,7 +561,7 @@
             }
 
             .products-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
 
             .product-card img {
@@ -525,40 +572,86 @@
                 font-size: 12px;
             }
 
-            .product-card p {
+            .product-card .price {
                 font-size: 10px;
+            }
+
+            .product-card .discount, .product-card .rating {
+                font-size: 9px;
             }
 
             .col-md-8 {
                 max-width: 100%;
             }
+
+            .footer-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .footer-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .footer-section h4 {
+                font-size: 16px;
+            }
+
+            .footer-section p, .footer-section ul li a {
+                font-size: 12px;
+            }
+
+            .social-links a {
+                font-size: 16px;
+            }
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
             .products-grid {
-                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }
         }
     </style>
 </head>
 <body>
+    <div class="toast-container">
+        <div class="toast" id="notificationToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </div>
+
     <header>
         <nav class="navbar">
             <div class="logo">
                 <h1><a href="/users/landing">Ocean Books</a></h1>
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
+            
             <ul class="nav-links">
-                <li><a href="/users/home">Home</a></li>
-                <li><a href="/users/products">Shop</a></li>
-                <li><a href="/users/logout">Logout</a></li>
+                <li><a href="/users/orders" class="active"><i class="fas fa-receipt"></i></a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+                <% } else { %>
+                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i></a></li>
+                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i></a></li>
+                <% } %>
             </ul>
+
         </nav>
     </header>
     <main>
         <div class="breadcrumbs">
-            <a href="/users/products">Shop</a>
-            <a href="/users/products?category=<%= encodeURIComponent(product.category && product.category._id ? product.category._id : product.category) %>"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></a>
+            <a href="/users/products">Shop ›</a>
+            <a href="/users/products?category=<%= encodeURIComponent(product.category && product.category._id ? product.category._id : product.category) %>"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %> ›</a>
             <span><%= product.name %></span>
         </div>
 
@@ -586,7 +679,7 @@
 
             <div class="product-info">
                 <div class="product-category"><%= product.category && product.category.name ? product.category.name : categoryName || 'Category' %></div>
-                <h1 class="productmn-name"><%= product.name %></h1>
+                <h1 class="product-name"><%= product.name %></h1>
                 <div class="product-rating">
                     <% if (product.ratings && product.reviews.length > 0) { %>
                         <% const avgRating = product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length; %>
@@ -611,7 +704,9 @@
                 </div>
                 <div class="quantity-selector">
                     <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" min="1" max="<%= product.stock %>" value="1">
+                    <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                    <input type="text" class="quantity-input" id="quantity" value="1" readonly>
+                    <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
                     <span class="stock-status">
                         <% if (product.stock > 0) { %>
                             <span class="in-stock">In Stock</span>
@@ -634,7 +729,18 @@
                     <div class="product-card">
                         <img src="<%= related.images[0] || '/images/default.jpg' %>" alt="<%= related.name %>">
                         <h3><a href="/users/products/<%= related._id %>"><%= related.name %></a></h3>
-                        <p>₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></p>
+                        <div class="price">₹<%= (related.price * (1 - related.discount / 100)).toFixed(2) %></div>
+                        <% if (related.discount > 0) { %>
+                            <div class="discount"><%= related.discount %>% off</div>
+                        <% } %>
+                        <div class="rating">
+                            <% if (related.reviews && related.reviews.length > 0) { %>
+                                <% const avgRating = related.reviews.reduce((sum, r) => sum + r.rating, 0) / related.reviews.length; %>
+                                <%= avgRating.toFixed(1) %> ⭐
+                            <% } else { %>
+                                0.0 ⭐
+                            <% } %>
+                        </div>
                     </div>
                 <% }) %>
             </div>
@@ -666,26 +772,23 @@
                 <div class="col-md-8">
                     <div class="card p-3">
                         <h4>All Reviews</h4>
-                      
                         <div id="reviewsContainer">
                             <% if (reviews.length === 0) { %>
-                              <p>No reviews yet.</p>
+                                <p>No reviews yet.</p>
                             <% } else { %>
-                              <% reviews.forEach(review => { %>
-                                <div class="border p-2 my-2">
-                                  <strong><%= review.user.name %></strong>
-                                  <span class="badge"><%= review.rating %> ⭐</span>
-                                  <p><%= review.comment %></p>
-                                  <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
-                                  <% if (user && review.user && user._id.toString() === review.user._id.toString()) { %>
-                                    <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">
-                                      Edit
-                                    </button>
-                                  <% } %>
-                                </div>
-                              <% }); %>
+                                <% reviews.forEach(review => { %>
+                                    <div class="border p-2 my-2">
+                                        <strong><%= review.user.name %></strong>
+                                        <span class="badge"><%= review.rating %> ⭐</span>
+                                        <p><%= review.comment %></p>
+                                        <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+                                        <% if (user && review.user && user._id.toString() === review.user._id.toString()) { %>
+                                            <button class="btn btn-sm btn-secondary" onclick="openEditModal('<%= review._id %>', '<%= review.rating %>', '<%= review.comment %>')">Edit</button>
+                                        <% } %>
+                                    </div>
+                                <% }); %>
                             <% } %>
-                          </div>
+                        </div>
                         <div class="d-flex justify-content-center mt-3">
                             <button id="prevPage" class="btn me-2" disabled>Previous</button>
                             <span id="pageInfo">Page 1 of <%= totalPages %></span>
@@ -702,7 +805,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="reviewModalLabel">Add Review</h5>
-                        <button type="button" class="close btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="reviewForm">
@@ -779,11 +882,19 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/drift-zoom@1.5.0/dist/Drift.min.js"></script>
     <script>
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('notificationToast');
+            const toastBody = toastEl.querySelector('.toast-body');
+            toastEl.classList.remove('toast-success', 'toast-error');
+            toastEl.classList.add(`toast-${type}`);
+            toastBody.textContent = message;
+            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
+            toast.show();
+        }
+
         function changeImage(element, src) {
-            console.log("Clicked thumbnail, changing to:", src);
             const mainImage = document.getElementById('mainImage');
             mainImage.src = src;
             mainImage.dataset.zoom = src;
@@ -791,262 +902,165 @@
             element.classList.add('active');
             new Drift(mainImage, {
                 paneContainer: document.body,
-                inlinePane: 400, // Trigger inline pane at 400px image width
+                inlinePane: 400,
                 zoomFactor: 3,
                 hoverDelay: 200
             });
         }
 
+        function updateQuantity(change) {
+            const input = document.getElementById('quantity');
+            const max = parseInt('<%= product.stock %>') || 1;
+            let value = parseInt(input.value) || 1;
+            value = Math.max(1, Math.min(max, value + change));
+            input.value = value;
+            document.querySelectorAll('.quantity-btn')[0].disabled = value === 1;
+            document.querySelectorAll('.quantity-btn')[1].disabled = value === max;
+        }
+
         document.getElementById('add-to-cart').addEventListener('click', async () => {
-                const productId = document.getElementById('add-to-cart').dataset.productId;
-                const response = await fetch(`/users/cart/add/${productId}`, {
+            const productId = document.getElementById('add-to-cart').dataset.productId;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const response = await fetch(`/users/cart/add/${productId}`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity }),
                 credentials: 'include'
             });
             const data = await response.json();
             if (data.success) {
-                const cartCountElement = document.querySelector('.cart-count');
-                if (cartCountElement) {
-                    cartCountElement.textContent = data.cartCount;
-                }
-                showMessage('Added to cart!');
+                showToast('Added to cart!');
             } else {
-                showMessage(data.message || 'Already in cart!');
+                showToast(data.message || 'Already in cart!', 'error');
             }
         });
 
         document.getElementById('buy-now').addEventListener('click', async () => {
-  const productId = document.getElementById('buy-now').dataset.productId;
-  const response = await fetch(`/users/order/buy-now/${productId}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' }
-  });
-  const data = await response.json();
-  if (data.success) {
-    window.location.href = `/users/checkout?orderId=${data.orderId}`; // Use _id
-  } else {
-    alert(data.message || 'Failed to proceed to checkout');
-  }
-});
+            const productId = document.getElementById('buy-now').dataset.productId;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const response = await fetch(`/users/order/buy-now/${productId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity }),
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = `/users/checkout?orderId=${data.orderId}`;
+            } else {
+                showToast(data.message || 'Failed to proceed to checkout', 'error');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             new Drift(document.querySelector('.drift-trigger'), {
                 paneContainer: document.body,
-                inlinePane: 400, // Inline pane kicks in at 400px
+                inlinePane: 400,
                 zoomFactor: 3,
                 hoverDelay: 200
             });
 
-            document.getElementById("openModalBtn").addEventListener("click", function () {
-                var modal = new bootstrap.Modal(document.getElementById("reviewModal"));
-                modal.show();
+            document.getElementById('openModalBtn').addEventListener('click', () => {
+                new bootstrap.Modal(document.getElementById('reviewModal')).show();
             });
-});         
-const token = '<%= user ? user.token : "" %>'; // From server
-document.getElementById("reviewForm").addEventListener("submit", function (event) {
-  event.preventDefault();
-  const rating = document.getElementById("rating").value;
-  const comment = document.getElementById("comment").value;
-  fetch(`/users/products/<%= product._id %>/review`, {
-    method: "POST",
-    headers: { 
-      'Content-Type': 'application/json', 
-      'Authorization': `Bearer ${token}` 
-    },
-    body: JSON.stringify({ productId: "<%= product._id %>", rating, comment })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      Swal.fire("Success!", "Review added!", "success").then(() => location.reload());
-    } else {
-      Swal.fire("Error!", data.message, "error");
-    }
-  });
-});
 
-function closeEditModal() {
-            var editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
-            editModal.hide();
+            updateQuantity(0);
+        });
+
+        const token = '<%= user ? user.token : "" %>';
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rating = document.getElementById('rating').value;
+            const comment = document.getElementById('comment').value;
+            const response = await fetch(`/users/products/<%= product._id %>/review`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ productId: '<%= product._id %>', rating, comment })
+            });
+            const data = await response.json();
+            if (data.success) {
+                showToast('Review added!');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast(data.message, 'error');
+            }
+        });
+
+        function openEditModal(reviewId, rating, comment) {
+            document.getElementById('editReviewId').value = reviewId;
+            document.getElementById('editRating').value = rating;
+            document.getElementById('editComment').value = comment;
+            new bootstrap.Modal(document.getElementById('editReviewModal')).show();
         }
 
-        document.getElementById("editReviewForm").addEventListener("submit", function (event) {
-    event.preventDefault();
-    const reviewId = document.getElementById("editReviewId").value;
-    const rating = document.getElementById("editRating").value;
-    const comment = document.getElementById("editComment").value;
-    const token = '<%= user && user.token ? user.token : "" %>';
-    fetch(`/users/products/<%= product._id %>/review/edit`, {
-      method: "POST",
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${token}` 
-      },
-      body: JSON.stringify({ reviewId, rating, comment })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        Swal.fire("Success!", "Review updated!", "success").then(() => {
-          const editModal = bootstrap.Modal.getInstance(document.getElementById("editReviewModal"));
-          editModal.hide();
-          location.reload();
-        });
-      } else {
-        Swal.fire("Error!", data.message, "error");
-      }
-    })
-    .catch(error => console.error("Error:", error));
-  });
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("prevPage")?.addEventListener("click", function () {
-                loadReviews(currentPage - 1);
-            });
+        function closeEditModal() {
+            bootstrap.Modal.getInstance(document.getElementById('editReviewModal')).hide();
+        }
 
-            document.getElementById("nextPage")?.addEventListener("click", function () {
-                loadReviews(currentPage + 1);
+        document.getElementById('editReviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reviewId = document.getElementById('editReviewId').value;
+            const rating = document.getElementById('editRating').value;
+            const comment = document.getElementById('editComment').value;
+            const response = await fetch(`/users/products/<%= product._id %>/review/edit`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ reviewId, rating, comment })
             });
+            const data = await response.json();
+            if (data.success) {
+                showToast('Review updated!');
+                setTimeout(() => {
+                    closeEditModal();
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(data.message, 'error');
+            }
         });
 
         function loadReviews(page) {
-            const productId = document.getElementById("productId").value;
-            fetch(`/product-details?id=${productId}&page=${page}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            const productId = document.getElementById('productId').value;
+            fetch(`/product-details?id=${productId}&page=${page}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(response => response.json())
                 .then(data => {
                     if (data.reviews) {
                         updateReviewsUI(data.reviews, data.currentPage, data.totalPages);
                     }
                 })
-                .catch(error => console.error("Error fetching reviews:", error));
+                .catch(error => console.error('Error fetching reviews:', error));
         }
 
         function updateReviewsUI(reviews, currentPage, totalPages) {
-            const reviewsContainer = document.getElementById("reviewsContainer");
-            reviewsContainer.innerHTML = "";
-            reviews.forEach(review => {
-                const reviewElement = document.createElement("div");
-                reviewElement.innerHTML = `
-                    <div class="border p-2 my-2">
+            const reviewsContainer = document.getElementById('reviewsContainer');
+            reviewsContainer.innerHTML = '';
+            if (reviews.length === 0) {
+                reviewsContainer.innerHTML = '<p>No reviews yet.</p>';
+            } else {
+                reviews.forEach(review => {
+                    const reviewElement = document.createElement('div');
+                    reviewElement.className = 'border p-2 my-2';
+                    reviewElement.innerHTML = `
                         <strong>${review.user.name}</strong>
                         <span class="badge">${review.rating} ⭐</span>
                         <p>${review.comment}</p>
                         <small class="text-muted">${new Date(review.createdAt).toLocaleDateString()}</small>
-                    </div>
-                `;
-                reviewsContainer.appendChild(reviewElement);
-            });
-            document.getElementById("prevPage").disabled = currentPage === 1;
-            document.getElementById("nextPage").disabled = currentPage === totalPages;
-            document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+                        ${'<%= user && user._id %>' && review.user && '<%= user._id %>' === review.user._id ? 
+                            `<button class="btn btn-sm btn-secondary" onclick="openEditModal('${review._id}', '${review.rating}', '${review.comment}')">Edit</button>` : ''}
+                    `;
+                    reviewsContainer.appendChild(reviewElement);
+                });
+            }
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
         }
     </script>
 </body>
 </html>
-<!-- 
-        // function toggleRating(rating) {
-        //     const stars = document.querySelectorAll('.stars span');
-        //     const currentRating = parseInt(document.getElementById('rating-value').value);
-        //     const newRating = currentRating === rating ? 0 : rating;
-        //     stars.forEach((star, index) => {
-        //         star.classList.toggle('active', index < newRating);
-        //     });
-        //     document.getElementById('rating-value').value = newRating;
-        // }
-
-//         function toggleAddReviewForm() {
-//             const form = document.getElementById('add-review-form');
-//             form.style.display = form.style.display === 'none' ? 'block' : 'none';
-//         }
-
-//         function showEditReviewForm(reviewId, rating, reviewText) {
-//             const form = document.getElementById('edit-review-form');
-//             document.getElementById('edit-review-id').value = reviewId;
-//             document.getElementById('edit-rating-value').value = rating || 0;
-//             document.getElementById('edit-review-text').value = reviewText || '';
-//             const stars = document.querySelectorAll('#edit-stars span');
-//             stars.forEach((star, index) => {
-//                 star.classList.toggle('active', index < (rating || 0));
-//             });
-//             form.style.display = 'block';
-//         }
-
-//         function hideEditReviewForm() {
-//             document.getElementById('edit-review-form').style.display = 'none';
-//         }
-
-//         function setRating(rating, formType) {
-//   console.log(`Setting rating ${rating} for ${formType}`);
-//   const stars = document.querySelectorAll(`#${formType}-stars span`);
-//   if (!stars.length) console.error(`No stars found for ${formType}`);
-//   stars.forEach((star, index) => {
-//     star.classList.toggle('active', index < rating);
-//   });
-//   document.getElementById(`${formType}-rating-value`).value = rating;
-// }
-
-//         document.getElementById('new-review-form')?.addEventListener('submit', async (e) => {
-//   e.preventDefault();
-//   console.log("Submitting review...");
-//   const rating = document.getElementById('new-rating-value').value;
-
-//   const review = document.querySelector('#new-review-form textarea').value;
-
-
-//   console.log("Rating:", rating, "Review:", review);
-//   if (rating === "0") {
-//     alert("Please select a rating.");
-//     return;
-//   }
-//   const token = localStorage.getItem('token');
-//   if (!token) {
-//     alert("No token found. Please log in again.");
-//     return;
-//   }
-//   try {
-//     const response = await fetch(`/users/products/<%= product._id %>/review`, {
-//       method: 'POST',
-//       headers: { 
-//         'Content-Type': 'application/json', 
-//         'Authorization': `Bearer ${token}` 
-//       },
-//       body: JSON.stringify({ rating: Number(rating), review })
-//     });
-//     const data = await response.json();
-//     console.log("Response:", data);
-//     if (response.ok) {
-//       window.location.reload();
-//     } else {
-//       alert("Failed to submit review: " + (data.message || "Unknown error"));
-//     }
-//   } catch (error) {
-//     console.error("Submit Error:", error);
-//     alert("Error submitting review: " + error.message);
-//   }
-// });
-
-//         document.getElementById('update-review-form')?.addEventListener('submit', async (e) => {
-//             e.preventDefault();
-//             const reviewId = document.getElementById('edit-review-id').value;
-//             const rating = document.getElementById('edit-rating-value').value;
-//             const review = document.getElementById('edit-review-text').value;
-//             if (rating === "0") {
-//                 alert("Please select a rating.");
-//                 return;
-//             }
-//             const token = localStorage.getItem('token');
-//             try {
-//                 const response = await fetch(`/users/products/<%= product._id %>/review/edit`, {
-//                     method: 'POST',
-//                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-//                     body: JSON.stringify({ reviewId, rating, review })
-//                 });
-//                 if (response.ok) {
-//                     window.location.reload();
-//                 } else {
-//                     alert("Failed to update review.");
-//                 }
-//             } catch (error) {
-//                 alert("Error updating review: " + error.message);
-//             }
-//         }); -->

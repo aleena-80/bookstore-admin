@@ -35,9 +35,28 @@
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+        .count-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #58CC02; /* Match brand color */
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
 
+        .count-badge:empty {
+            display: none; /* Hide if count is 0 */
+        }
         .logo h1 a {
-            color: #58CC02; /* Green for Ocean Books */
+            color: #58CC02;
             text-decoration: none;
             font-size: 28px;
             font-weight: 700;
@@ -46,7 +65,7 @@
         .tagline {
             color: #1C2526;
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .nav-links {
@@ -56,7 +75,7 @@
             align-items: center;
             flex-wrap: wrap;
             justify-content: flex-end;
-            width: 70%;
+            width: auto; /* Adjusted for better mobile fit */
         }
 
         .nav-links li a {
@@ -67,6 +86,7 @@
             display: flex;
             align-items: center;
             transition: color 0.3s;
+            position: relative;
         }
 
         .nav-links li a:hover {
@@ -78,13 +98,16 @@
         }
 
         .nav-links li.profile-link a {
-            color: #1C2526; /* Default dark gray, green on hover */
+            color: #1C2526;
         }
 
         .search-bar {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .search-bar input {
@@ -93,7 +116,7 @@
             border-radius: 8px;
             font-size: 14px;
             outline: none;
-            width: 300px; /* Longer */
+            width: 300px;
             transition: border-color 0.3s;
         }
 
@@ -106,9 +129,24 @@
             text-align: center;
         }
 
+        .search-bar button {
+            padding: 8px 15px;
+            background: #1C2526;
+            border: none;
+            border-radius: 20px;
+            color: #FFFFFF;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background: #58CC02;
+        }
+
         /* Breadcrumbs */
         .breadcrumbs {
-            padding: 20px 20px;
+            margin-top: 10px;
+            padding: 10px 20px;
             font-size: 14px;
             color: #1C2526;
             background-color: #E5E5E5;
@@ -120,63 +158,91 @@
         }
 
         .banner {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    overflow: hidden;
-  }
-  .banner-slideshow {
-    width: 100%;
-    height: 100%;
-  }
-  .banner-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-  }
-  .banner-img.active {
-    opacity: 1;
-  }
-  .banner-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #FFFFFF;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  .banner-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #58CC02;
-    color: #FFFFFF;
-    text-decoration: none;
-    border-radius: 20px;
-    font-weight: 700;
-  }
-  .banner-btn:hover {
-    background: #46a802;
-  }
-        .search-bar button { padding: 8px 15px; background: #1C2526; border: none; border-radius: 20px; color: #FFFFFF; font-weight: 700; cursor: pointer; }
-        .search-bar button:hover { background: #58CC02; }
+            position: relative;
+            width: 100%;
+            height: 50vh; /* Relative height */
+            min-height: 300px;
+            overflow: hidden;
+        }
+
+        .banner-slideshow {
+            width: 100%;
+            height: 100%;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .banner-img.active {
+            opacity: 1;
+        }
+
+        .banner-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #FFFFFF;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            width: 90%;
+        }
+
         .banner-content h2 {
-            font-size: 36px;
+            font-size: clamp(24px, 5vw, 36px); /* Responsive font */
             font-weight: 700;
             margin-bottom: 10px;
         }
 
         .banner-content p {
-            font-size: 20px;
+            font-size: clamp(16px, 3vw, 20px);
             margin-bottom: 20px;
         }
 
-  
+        .banner-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #58CC02;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+
+        .banner-btn:hover {
+            background: #46a802;
+        }
+
+        .banner-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #FFF;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        .dot.active {
+            opacity: 1;
+        }
 
         /* Featured Books */
         .featured-books {
@@ -206,7 +272,6 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 2px solid #E5E5E5;
             text-align: center;
-            height: 400px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -214,8 +279,9 @@
 
         .book-card img {
             width: 100%;
-            height: 150px;
-            object-fit: cover;
+            height: auto; /* Show full image */
+            max-height: 250px; /* Cap for large images */
+            object-fit: contain; /* Preserve aspect ratio */
             border-radius: 8px;
             margin-bottom: 10px;
         }
@@ -248,6 +314,7 @@
             width: 100%;
             margin-top: 5px;
         }
+
         .book-card .wishlist-btn {
             background: none;
             border: none;
@@ -357,69 +424,88 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-    
-            .banner { position: relative; }
-            .banner-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
-            .dot { width: 10px; height: 10px; background: #FFF; border-radius: 50%; cursor: pointer; opacity: 0.5; }
-            .dot.active { opacity: 1; }
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column; /* Stack logo and nav vertically */
-        align-items: flex-start; /* Align items to the left */
-    }
+            body {
+                padding-top: 120px; /* Adjust for taller header */
+            }
 
-    .nav-links {
-        flex-direction: row; /* Stack links vertically */
-        align-items: flex-end; /* Align links to the left */
-    }
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-    .nav-links li a {
-        font-size: 14px; /* Slightly smaller text */
-        justify-content: flex-start; /* Align icons and text to the left */
-    }
+            .logo h1 a {
+                font-size: 24px;
+            }
 
-    .search-bar {
-        position: static; /* Remove absolute positioning */
-        transform: none; /* Remove transform */
-        margin-top: 15px; /* Space above search */
-        display: flex; /* Flex for input and button */
-        gap: 10px; /* Space between input and button */
-    }
+            .tagline {
+                font-size: 12px;
+                margin-top: -3px;
+            }
 
-    .search-bar input {
-        width: 100%; /* Full width for input */
-        font-size: 14px; /* Match link size */
-    }
+            .nav-links {
+                width: 100%;
+                margin-top: -40px;
+            }
 
-    .search-bar button {
-        padding: 8px 12px; /* Slightly smaller button */
-        font-size: 14px; /* Match link size */
-    }
-}
+            .nav-links li a {
+                font-size: 14px;
+            
+            }
+
             .search-bar {
                 position: static;
                 transform: none;
-                margin-top: 10px;
+                width: 100%;
+                margin-top: 20px;
             }
 
             .search-bar input {
                 width: 100%;
+                font-size: 14px;
+            }
+
+            .search-bar button {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .banner {
+                height: 40vh;
+                min-height: 200px;
             }
 
             .banner-img {
-                height: 250px;
+                height: 100%;
+            }
+
+            .banner-content {
+                width: 95%;
             }
 
             .banner-content h2 {
-                font-size: 24px;
+                font-size: clamp(18px, 5vw, 24px);
             }
 
             .banner-content p {
-                font-size: 16px;
+                font-size: clamp(14px, 3vw, 16px);
+            }
+
+            .banner-btn {
+                padding: 8px 16px;
+                font-size: clamp(12px, 2.5vw, 14px);
             }
 
             .book-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .book-card {
+                padding: 10px;
+            }
+
+            .book-card img {
+                max-height: 200px; /* Smaller cap for mobile */
             }
 
             .footer-content {
@@ -438,12 +524,25 @@
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
-            .book-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .navbar {
+                padding: 10px 15px;
             }
 
             .search-bar input {
                 width: 250px;
+            }
+
+            .banner {
+                height: 45vh;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .book-card img {
+                max-height: 220px;
             }
         }
     </style>
@@ -456,10 +555,8 @@
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
             <ul class="nav-links">
-
                 <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
                 <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
-
                 <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
                 <% if (user) { %>
                     <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
@@ -553,32 +650,33 @@
     </footer>
 
     <script>
-  const slides = document.querySelectorAll('.banner-img');
-  const dots = document.querySelectorAll('.dot');
-  let currentSlide = 0;
+        const slides = document.querySelectorAll('.banner-img');
+        const dots = document.querySelectorAll('.dot');
+        let currentSlide = 0;
 
-  function updateSlide(index) {
-    slides[currentSlide].classList.remove('active');
-    dots[currentSlide].classList.remove('active');
-    currentSlide = index;
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
-  }
+        function updateSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
 
-  function showNextSlide() {
-    if (slides.length > 1) {
-      updateSlide((currentSlide + 1) % slides.length);
-    }
-  }
+        function showNextSlide() {
+            if (slides.length > 1) {
+                updateSlide((currentSlide + 1) % slides.length);
+            }
+        }
 
-  if (slides.length > 0) {
-    setInterval(showNextSlide, 5000);
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        updateSlide(parseInt(dot.getAttribute('data-index')));
-      });
-    });
-  }
+        if (slides.length > 0) {
+            setInterval(showNextSlide, 5000);
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    updateSlide(parseInt(dot.getAttribute('data-index')));
+                });
+            });
+        }
+
         function logout() {
             fetch('/users/logout', { method: 'POST', credentials: 'include' })
                 .then(() => {
@@ -589,25 +687,38 @@
         }
 
         function addToWishlist(bookId) {
-            fetch(`/users/wishlist/add/${bookId}`, { method: 'POST', credentials: 'include' })
-            .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        const count = parseInt(document.querySelector('.nav-links li:first-child a').textContent.match(/\d+/) || 0) + 1;
-                        document.querySelector('.nav-links li:first-child a').innerHTML = `<i class="fas fa-heart"></i> (${count})`;
-                    }
-                })
-                .catch(err => console.error('Wishlist add failed:', err));
-        }
-        
-        function addToCart(bookId) {
-            fetch(`/users/cart/add/${bookId}`, { method: 'POST', credentials: 'include' })
-                .then(res => res.json())
-                .then(data => console.log(data))
-                .catch(err => console.error('Cart add failed:', err));
+    fetch(`/users/wishlist/add/${bookId}`, { method: 'POST', credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
+                wishlistBadge.textContent = data.wishlistCount;
+                wishlistBadge.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
+            } else {
+                console.error('Wishlist add failed:', data.message || 'Unknown error');
             }
+        })
+        .catch(err => console.error('Wishlist add failed:', err));
+}
 
-            const searchInput = document.getElementById('searchInput');
+function addToCart(bookId) {
+    fetch(`/users/cart/add/${bookId}`, { method: 'POST', credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const cartBadge = document.querySelector('.nav-links a[href="/users/cart"] .count-badge');
+                cartBadge.textContent = data.cartCount;
+                cartBadge.style.display = data.cartCount > 0 ? 'flex' : 'none';
+            } else {
+                console.error('Cart add failed:', data.message || 'Unknown error');
+            }
+        })
+        .catch(err => console.error('Cart add failed:', err));
+}
+        
+      
+
+        const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
             const query = this.value.toLowerCase();
             fetch(`/users/search?q=${encodeURIComponent(query)}`, {
@@ -633,16 +744,12 @@
                                     <button class="wishlist-btn" onclick="addToWishlist('${book.id}')"><i class="fas fa-heart"></i></button>
                                     <button onclick="addToCart('${book.id}')">Add to Cart</button>
                                 </div>
-                                </div>
+                            </div>
                         `;
                     });
                 })
                 .catch(err => console.error('Search failed:', err));
         });
-
-        </script>
+    </script>
 </body>
 </html>
-
-
-

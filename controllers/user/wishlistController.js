@@ -1,10 +1,16 @@
 import Wishlist from "../../models/Wishlist.js";
+import Cart from "../../models/Carts.js";
 
 export const getWishlist = async (req, res) => {
     try {
         if (!req.user) {
             return res.redirect('/users/login');
         }
+
+
+        const cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
+        const cartCount = cartItems.length;
+    
 
         const wishlistItems = await Wishlist.find({ userId: req.user.id }).populate('productId');
         const formattedItems = wishlistItems.map(item => ({
@@ -25,6 +31,7 @@ export const getWishlist = async (req, res) => {
         res.render('user/wishlist', {
             wishlistItems: formattedItems,
             user: req.user,
+            cartCount,
             wishlistCount,
             success: req.query.success || null
         });
@@ -34,6 +41,7 @@ export const getWishlist = async (req, res) => {
             wishlistItems: [],
             user: req.user || null,
             wishlistCount: 0,
+            cartCount,
             error: 'Failed to load wishlist'
         });
     }

@@ -6,6 +6,8 @@
   <title>Ocean Books - Addresses</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Toastify for edit form -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; padding-top: 70px; }
@@ -15,72 +17,66 @@
     .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
     .nav-links li a:hover { color: #58CC02; }
     .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
-    .sidebar ul { list-style: none; }
-    .swal-z-index { z-index: 3000 !important; }
     .sidebar { 
-  position: fixed; 
-  top: 118px; 
-  left: 0; 
-  width: 250px; 
-  height: calc(100% - 70px); 
-  background: #FFFFFF; 
-  padding: 20px; 
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); 
-  transition: transform 0.3s ease; 
-}
-.sidebar ul li a { 
-  color: #1C2526; 
-  text-decoration: none; 
-  font-weight: 700; 
-  font-size: 16px; 
-  padding: 10px; 
-  border-radius: 8px; 
-  transition: background 0.3s; 
-}
-.sidebar ul li a:hover, .sidebar ul li a.active { 
-  color: #58CC02; 
-  background: #E5E5E5; 
-  width: 100%; 
-}
+      position: fixed; 
+      top: 118px; 
+      left: 0; 
+      width: 250px; 
+      height: calc(100% - 70px); 
+      background: #FFFFFF; 
+      padding: 20px; 
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); 
+      transition: transform 0.3s ease; 
+    }
+    .sidebar ul { list-style: none; }
     .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
-    .main-content { margin-left: 270px; padding: 20px; max-width: 1200px; }
+    .sidebar ul li a { 
+      color: #1C2526; 
+      text-decoration: none; 
+      font-weight: 700; 
+      font-size: 16px; 
+      padding: 10px; 
+      border-radius: 8px; 
+      transition: background 0.3s; 
+    }
+    .sidebar ul li a:hover, .sidebar ul li a.active { 
+      color: #58CC02; 
+      background: #E5E5E5; 
+      width: 100%; 
+    }
+    .main-content { 
+      margin-left: 270px; 
+      padding: 70px 20px 20px; 
+      max-width: 1200px; 
+    }
     .breadcrumbs { 
-  position: fixed; 
-  top: 65px; 
-  left: 2px; 
-  right: 0; 
-  padding: 18px 20px; 
-  font-size: 14px; 
-  color: #1C2526; 
-  background: #E5E5E5; 
-  z-index: 999; 
-}
-.breadcrumbs a { 
-  color: #1C2526; 
-  text-decoration: none; 
-}
-.breadcrumbs a:hover { 
-  color: #58CC02; 
-}
-.breadcrumbs span { 
-  margin: 0 5px; 
-}
-.breadcrumbs a::after { 
-  content: " › "; 
-  color: #A0A0A0; 
-}
-.breadcrumbs span::after { 
-  content: ""; 
-}
-.main-content { 
-  margin-left: 270px; 
-  padding: 70px 20px 20px; 
-  max-width: 1200px; 
-}
-.form-group label.checkbox-label {
-  margin-left: -164px;
-}
-
+      position: fixed; 
+      top: 65px; 
+      left: 2px; 
+      right: 0; 
+      padding: 18px 20px; 
+      font-size: 14px; 
+      color: #1C2526; 
+      background: #E5E5E5; 
+      z-index: 999; 
+    }
+    .breadcrumbs a { 
+      color: #1C2526; 
+      text-decoration: none; 
+    }
+    .breadcrumbs a:hover { 
+      color: #58CC02; 
+    }
+    .breadcrumbs span { 
+      margin: 0 5px; 
+    }
+    .breadcrumbs a::after { 
+      content: " › "; 
+      color: #A0A0A0; 
+    }
+    .breadcrumbs span::after { 
+      content: ""; 
+    }
     .section { background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
     .section h2 { font-size: 28px; color: #58CC02; margin-bottom: 20px; }
     .address-list { margin-top: 10px; }
@@ -90,12 +86,39 @@
     .address-actions a:hover { text-decoration: underline; }
     .btn { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; }
     .btn:hover { background: #46a802; }
-    .swal-z-index { z-index: 3000 !important; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; display: flex; justify-content: center; align-items: center; }
     .modal-content { background: #FFFFFF; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .form-group input[type="text"], .form-group input[type="number"] { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .form-group.checkbox-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      margin-top: 10px; 
+    }
+    .form-group.checkbox-group label { 
+      margin-bottom: 0; 
+      font-weight: 400; 
+    }
+    .error-message { 
+      color: #FF4D4D; 
+      font-size: 12px; 
+      margin-top: 5px; 
+      display: none; 
+    }
+    .success-message { 
+      display: none; 
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      background: #58CC02; 
+      color: #FFFFFF; 
+      padding: 10px 20px; 
+      border-radius: 8px; 
+      z-index: 3000; 
+      font-size: 14px; 
+    }
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
@@ -152,7 +175,7 @@
                 <%= address.street %>, <%= address.city %>, <%= address.state %>, <%= address.postalCode %>
               </div>
               <div class="address-actions">
-                <a href="#" onclick="openEditAddressModal('<%= address._id %>', '<%= address.name %>', '<%= address.street %>', '<%= address.city %>', '<%= address.state %>', '<%= address.postalCode %>')">Edit</a>
+                <a href="#" onclick="openEditAddressModal('<%= address._id %>', '<%= address.name %>', '<%= address.street %>', '<%= address.city %>', '<%= address.state %>', '<%= address.postalCode %>', <%= address.isDefault ? 'true' : 'false' %>)">Edit</a>
               </div>
             </div>
           <% }); %>
@@ -160,7 +183,7 @@
       <% } else { %>
         <p>No addresses found.</p>
       <% } %>
-      <a href="#" id="add-address-link" style="color: #58CC02; display: block; margin-top: 20px;">+ Add New Address</a>
+      <a href="#" id="add-address-link" style="color: #58CC02; display: block; margin-top: 20px; ">+ Add New Address</a>
     </div>
   </div>
 
@@ -188,9 +211,11 @@
         <div class="form-group">
           <label for="addPostalCode">Postal Code</label>
           <input type="text" id="addPostalCode" name="postalCode" required>
+          <div id="addPostalCodeError" class="error-message">Please enter a valid 6-digit postal code</div>
         </div>
-        <div class="form-group">
-          <label class="checkbox-label"><input type="checkbox" name="isDefault" value="true"> Set as Default</label>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="addIsDefault" name="isDefault" value="true">
+          <label for="addIsDefault">Set as Default</label>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <button type="submit" class="btn">Save</button>
@@ -225,9 +250,11 @@
         <div class="form-group">
           <label for="editPostalCode">Postal Code</label>
           <input type="text" id="editPostalCode" name="postalCode" required>
+          <div id="editPostalCodeError" class="error-message">Please enter a valid 6-digit postal code</div>
         </div>
-        <div class="form-group">
-          <label class="checkbox-label"><input type="checkbox" id="editIsDefault" name="isDefault" value="true"> Set as Default</label>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="editIsDefault" name="isDefault" value="true">
+          <label for="editIsDefault">Set as Default</label>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <button type="submit" class="btn">Save</button>
@@ -237,7 +264,11 @@
     </div>
   </div>
 
+  <!-- Success Message Fallback -->
+  <div id="successMessage" class="success-message"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const hamburger = document.querySelector('.hamburger');
@@ -247,11 +278,11 @@
       // Hamburger menu toggle
       hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
 
-      // Explicitly ensure modals are hidden on load
+      // Hide modals on load
       document.getElementById('addAddressModal').style.display = 'none';
       document.getElementById('editAddressModal').style.display = 'none';
 
-      // Add address link click handler
+      // Add address link
       addAddressLink.addEventListener('click', (e) => {
         e.preventDefault();
         openAddAddressModal();
@@ -259,96 +290,172 @@
     });
 
     function openAddAddressModal() {
+      const form = document.getElementById('addAddressForm');
+      form.reset();
+      document.getElementById('addPostalCodeError').style.display = 'none';
       document.getElementById('addAddressModal').style.display = 'flex';
     }
+
     function closeAddAddressModal() {
       document.getElementById('addAddressModal').style.display = 'none';
     }
+
     function openEditAddressModal(id, name, street, city, state, postalCode, isDefault) {
       document.getElementById('editAddressId').value = id;
-      document.getElementById('editName').value = name;
-      document.getElementById('editStreet').value = street;
-      document.getElementById('editCity').value = city;
-      document.getElementById('editState').value = state;
-      document.getElementById('editPostalCode').value = postalCode;
-      document.getElementById('editIsDefault').checked = isDefault === 'true' || isDefault === true;
+      document.getElementById('editName').value = name || '';
+      document.getElementById('editStreet').value = street || '';
+      document.getElementById('editCity').value = city || '';
+      document.getElementById('editState').value = state || '';
+      document.getElementById('editPostalCode').value = postalCode || '';
+      document.getElementById('editIsDefault').checked = isDefault === true || isDefault === 'true';
+      document.getElementById('editPostalCodeError').style.display = 'none';
       document.getElementById('editAddressModal').style.display = 'flex';
     }
+
     function closeEditAddressModal() {
       document.getElementById('editAddressModal').style.display = 'none';
     }
 
-    document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const formData = {
-    name: form.name.value,
-    street: form.street.value,
-    city: form.city.value,
-    state: form.state.value,
-    postalCode: form.postalCode.value,
-    country: 'India',
-    isDefault: form.isDefault.checked
-  };
-  try {
-    const response = await fetch('/users/addresses/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(formData)
-    });
-    const data = await response.json();
-    if (data.success) {
-      closeAddAddressModal();
-      Swal.fire({
-        title: 'Success!',
-        text: 'Address added!',
-        icon: 'success',
-        customClass: { popup: 'swal-z-index' }
-      }).then(() => location.reload());
-    } else {
-      Swal.fire({
-        title: 'Error!',
-        text: data.message,
-        icon: 'error',
-        customClass: { popup: 'swal-z-index' }
-      });
+    // Validate postal code (6 digits)
+    function validatePostalCode(postalCode) {
+      const regex = /^\d{6}$/;
+      return regex.test(postalCode);
     }
-  } catch (error) {
-    console.error('Add Address Error:', error);
-    Swal.fire({
-      title: 'Error!',
-      text: 'Failed to add address',
-      icon: 'error',
-      customClass: { popup: 'swal-z-index' }
-    });
-  }
-});
 
-document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Save these changes?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#58CC02',
-    cancelButtonColor: '#FF4D4D',
-    confirmButtonText: 'Yes, save it!',
-    customClass: { popup: 'swal-z-index' }
-  }).then(async (result) => {
-    if (result.isConfirmed) {
+    // Show toaster (Toastify or text fallback)
+    function showToast(message, isError = false) {
+      if (typeof Toastify !== 'undefined') {
+        Toastify({
+          text: message,
+          duration: 2000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: isError ? '#FF4D4D' : '#58CC02',
+          stopOnFocus: true
+        }).showToast();
+        return;
+      }
+      // Fallback to text
+      const successMessage = document.getElementById('successMessage');
+      successMessage.textContent = message;
+      successMessage.style.background = isError ? '#FF4D4D' : '#58CC02';
+      successMessage.style.display = 'block';
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+      }, 2000);
+    }
+
+    // Add address
+    document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
       const form = e.target;
+      const postalCode = form.postalCode.value;
+      const postalCodeError = document.getElementById('addPostalCodeError');
+
+      if (!validatePostalCode(postalCode)) {
+        postalCodeError.style.display = 'block';
+        return;
+      }
+      postalCodeError.style.display = 'none';
+
       const formData = {
-        name: form.name.value,
-        street: form.street.value,
-        city: form.city.value,
-        state: form.state.value,
-        postalCode: form.postalCode.value,
+        name: form.name.value.trim(),
+        street: form.street.value.trim(),
+        city: form.city.value.trim(),
+        state: form.state.value.trim(),
+        postalCode: postalCode,
+        country: 'India',
+        isDefault: form.isDefault.checked
+      };
+
+      try {
+        const response = await fetch('/users/addresses/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+        const data = await response.json();
+        if (data.success) {
+          closeAddAddressModal();
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: 'Success!',
+              text: 'Address added!',
+              icon: 'success',
+              customClass: { popup: 'swal-z-index' },
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              zIndex: 3000
+            });
+            setTimeout(() => location.reload(), 2000);
+          }
+        } else {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message || 'Failed to add address',
+              icon: 'error',
+              customClass: { popup: 'swal-z-index' },
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              zIndex: 3000
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Add Address Error:', error);
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to add address',
+            icon: 'error',
+            customClass: { popup: 'swal-z-index' },
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            zIndex: 3000
+          });
+        }
+      }
+    });
+
+    // Edit address
+    document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const postalCode = form.postalCode.value;
+      const postalCodeError = document.getElementById('editPostalCodeError');
+
+      // Validate postal code
+      if (!validatePostalCode(postalCode)) {
+        postalCodeError.style.display = 'block';
+        return;
+      }
+      postalCodeError.style.display = 'none';
+
+      // Close modal immediately
+      closeEditAddressModal();
+
+      const formData = {
+        name: form.name.value.trim(),
+        street: form.street.value.trim(),
+        city: form.city.value.trim(),
+        state: form.state.value.trim(),
+        postalCode: postalCode,
         country: 'India',
         isDefault: form.isDefault.checked
       };
       const addressId = document.getElementById('editAddressId').value;
+
       try {
         const response = await fetch(`/users/addresses/edit/${addressId}`, {
           method: 'POST',
@@ -358,33 +465,16 @@ document.getElementById('editAddressForm').addEventListener('submit', async (e) 
         });
         const data = await response.json();
         if (data.success) {
-          closeEditAddressModal();
-          Swal.fire({
-            title: 'Success!',
-            text: 'Address updated!',
-            icon: 'success',
-            customClass: { popup: 'swal-z-index' }
-          }).then(() => location.reload());
+          showToast('Address updated!');
+          setTimeout(() => location.reload(), 2000);
         } else {
-          Swal.fire({
-            title: 'Error!',
-            text: data.message,
-            icon: 'error',
-            customClass: { popup: 'swal-z-index' }
-          });
+          showToast(data.message || 'Failed to update address', true);
         }
       } catch (error) {
         console.error('Edit Address Error:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to update address',
-          icon: 'error',
-          customClass: { popup: 'swal-z-index' }
-        });
+        showToast('Failed to update address', true);
       }
-    }
-  });
-});
+    });
   </script>
 </body>
 </html>

@@ -14,7 +14,7 @@ import Newsletter from '../../models/Newsletter.js'
 export const getProducts = async (req, res) => {
   try {
     const user = req.user || null;
-    const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 10 ,language=''} = req.query;
+    const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 12 ,language=''} = req.query;
     const skip = (page - 1) * limit;
 
     let query = { isListed: true, isDeleted: false };
@@ -91,6 +91,8 @@ export const getProductDetails = async (req, res) => {
       isDeleted: false 
     }).limit(5);
     const categoryName = product.category && product.category.name ? product.category.name : 'Unknown';
+    const wishlistCount = user ? await Wishlist.countDocuments({ userId: user.id }) : 0;
+    const cartCount = user ? await Cart.countDocuments({ userId: user.id }) : 0;
 
     product.reviews = product.reviews || [];
 
@@ -137,6 +139,8 @@ export const getProductDetails = async (req, res) => {
       ratingCounts,
       reviews: paginatedReviews,
       currentPage: page,
+      cartCount,
+      wishlistCount,
       totalPages });
 
 
@@ -150,44 +154,34 @@ export const getProductDetails = async (req, res) => {
 //-------------------------------------------------------------
 export const buyNow = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const userId = req.user._id; // Use _id from middleware
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-    if (product.stock <= 0) return res.status(400).json({ success: false, message: 'Out of stock' });
+      const { productId } = req.params;
+      const { quantity = 1 } = req.body;
+      const userId = req.user._id;
+      const product = await Product.findById(productId);
+      if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+      if (product.stock < quantity) return res.status(400).json({ success: false, message: 'Insufficient stock' });
 
-    const address = await Address.findOne({ userId, isDefault: true }) || await Address.findOne({ userId });
-    if (!address) return res.status(400).json({ success: false, message: 'Please add an address' });
-
-    const order = new Order({
-      userId,
-      items: [{
-        productId: product._id,
-        quantity: 1,
-        price: product.price,
-        discount: product.discount || 0
-      }],
-      address: {
-        name: address.name,
-        street: address.street || address.addressLine1,
-        city: address.city,
-        state: address.state,
-        postalCode: address.pincode || address.postalCode,
-        country: 'India'
-      },
-      subtotal: product.price * (1 - (product.discount || 0) / 100),
-      taxes: product.price * (1 - (product.discount || 0) / 100) * 0.05,
-      shipping: 100,
-      total: product.price * (1 - (product.discount || 0) / 100) * 1.05 + 100,
-      paymentMethod: 'Pending',
-      status: 'Pending',
-      orderId: `ORD${Date.now()}`
-    });
-    await order.save();
-    res.json({ success: true, orderId: order._id }); // Use _id for MongoDB
+      const order = new Order({
+          userId,
+          items: [{
+              productId: product._id,
+              quantity,
+              price: product.price,
+              discount: product.discount || 0
+          }],
+          subtotal: product.price * (1 - (product.discount || 0) / 100) * quantity,
+          taxes: product.price * (1 - (product.discount || 0) / 100) * quantity * 0.05,
+          shipping: 100,
+          total: product.price * (1 - (product.discount || 0) / 100) * quantity * 1.05 + 100,
+          paymentMethod: 'Pending',
+          status: 'Confirmed',
+          orderId: `ORD${Date.now()}`
+      });
+      await order.save();
+      res.json({ success: true, orderId: order._id });
   } catch (error) {
-    console.error('Buy Now Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to process Buy Now' });
+      console.error('Buy Now Error:', error);
+      res.status(500).json({ success: false, message: 'Failed to process Buy Now' });
   }
 };
 //--------------------------------------------------------------------
@@ -244,32 +238,22 @@ export const editReview = async (req, res) => {
 
       if (!user) {
           return res.json({ success: false, message: "Please log in to edit your review." });
-
-
       }
 
       if (!rating || rating < 1 || rating > 5) {
           return res.json({ success: false, message: "Invalid rating value." });
       }
-
-
       const product = await Product.findOne({ "reviews._id": reviewId });
 
       if (!product) {
           return res.json({ success: false, message: "Review not found." });
       }
-
-
       const review = product.reviews.find(r => r._id.toString() === reviewId);
 
       if (!review) {
           return res.json({ success: false, message: "Review not found." });
       }
 
-    
-      if (review.user.toString() !== user) {
-          return res.json({ success: false, message: "You are not authorized to edit this review." });
-      }
 
     
       review.rating = rating;
@@ -293,8 +277,6 @@ export const getHome = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(15)
     .select('name images price author language stock');
-
-    console.log('Home books:', books.map(b => b.images));
 
     const formattedBooks = books.map(book => ({
       id: book._id.toString(),
@@ -329,7 +311,7 @@ export const getHome = async (req, res) => {
 
     res.render('user/home', { 
       books: formattedBooks, 
-      banners: bannersToShow, // Pass bannersToShow as 'banners'
+      banners: bannersToShow, 
       user: req.user || null, 
       wishlistCount, 
       cartItems,

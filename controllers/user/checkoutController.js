@@ -147,6 +147,7 @@ export const getCheckout = async (req, res) => {
 export const initiateOrder = async (req, res) => {
   try {
     const { addressId } = req.body;
+    const {userId}= req.body
     console.log('Initiate Order Request:', { addressId, userId: req.user.id });
 
     if (!addressId) return res.json({ success: false, message: 'Address is required' });
@@ -170,7 +171,7 @@ export const initiateOrder = async (req, res) => {
 
     const order = new Order({
       userId: req.user.id,
-      items: orderItems,
+      items,
       address: {
         name: address.name,
         street: address.street,
@@ -184,13 +185,15 @@ export const initiateOrder = async (req, res) => {
       shipping,
       total,
       paymentMethod: 'Pending',
-      status: 'Pending',
+      status: 'Confirmed',
       orderId: `ORD${Date.now()}`,
       createdAt: new Date()
     });
 
     await order.save();
+    await Cart.deleteMany({ userId });
     await Cart.findOneAndUpdate({ userId }, { items: [] });
+
     console.log('Order Initiated:', order.orderId);
     res.json({ success: true, orderId: order.orderId });
   } catch (error) {
@@ -382,17 +385,22 @@ export const verifyPayment = async (req, res) => {
   }
 };
 
-// Updated confirmPayment (add Razorpay handling)
+//-------------------------------------------------
 export const confirmPayment = async (req, res) => {
   try {
     const { orderId, paymentMethod } = req.body;
-    const order = await Order.findOne({ orderId, userId: req.user.id }).populate('items.productId');
+    console.log('Confirm Payment Request:', { orderId, paymentMethod, userId: req.user.id });
+
+    const order = await Order.findOne({ 
+      orderId, 
+      userId: req.user.id 
+    }).populate('items.productId');
+    
     if (!order) {
+      console.log('Order not found for:', { orderId, userId: req.user.id });
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
-    if (order.status !== 'Pending') {
-      return res.status(400).json({ success: false, message: 'Order already processed' });
-    }
+    console.log('Found order:', { orderId: order.orderId, status: order.status });
 
     if (paymentMethod === 'COD') {
       order.paymentMethod = 'COD';
@@ -413,14 +421,21 @@ export const confirmPayment = async (req, res) => {
         await product.save();
       }
 
-
       await order.save();
       await Cart.deleteMany({ userId: req.user.id });
       console.log('Payment Confirmed & Cart Cleared:', orderId);
       res.json({ success: true, redirect: '/users/order-success', orderId });
     } else if (paymentMethod === 'Razorpay') {
-      // For Razorpay, we'll just return success and let frontend handle the payment flow
-      res.json({ success: true, message: 'Proceed with Razorpay payment' });
+      // Initialize Razorpay order (mock for now)
+      order.paymentMethod = 'Razorpay';
+      order.status = 'Confirmed'; // Keep Pending until payment verified
+      await order.save();
+      res.json({ 
+        success: true, 
+        message: 'Proceed with Razorpay payment',
+        razorpayOrderId: `rzp_${order._id}`,
+        amount: order.total * 100 // Razorpay expects paise
+      });
     } else {
       return res.status(400).json({ success: false, message: `${paymentMethod} not implemented yet` });
     }

@@ -15,7 +15,7 @@
     .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
     .nav-links li a:hover { color: #58CC02; }
     .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
-    .sidebar { position: fixed; top: 118px; left: 0; width: 250px; height: calc(100% - 70px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
+    .sidebar { position: fixed; top: 70px; left: 0; width: 250px; height: calc(100% - 70px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
     .sidebar ul { list-style: none; }
     .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
     .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
@@ -25,16 +25,18 @@
     .breadcrumbs a { color: #1C2526; text-decoration: none; }
     .breadcrumbs a:hover { color: #58CC02; }
     .breadcrumbs span { margin: 0 5px; }
-    .wallet-card {    margin-top: 77px; background: linear-gradient(135deg, #58CC02, #46a802); padding: 30px; border-radius: 12px; color: #FFFFFF; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
+    .wallet-card { margin-top: 77px; background: linear-gradient(135deg, #58CC02, #46a802); padding: 30px; border-radius: 12px; color: #FFFFFF; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
     .wallet-card h2 { font-size: 28px; margin-bottom: 20px; }
     .wallet-card .balance { font-size: 36px; font-weight: 700; margin: 20px 0; }
     .wallet-card .btn { background: #FFFFFF; color: #58CC02; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; }
     .wallet-card .btn:hover { background: #F5F5F5; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
-    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .transactions { margin-top: 20px; background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+    .transactions h3 { font-size: 20px; color: #1C2526; margin-bottom: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #58CC02; color: #FFFFFF; font-weight: 700; }
+    .no-transactions { text-align: center; padding: 20px; color: #1C2526; }
+    .error { color: #FF4D4D; margin-bottom: 15px; font-weight: bold; }
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
@@ -43,6 +45,9 @@
       .main-content { margin-left: 0; padding: 70px 10px 10px; }
       .wallet-card { padding: 20px; }
       .wallet-card .balance { font-size: 28px; }
+      .breadcrumbs { padding: 10px; font-size: 12px; }
+      table { font-size: 14px; }
+      th, td { padding: 8px; }
     }
   </style>
 </head>
@@ -77,8 +82,42 @@
     </div>
     <div class="wallet-card">
       <h2>Your Wallet</h2>
-      <p class="balance">₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
+      <p class="balance">₹<%= wallet && typeof wallet.balance === 'number' ? wallet.balance.toFixed(2) : '0.00' %></p>
       <button class="btn" onclick="addFunds()">Add Funds</button>
+    </div>
+    <div class="transactions">
+      <h3>Transaction History</h3>
+      <% if (wallet && Array.isArray(wallet.transactions) && wallet.transactions.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% wallet.transactions.forEach(t => { %>
+              <tr>
+                <td><%= t.transactionId %></td>
+                <td><%= t.date.toLocaleDateString() %></td>
+                <td><%= t.source.type.charAt(0).toUpperCase() + t.source.type.slice(1) %></td>
+                <td>₹<%= t.amount.toFixed(2) %></td>
+                <td><%= t.source.orderId && t.source.orderId.paymentMethod ? t.source.orderId.paymentMethod : 'N/A' %></td>
+                <td><%= t.source.type %> <%= t.source.orderId && t.source.orderId.orderId ? `(Order: ${t.source.orderId.orderId})` : '' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p class="no-transactions">No transactions found.</p>
+      <% } %>
     </div>
   </div>
 

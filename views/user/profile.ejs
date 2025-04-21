@@ -6,6 +6,7 @@
   <title>Ocean Books - Profile</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; }
@@ -25,7 +26,6 @@
     .breadcrumbs a { color: #1C2526; text-decoration: none; }
     .breadcrumbs a:hover { color: #58CC02; }
     .breadcrumbs span { margin: 0 5px; }
-    .swal-z-index { z-index: 6000 !important; }
     .profile-card { background: #FFFFFF; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); text-align: center; margin: 115px auto; max-width: 500px; }
     .profile-card h2 { color: #58CC02; font-size: 28px; margin-bottom: 20px; }
     .profile-card p { font-size: 18px; margin: 10px 0; position: relative; }
@@ -33,37 +33,23 @@
     .btn { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; margin: 5px; display: inline-flex; align-items: center; gap: 5px; }
     .btn:hover { background: #46a802; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
-    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 450px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
     .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
-    .modal-content { 
-      background: #FFFFFF; 
-      padding: 20px; 
-      margin: 15% auto; 
-      width: 90%; 
-      max-width: 450px; /* Increased from 400px */
-      border-radius: 12px; 
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
-    }
-    #otpSection { 
-      text-align: center; 
-      padding: 20px 0; /* Added padding for more vertical space */
-      min-height: 220px; /* Ensure enough height */
-    }
-    #otpMessage { font-size: 16px; margin-bottom: 15px; } /* Spacing for message */
-    #otpForm .form-group { margin-bottom: 10px; } /* Space below OTP input */
-    #otpForm .btn-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; } /* Align buttons */
-    #timer { font-size: 14px; color: #1C2526; margin: 10px 0; } /* Timer styling */
+    #otpSection { text-align: center; padding: 20px 0; min-height: 220px; }
+    #otpMessage { font-size: 16px; margin-bottom: 15px; }
+    #otpForm .form-group { margin-bottom: 10px; }
+    #otpForm .btn-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+    #timer { font-size: 14px; color: #1C2526; margin: 10px 0; }
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px);   z-index: 50; 
-        background-color: white; }
+      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); z-index: 50; background-color: white; }
       .sidebar.active { transform: translateX(0); }
       .main-content { margin-left: 0; padding: 70px 10px 10px; }
       .breadcrumbs { left: 0; }
-      .profile-card { padding: 20px;}
+      .profile-card { padding: 20px; }
     }
   </style>
 </head>
@@ -110,14 +96,14 @@
   <div id="editModal" class="modal">
     <div class="modal-content">
       <h3>Edit <span id="editField"></span></h3>
-      <form id="editProfileForm" enctype="multipart/form-data">
+      <form id="editProfileForm">
         <div class="form-group" id="nameField">
           <label for="name">Name</label>
           <input type="text" id="name" name="name" value="<%= user.name %>" required>
         </div>
         <div class="form-group" id="phoneField" style="display: none;">
           <label for="phone">Phone</label>
-          <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
+          <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>" pattern="\d{10}" title="Phone number must be 10 digits">
         </div>
         <button type="submit" class="btn">Save</button>
         <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; background: #FF4D4D; color: #FFFFFF; border: none; border-radius: 20px;">Cancel</button>
@@ -174,120 +160,115 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
+    // Sidebar toggle
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
 
+    // Modal functions
     function openEditModal(field) {
-      document.getElementById('editField').textContent = field === 'name' ? 'Name' : 'Phone';
-      document.getElementById('nameField').style.display = field === 'name' ? 'block' : 'none';
-      document.getElementById('phoneField').style.display = field === 'phone' ? 'block' : 'none';
-      document.getElementById('editModal').style.display = 'flex';
+      console.log('Opening modal for:', field); // Debug
+      const editModal = document.getElementById('editModal');
+      const editField = document.getElementById('editField');
+      const nameField = document.getElementById('nameField');
+      const phoneField = document.getElementById('phoneField');
+      
+      editField.textContent = field === 'name' ? 'Name' : 'Phone';
+      nameField.style.display = field === 'name' ? 'block' : 'none';
+      phoneField.style.display = field === 'phone' ? 'block' : 'none';
+      editModal.style.display = 'flex';
     }
-    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
-    function openEmailModal() { document.getElementById('emailModal').style.display = 'flex'; }
-    function closeEmailModal() { document.getElementById('emailModal').style.display = 'none'; document.getElementById('otpSection').style.display = 'none'; document.getElementById('otpMessage').style.display = 'none'; }
-    function openPasswordModal() { document.getElementById('passwordModal').style.display = 'flex'; }
-    function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
 
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    function openEmailModal() {
+      document.getElementById('emailModal').style.display = 'flex';
+    }
+
+    function closeEmailModal() {
+      document.getElementById('emailModal').style.display = 'none';
+      document.getElementById('otpSection').style.display = 'none';
+      document.getElementById('otpMessage').style.display = 'none';
+    }
+
+    function openPasswordModal() {
+      document.getElementById('passwordModal').style.display = 'flex';
+    }
+
+    function closePasswordModal() {
+      document.getElementById('passwordModal').style.display = 'none';
+    }
+
+    // Edit Profile Form Submission
     document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'Save these changes?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#58CC02',
-        cancelButtonColor: '#FF4D4D',
-        confirmButtonText: 'Yes, save it!'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const response = await fetch('/users/profile/edit', {
-              method: 'POST',
-              credentials: 'include',
-              body: formData
-            });
-            const data = await response.json();
-            if (data.success) {
-              closeEditModal();
-              Swal.fire('Success!', 'Profile updated!', 'success').then(() => location.reload());
-            } else {
-              Swal.fire('Error!', data.message, 'error');
-            }
-          } catch (error) {
-            console.error('Edit Profile Error:', error);
-            Swal.fire('Error!', 'Failed to update profile', 'error');
-          }
-        }
-      });
-    });
+      const data = Object.fromEntries(formData);
+      console.log('Submitting edit data:', data); // Debug
 
-    let countdown;
-    document.getElementById('changeEmailForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const formData = { email: document.getElementById('newEmail').value };
-  try {
-    const response = await fetch('/users/profile/change-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(formData)
-    });
-    const data = await response.json();
-    if (data.success) {
-      document.getElementById('changeEmailForm').style.display = 'none';
-      document.getElementById('otpSection').style.display = 'block';
-      let timeLeft = 60;
-      document.getElementById('countdown').textContent = timeLeft;
-      document.getElementById('resendOtp').disabled = true;
-      countdown = setInterval(() => {
-        timeLeft--;
-        document.getElementById('countdown').textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(countdown);
-          document.getElementById('resendOtp').disabled = false;
-        }
-      }, 1000);
-    } else {
-      Swal.fire({
-        title: 'Error!',
-        text: data.message,
-        icon: 'error',
-        customClass: { popup: 'swal-z-index' }
-      });
-    }
-  } catch (error) {
-    console.error('Change Email Error:', error);
-    Swal.fire({
-      title: 'Error!',
-      text: 'Failed to send OTP',
-      icon: 'error',
-      customClass: { popup: 'swal-z-index' }
-    });
-  }
-});
-    document.getElementById('resendOtp').addEventListener('click', async () => {
-      const email = document.getElementById('newEmail').value;
       try {
-        const response = await fetch('/users/resend-otp', {
+        const response = await fetch('/users/profile/edit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ email })
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        console.log('Edit response:', result); // Debug
+
+        if (result.success) {
+          closeEditModal();
+          Toastify({
+            text: 'Profile updated successfully!',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#58CC02',
+          }).showToast();
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          Toastify({
+            text: result.message || 'Failed to update profile',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#FF4D4D',
+          }).showToast();
+        }
+      } catch (error) {
+        console.error('Edit Profile Error:', error);
+        Toastify({
+          text: 'Error updating profile',
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#FF4D4D',
+        }).showToast();
+      }
+    });
+
+    // Email Change with OTP
+    let countdown;
+    document.getElementById('changeEmailForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = { email: document.getElementById('newEmail').value };
+      try {
+        const response = await fetch('/users/profile/change-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData),
         });
         const data = await response.json();
         if (data.success) {
-          Swal.fire({
-            title: 'Success!',
-            text: 'OTP resent!',
-            icon: 'success',
-            confirmButtonColor: '#58CC02',
-            customClass: { popup: 'swal-z-index' }
-          });
+          document.getElementById('changeEmailForm').style.display = 'none';
+          document.getElementById('otpSection').style.display = 'block';
           let timeLeft = 60;
           document.getElementById('countdown').textContent = timeLeft;
           document.getElementById('resendOtp').disabled = true;
@@ -300,88 +281,167 @@
             }
           }, 1000);
         } else {
-          Swal.fire({
-            title: 'Error!',
-            text: data.message,
-            icon: 'error',
-            customClass: { popup: 'swal-z-index' }
-          });
+          Toastify({
+            text: data.message || 'Failed to send OTP',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#FF4D4D',
+          }).showToast();
+        }
+      } catch (error) {
+        console.error('Change Email Error:', error);
+        Toastify({
+          text: 'Failed to send OTP',
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#FF4D4D',
+        }).showToast();
+      }
+    });
+
+    document.getElementById('resendOtp').addEventListener('click', async () => {
+      const email = document.getElementById('newEmail').value;
+      try {
+        const response = await fetch('/users/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          Toastify({
+            text: 'OTP resent successfully!',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#58CC02',
+          }).showToast();
+          let timeLeft = 60;
+          document.getElementById('countdown').textContent = timeLeft;
+          document.getElementById('resendOtp').disabled = true;
+          countdown = setInterval(() => {
+            timeLeft--;
+            document.getElementById('countdown').textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(countdown);
+              document.getElementById('resendOtp').disabled = false;
+            }
+          }, 1000);
+        } else {
+          Toastify({
+            text: data.message || 'Failed to resend OTP',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#FF4D4D',
+          }).showToast();
         }
       } catch (error) {
         console.error('Resend OTP Error:', error);
-        Swal.fire({
-          title: 'Error!',
+        Toastify({
           text: 'Failed to resend OTP',
-          icon: 'error',
-          customClass: { popup: 'swal-z-index' }
-        });
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#FF4D4D',
+        }).showToast();
       }
     });
 
     document.getElementById('otpForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const otp = document.getElementById('otp').value;
-  try {
-    const response = await fetch('/users/verify-email-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ otp })
+      e.preventDefault();
+      const otp = document.getElementById('otp').value;
+      try {
+        const response = await fetch('/users/verify-email-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ otp }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          clearInterval(countdown);
+          document.getElementById('verifyMessage').textContent = 'Email Verified OK!';
+          document.getElementById('verifyMessage').style.display = 'block';
+          Toastify({
+            text: 'Email verified successfully!',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#58CC02',
+          }).showToast();
+          setTimeout(() => {
+            closeEmailModal();
+            location.reload();
+          }, 2000);
+        } else {
+          Toastify({
+            text: data.message || 'Failed to verify OTP',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#FF4D4D',
+          }).showToast();
+        }
+      } catch (error) {
+        console.error('Verify OTP Error:', error);
+        Toastify({
+          text: 'Failed to verify OTP',
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#FF4D4D',
+        }).showToast();
+      }
     });
-    const data = await response.json();
-    if (data.success) {
-      clearInterval(countdown);
-      document.getElementById('verifyMessage').textContent = 'Email Verified OK!';
-      document.getElementById('verifyMessage').style.display = 'block';
-      setTimeout(() => {
-        closeEmailModal();
-        location.reload();
-      }, 2000); // Wait 2 seconds before closing and reloading
-    } else {
-      Swal.fire('Error!', data.message, 'error');
-    }
-  } catch (error) {
-    console.error('Verify OTP Error:', error);
-    Swal.fire('Error!', 'Failed to verify OTP', 'error');
-  }
-});
+
     document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'Change your password?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#58CC02',
-        cancelButtonColor: '#FF4D4D',
-        confirmButtonText: 'Yes, change it!'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const form = e.target;
-          const formData = {
-            currentPassword: form.currentPassword.value,
-            newPassword: form.newPassword.value
-          };
-          try {
-            const response = await fetch('/users/profile/change-password', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify(formData)
-            });
-            const data = await response.json();
-            if (data.success) {
-              closePasswordModal();
-              Swal.fire('Success!', 'Password changed! Please log in again.', 'success').then(() => window.location.href = '/users/logout');
-            } else {
-              Swal.fire('Error!', data.message, 'error');
-            }
-          } catch (error) {
-            console.error('Change Password Error:', error);
-            Swal.fire('Error!', 'Failed to change password', 'error');
-          }
+      const form = e.target;
+      const formData = {
+        currentPassword: form.currentPassword.value,
+        newPassword: form.newPassword.value,
+      };
+      try {
+        const response = await fetch('/users/profile/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData),
+        });
+        const data = await response.json();
+        if (data.success) {
+          closePasswordModal();
+          Toastify({
+            text: 'Password changed! Please log in again.',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#58CC02',
+          }).showToast();
+          setTimeout(() => (window.location.href = '/users/logout'), 1000);
+        } else {
+          Toastify({
+            text: data.message || 'Failed to change password',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            backgroundColor: '#FF4D4D',
+          }).showToast();
         }
-      });
+      } catch (error) {
+        console.error('Change Password Error:', error);
+        Toastify({
+          text: 'Error changing password',
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#FF4D4D',
+        }).showToast();
+      }
     });
   </script>
 </body>

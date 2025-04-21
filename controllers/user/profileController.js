@@ -3,7 +3,7 @@ import Address from '../../models/Address.js';
 import Order from '../../models/Order.js';
 import Wishlist from '../../models/Wishlist.js';
 import Carts from '../../models/Carts.js';
-import Wallet from '../../models/Wallet.js';
+import Wallet from '../../models/Wallets.js';
 import Coupon from '../../models/Coupon.js';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
@@ -112,31 +112,54 @@ export const profileeditAddress = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to edit address' });
   }
 };
+
 export const getWallet = async (req, res) => {
   try {
     const userId = req.user._id;
-    const wallet = await Wallet.findOne({ userId });
-    const user = await User.findById(req.user._id).select('name email phone wallet');
+    let wallet = await Wallet.findOne({ userId }).populate('transactions.source.orderId');
+    const user = await User.findById(userId).select('name email phone');
     if (!user) return res.status(404).send('User not found');
 
-    const wishlistCount = user ? await Wishlist.countDocuments({ userId: user.id }) : 0;
-    const cartCount = user ? await Carts.countDocuments({ userId: user.id }) : 0;
+    if (!wallet) {
+      console.log(`Creating new wallet for user ${userId}`);
+      wallet = new Wallet({
+        userId,
+        balance: 0,
+        transactions: []
+      });
+      await wallet.save();
+    }
+    if (!Array.isArray(wallet.transactions)) {
+      console.log(`Fixing transactions array for wallet ${wallet._id}`);
+      wallet.transactions = [];
+      await wallet.save();
+    }
+    console.log(`Fetched wallet for user ${userId}: balance = ₹${wallet.balance}, transactions = ${wallet.transactions.length}`);
+
+    const wishlistCount = await Wishlist.countDocuments({ userId });
+    const cartCount = await Carts.countDocuments({ userId });
 
     res.render('user/wallet', {
-      wallet: { balance: user.wallet || 0 }, 
+      wallet,
+      user,
       wishlistCount,
-      cartCount
+      cartCount,
+      error: null
     });
   } catch (error) {
     console.error('Wallet Error:', error);
-    res.render('user/wallet', { 
-      wallet: null, 
-      wishlistCount: 0, 
-      cartCount: 0, 
-      error: 'Failed to load wallet' 
+    res.render('user/wallet', {
+      wallet: null,
+      user: null,
+      wishlistCount: 0,
+      cartCount: 0,
+      error: 'Failed to load wallet'
     });
   }
 };
+
+
+
 export const addFundsToWallet = async (req, res) => {
   try {
     const userId = req.user._id;

@@ -1,13 +1,13 @@
 import Order from '../../models/Order.js';
 import User from '../../models/User.js';
 import Product from '../../models/Product.js';
+import Wallet from '../../models/Wallets.js';
 
 export const getOrders = async (req, res) => {
   try {
     const { page = 1, search = '', status = '', sort = 'createdAt', direction = 'desc' } = req.query;
     const limit = 10;
     const skip = (page - 1) * limit;
-
     const query = {};
     if (search) {
       query.$or = [
@@ -40,7 +40,6 @@ export const getOrders = async (req, res) => {
     res.render('admin/orders', { orders: [], currentPage: 1, totalPages: 1, search: '', status: '', error: 'Failed to load orders' });
   }
 };
-
 export const getOrderView = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -55,38 +54,72 @@ export const getOrderView = async (req, res) => {
   }
 };
 //------------------------------------------------------
+
 export const verifyReturn = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { action } = req.body;
 
+    console.log(`Processing return for order ${orderId}, action: ${action}`);
+
     const order = await Order.findById(orderId).populate('userId');
     if (!order || !order.returnRequest) {
+      console.log(`No return request found for order ${orderId}`);
       return res.json({ success: false, message: 'No return request found' });
     }
 
     if (action === 'approve') {
       order.status = 'Returned';
-      order.returnRequest = false; // Clear request
-      const user = order.userId;
-      user.wallet = (user.wallet || 0) + order.total;
-      await user.save();
+      order.returnRequest = false;
+
+      if (order.paymentMethod === 'Razorpay') {
+        console.log(`Processing Razorpay refund for order ${order.orderId}, amount: ₹${order.total}, paymentId: ${order.paymentId || 'none'}`);
+        let wallet = await Wallet.findOne({ userId: order.userId._id });
+        if (!wallet) {
+          console.log(`Creating new wallet for user ${order.userId._id}`);
+          wallet = new Wallet({
+            userId: order.userId._id,
+            balance: 0,
+            transactions: []
+          });
+        }
+        const previousBalance = wallet.balance;
+        wallet.balance += order.total;
+        const transaction = {
+          transactionId: `TXN${Date.now()}`,
+          type: 'credit',
+          amount: order.total,
+          source: { type: 'refund', orderId: order._id },
+          date: new Date()
+        };
+        wallet.transactions.push(transaction);
+        await wallet.save();
+        console.log(`Wallet updated for user ${order.userId._id}: balance = ₹${previousBalance} -> ₹${wallet.balance}, new transaction: ${transaction.transactionId}`);
+        // Sync User.wallet with Wallet.balance
+        const userUpdate = await User.findByIdAndUpdate(order.userId._id, { wallet: wallet.balance }, { new: true });
+        console.log(`Synced User.wallet for user ${order.userId._id}: ₹${userUpdate.wallet}`);
+      } else {
+        console.log(`No refund processed for order ${order.orderId} (paymentMethod: ${order.paymentMethod})`);
+      }
 
       // Restore stock
       for (const item of order.items) {
         await Product.findByIdAndUpdate(item.productId, {
           $inc: { stock: item.quantity }
         });
+        console.log(`Restored stock for product ${item.productId}: +${item.quantity}`);
       }
     } else if (action === 'reject') {
-      order.returnRequest = false; // Clear request, keep original status
+      console.log(`Return rejected for order ${orderId}`);
+      order.returnRequest = false;
     }
 
     await order.save();
-    res.json({ success: true });
+    console.log(`Order ${order.orderId} updated, status: ${order.status}`);
+    res.json({ success: true, message: 'Return processed successfully' });
   } catch (error) {
     console.error('Verify Return Error:', error);
-    res.json({ success: false, message: 'Failed to verify return' });
+    res.json({ success: false, message: 'Failed to process return' });
   }
 };
 //--------------------------------------------------------

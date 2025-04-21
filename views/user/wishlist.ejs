@@ -47,7 +47,42 @@
             font-size: 14px;
             margin-top: 5px;
         }
-
+        .wishlist-count, .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #58CC02; /* Match brand color */
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge:empty {
+            display: none; /* Hide if count is 0 */
+        }
+       
         .nav-links {
             list-style: none;
             display: flex;
@@ -55,7 +90,7 @@
             align-items: center;
             flex-wrap: wrap;
             justify-content: flex-end;
-            width: 70%;
+            width: auto; /* Adjusted for better mobile fit */
         }
 
         .nav-links li a {
@@ -66,6 +101,7 @@
             display: flex;
             align-items: center;
             transition: color 0.3s;
+            position: relative;
         }
 
         .nav-links li a:hover {
@@ -75,6 +111,14 @@
         .nav-links li a i {
             margin-right: 5px;
         }
+
+        .nav-links li.profile-link a {
+            color: #1C2526;
+        }
+        .breadcrumbs { padding: 15px 12px; font-size: 14px; color: #1C2526; background: #E5E5E5; }
+        .breadcrumbs a { color: #1C2526; text-decoration: none; }
+        .breadcrumbs a:hover { color: #58CC02; }
+        .breadcrumbs span { margin: 0 5px; }
 
         .search-bar {
             position: absolute;
@@ -127,6 +171,7 @@
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            min-height: calc(100vh - 120px - 100px);
         }
 
         .wishlist-section h3 {
@@ -138,28 +183,30 @@
 
         .wishlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 200px));
             gap: 20px;
-            justify-items: center; /* This will center the cards */
+            justify-items: center;
         }
 
         .wishlist-card {
-    background: #FFFFFF;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    border: 2px solid #E5E5E5;
-    text-align: center;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 200px; /* Add this fixed width */
-}
+            background: #FFFFFF;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 2px solid #E5E5E5;
+            text-align: center;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 200px;
+            max-width: 200px;
+        }
+
         .wishlist-card img {
             width: 100%;
-            height: 150px;
-            object-fit: cover;
+            max-height: 150px;
+            object-fit: contain;
             border-radius: 8px;
             margin-bottom: 10px;
         }
@@ -306,29 +353,22 @@
 
         @media (max-width: 768px) {
             .navbar {
-                flex-direction: column;
-                padding: 10px 20px;
+                flex-wrap: wrap;
             }
-
-            .nav-links {
-                flex-direction: column;
-                align-items: center;
-                margin-top: 10px;
-                width: 100%;
+            .nav-links li a {
+                font-size: 16px;
             }
-
-            .search-bar {
-                position: static;
-                transform: none;
-                margin-top: 10px;
-            }
-
-            .search-bar input {
-                width: 100%;
+           
+            .wishlist-section {
+                min-height: calc(100vh - 120px - 140px);
             }
 
             .wishlist-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .wishlist-card {
+                max-width: 100%;
             }
 
             .footer-content {
@@ -351,9 +391,6 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .search-bar input {
-                width: 250px;
-            }
         }
     </style>
 </head>
@@ -365,25 +402,24 @@
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
             <ul class="nav-links">
-                <li><a href="/users/products"><i class="fas fa-store"></i> </a></li>
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
-                <li><a href="/users/profile"><i class="fas fa-user"></i> </a></li>
-                <% if (user) { %>
-                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i> </a></li>
+                <li><a href="/users/orders" class="active"><i class="fas fa-receipt"></i></a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
+                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
                 <% } else { %>
-                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i> Signup</a></li>
+                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i></a></li>
+                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i></a></li>
                 <% } %>
-                <li class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search by title, author, or language...">
-                </li>
+               
             </ul>
         </nav>
     </header>
 
     <main>
         <section class="breadcrumbs">
-            <a href="/users/home">Home</a> <span>›</span> <span>Wishlist</span>
+            <a href="/users/home">Home</a> <span>›</span>  <a href="/users/products">Shop</a>  <span>›</span>  <span>Wishlist</span>
         </section>
         <section class="wishlist-section">
             <h3>Your Wishlist</h3>
@@ -448,15 +484,15 @@
 
     <script>
         function addToCart(productId) {
-          fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' })
-               .then(res => res.json())
-               .then(data => {
-            if (data.success) {
-                removeFromWishlist(productId);
-            }
-        })
-        .catch(err => console.error('Cart add failed:', err));
-}
+            fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        removeFromWishlist(productId);
+                    }
+                })
+                .catch(err => console.error('Cart add failed:', err));
+        }
 
         function removeFromWishlist(productId) {
             fetch(`/users/wishlist/remove/${productId}`, { method: 'POST', credentials: 'include' })

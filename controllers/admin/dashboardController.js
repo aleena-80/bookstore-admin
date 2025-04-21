@@ -1,94 +1,366 @@
-import {jsPDF} from 'jspdf'; // npm install jspdf
-import { Parser } from 'json2csv'; // npm install json2csv
+import PDFDocument from 'pdfkit';
 import User from '../../models/User.js';
-import Order from '../../models/Order.js'
+import Order from '../../models/Order.js';
 
 export const getDashboard = async (req, res) => {
-  const totalUsers = await User.countDocuments();
-  const totalOrders = await Order.countDocuments();
-  const totalSales = await Order.aggregate([{ $match: { status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$total' } } }]);
-  res.render('admin/dashboard', { totalUsers, totalOrders, totalSales: totalSales[0]?.total || 0 });
-};
-export const getSalesReport = async (req, res) => {
-  const { startDate, endDate, period } = req.query;
-  let dateFilter = {};
-
-  // Only apply date filter if valid input is provided
-  if (period || (startDate && endDate)) {
-    const now = new Date();
-    if (period === 'daily') {
-      dateFilter = { $gte: new Date(now.setDate(now.getDate() - 1)) };
-    } else if (period === 'weekly') {
-      dateFilter = { $gte: new Date(now.setDate(now.getDate() - 7)) };
-    } else if (period === 'monthly') {
-      dateFilter = { $gte: new Date(now.setDate(now.getDate() - 30)) };
-    } else if (startDate && endDate) {
-      // Validate dates
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      if (isNaN(start) || isNaN(end)) {
-        return res.status(400).json({ error: 'Invalid date range' });
-      }
-      dateFilter = { $gte: start, $lte: end };
-    }
-  }
-
   try {
-    // If dateFilter is empty, it won't be applied (show all Confirmed orders)
-    const query = { status: { $in: ['Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'] } }
-    if (Object.keys(dateFilter).length > 0) {
-      query.createdAt = dateFilter;
-    }
+    const totalUsers = await User.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const orders = await Order.find();
 
-    const orders = await Order.find(query).populate('userId', 'name email');
-    const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
-    const totalDiscount = orders.reduce((sum, order) => sum + (order.discount ? (order.subtotal * order.discount / 100) : 0), 0);
-    const salesCount = orders.length;
+    let totalSales = 0, totalRefund = 0, totalCancellations = 0, totalReturns = 0;
 
-    if (req.query.format === 'pdf') {
-      const doc = new jsPDF();
-      doc.text(`Sales Report (${period || 'Custom'})`, 10, 10);
-      let y = 20;
-      orders.forEach((order, i) => {
-        doc.text(`${i + 1}. ${order.orderId} - ${order.userId?.name || 'N/A'} - ₹${order.total}`, 10, y);
-        y += 10;
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        const price = Number(item.price) || 0;
+        if (item.status === 'Cancelled') {
+          totalCancellations += 1; // Count orders, not amount
+        } else if (item.status === 'Refunded') {
+          totalRefund += 1;
+        } else if (item.status === 'Returned') {
+          totalReturns += 1;
+        } else {
+          totalSales += price;
+        }
       });
-      const pdfBuffer = doc.output('arraybuffer'); // Use arraybuffer for proper response
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
-      return res.send(Buffer.from(pdfBuffer));
-    } else if (req.query.format === 'csv') {
-      const fields = ['orderId', 'username', 'email', 'total', 'paymentMethod', 'createdAt', 'expectedDelivery'];
-      const csvData = new Parser({ fields }).parse(orders.map(o => ({
-        orderId: o.orderId,
-        username: o.userId?.name,
-        email: o.userId?.email || 'N/A',
-        total: o.total,
-        paymentMethod: o.paymentMethod || 'N/A',
-        createdAt: o.createdAt,
-        expectedDelivery: o.expectedDelivery || 'N/A'
-      })));
-      const csv = new Parser({ fields }).parse(csvData);
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="sales_report.csv"');
-      return res.send(Buffer.from(csv, 'utf-8'));
-    }
+    });
 
-    res.json({
-      salesCount,
-      totalSales,
-      totalDiscount,
-      orders: orders.map(o => ({
-        orderId: o.orderId,
-        user: { username: o.userId?.name, email: o.userId?.email },
-        total: o.total,
-        paymentMethod: o.paymentMethod,
-        createdAt: o.createdAt,
-        expectedDelivery: o.expectedDelivery
-      }))
+    console.log('Dashboard Stats:', { 
+      totalUsers, 
+      totalOrders, 
+      totalSales, 
+      totalRefund, 
+      totalCancellations, 
+      totalReturns 
+    });
+
+    res.render('admin/dashboard', { 
+      totalUsers, 
+      totalOrders, 
+      totalSales, 
+      totalRefund, 
+      totalCancellations, 
+      totalReturns 
     });
   } catch (error) {
-    console.error('Sales Report Error:', error);
-    res.status(500).json({ error: 'Failed to generate sales report' });
+    console.error('Error loading dashboard:', error);
+    res.status(500).send('Server error');
+  }
+};
+
+export const getSalesReport = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    let filterCondition = {
+      status: { $in: ['Delivered', 'Returned', 'Refunded', 'Cancelled', 'Confirmed', 'Shipped', 'Out for Delivery'] }
+    };
+
+    if (start && end) {
+      filterCondition.createdAt = {
+        $gte: new Date(start),
+        $lte: new Date(end)
+      };
+    }
+    console.log('Sales Report Query:', filterCondition);
+
+    const orders = await Order.find(filterCondition)
+      .populate('userId', 'name')
+      .populate('items.productId', 'name')
+      .sort({ createdAt: -1 });
+
+    console.log('Fetched Orders:', orders.map(o => ({
+      orderId: o.orderId,
+      date: o.createdAt,
+      customer: o.userId?.name
+    })));
+
+    const salesData = orders.map(order => {
+      const totalPrice = order.items.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+      const discount = order.items.reduce((sum, item) => sum + (Number(item.discount) || 0), 0);
+      return {
+        orderId: order.orderId,
+        date: order.createdAt,
+        customer: order.userId?.name || 'Unknown',
+        status: order.status,
+        totalPrice,
+        discount,
+        totalAmount: Number(order.total) || totalPrice,
+        paymentMethod: order.paymentMethod || 'N/A',
+        items: order.items.map(item => ({
+          productName: item.productId?.name || 'Unknown Product',
+          quantity: item.quantity
+        }))
+      };
+    });
+
+    res.json(salesData);
+  } catch (error) {
+    console.error('Error fetching sales report:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getSalesReportPDF = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    let filterCondition = {
+      status: { $in: ['Delivered', 'Returned', 'Refunded', 'Cancelled', 'Confirmed', 'Shipped', 'Out for Delivery'] }
+    };
+
+    if (start && end) {
+      filterCondition.createdAt = {
+        $gte: new Date(start),
+        $lte: new Date(end)
+      };
+    }
+    console.log('PDF Query:', filterCondition);
+
+    const orders = await Order.find(filterCondition)
+      .populate('userId', 'name')
+      .populate('items.productId', 'name')
+      .sort({ createdAt: -1 });
+
+    if (!orders.length) {
+      return res.status(404).json({ error: 'No orders found for the selected criteria' });
+    }
+
+    console.log('PDF Orders:', orders.map(o => ({
+      orderId: o.orderId,
+      date: o.createdAt,
+      customer: o.userId?.name
+    })));
+
+    const doc = new PDFDocument({ 
+      margin: 50, 
+      size: 'A4', 
+      bufferPages: true 
+    });
+
+    let buffers = [];
+    doc.on('data', chunk => buffers.push(chunk));
+    doc.on('end', () => {
+      const pdfData = Buffer.concat(buffers);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
+      res.setHeader('Content-Length', pdfData.length);
+      res.status(200).send(pdfData);
+    });
+    doc.on('error', error => {
+      console.error('PDF Stream Error:', error);
+      res.status(500).send('Error generating PDF');
+    });
+
+    doc.fontSize(18)
+       .font('Helvetica-Bold')
+       .text('Sales Report', { align: 'center' });
+    doc.moveDown(1);
+
+    const headers = ['Order ID', 'Date', 'Customer', 'Status', 'Total', 'Payment', 'Products (Qty)'];
+    const colWidths = [70, 60, 80, 60, 60, 80, 100];
+    const rowHeight = 20;
+    let y = 100;
+
+    doc.fontSize(10).font('Helvetica-Bold');
+    headers.forEach((header, i) => {
+      doc.text(header, 50 + colWidths.slice(0, i).reduce((sum, w) => sum + w, 0), y, { 
+        width: colWidths[i], 
+        align: 'left' 
+      });
+    });
+    y += rowHeight;
+    doc.moveTo(50, y - 5).lineTo(550, y - 5).stroke();
+
+    doc.font('Helvetica');
+    orders.forEach((order, index) => {
+      const productsWithQty = order.items
+        ? order.items.map(item => `${item.productId?.name || 'N/A'} (${item.quantity})`).join(', ')
+        : 'No items';
+      const row = [
+        order.orderId,
+        new Date(order.createdAt).toLocaleDateString(),
+        order.userId?.name || 'N/A',
+        order.status,
+        `₹${Number(order.total || 0).toFixed(2)}`,
+        order.paymentMethod || 'N/A',
+        productsWithQty
+      ];
+
+      row.forEach((cell, i) => {
+        doc.text(cell, 50 + colWidths.slice(0, i).reduce((sum, w) => sum + w, 0), y, { 
+          width: colWidths[i], 
+          align: 'left' 
+        });
+      });
+      y += rowHeight;
+
+      if (y > 700 && index < orders.length - 1) {
+        doc.addPage();
+        y = 50;
+        doc.fontSize(10).font('Helvetica-Bold');
+        headers.forEach((header, i) => {
+          doc.text(header, 50 + colWidths.slice(0, i).reduce((sum, w) => sum + w, 0), y, { 
+            width: colWidths[i], 
+            align: 'left' 
+          });
+        });
+        y += rowHeight;
+        doc.moveTo(50, y - 5).lineTo(550, y - 5).stroke();
+        doc.font('Helvetica');
+      }
+    });
+
+    doc.end();
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ error: 'Failed to generate PDF' });
+  }
+};
+export const getTopProducts = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const match = { status: { $nin: ['Cancelled', 'Returned'] } };
+    if (start && end) {
+      match.date = {
+        $gte: new Date(start),
+        $lte: new Date(new Date(end).setHours(23, 59, 59, 999))
+      };
+    }
+
+    const products = await Order.aggregate([
+      { $match: match },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.productId',
+          totalQuantity: { $sum: '$items.quantity' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      {
+        $project: {
+          name: '$product.name',
+          totalQuantity: 1
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 10 }
+    ]);
+
+    console.log(`Fetched ${products.length} top products`);
+    res.json(products);
+  } catch (error) {
+    console.error('Get Top Products Error:', error);
+    res.status(500).json({ error: 'Failed to fetch top products' });
+  }
+};
+
+export const getTopCategories = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const match = { status: { $nin: ['Cancelled', 'Returned'] } };
+    if (start && end) {
+      match.date = {
+        $gte: new Date(start),
+        $lte: new Date(new Date(end).setHours(23, 59, 59, 999))
+      };
+    }
+
+    const categories = await Order.aggregate([
+      { $match: match },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.productId',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      {
+        $group: {
+          _id: '$product.category',
+          totalQuantity: { $sum: '$items.quantity' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: '$category' },
+      {
+        $project: {
+          name: '$category.name',
+          totalQuantity: 1
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 10 }
+    ]);
+
+    console.log(`Fetched ${categories.length} top categories`);
+    res.json(categories);
+  } catch (error) {
+    console.error('Get Top Categories Error:', error);
+    res.status(500).json({ error: 'Failed to fetch top categories' });
+  }
+};
+
+export const getTopBrands = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const match = { status: { $nin: ['Cancelled', 'Returned'] } };
+    if (start && end) {
+      match.date = {
+        $gte: new Date(start),
+        $lte: new Date(new Date(end).setHours(23, 59, 59, 999))
+      };
+    }
+
+    const brands = await Order.aggregate([
+      { $match: match },
+      { $unwind: '$items' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'items.productId',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      {
+        $group: {
+          _id: '$product.brand',
+          totalQuantity: { $sum: '$items.quantity' }
+        }
+      },
+      {
+        $project: {
+          name: '$_id',
+          totalQuantity: 1
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 10 }
+    ]);
+
+    console.log(`Fetched ${brands.length} top brands`);
+    res.json(brands);
+  } catch (error) {
+    console.error('Get Top Brands Error:', error);
+    res.status(500).json({ error: 'Failed to fetch top brands' });
   }
 };

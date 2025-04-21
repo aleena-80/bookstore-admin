@@ -66,7 +66,7 @@ export const sendOtp = async (req, res) => {
   if (req.method === 'GET') {
     return res.render('user/signup', { error: null });
   }
-  const { name, email, password, phone = ''} = req.body;
+  const { name, email, password, phone } = req.body;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -74,7 +74,7 @@ export const sendOtp = async (req, res) => {
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 60 * 1000;
-    otpStore[email] = { otp, expiresAt, name, password };
+    otpStore[email] = { otp, expiresAt, name, password ,phone};
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
@@ -123,7 +123,7 @@ export const verifyOtp = async (req, res) => {
     if (!otpData) {
       return res.status(400).json({ success: false, message: "OTP not found or expired" });
     }
-    const { otp: storedOtp, expiresAt, name, password } = otpData;
+    const { otp: storedOtp, expiresAt, name, password,phone } = otpData;
     if (!email) return res.status(400).json({ success: false, message: "Email is required" });
     if (!otp) return res.status(400).json({ success: false, message: "OTP is required" });
     if (Date.now() > expiresAt) {
@@ -138,7 +138,7 @@ export const verifyOtp = async (req, res) => {
       delete otpStore[email];
       return res.status(400).json({ success: false, message: "This email is already registered. Please log in." });
     }
-    const newUser = new User({ name, email, password });
+    const newUser = new User({ name, email, password,phone });
     await newUser.save();
     delete otpStore[email];
     const token = jwt.sign({ id: newUser._id, email: newUser.email, role: newUser.role || 'user' }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -147,7 +147,7 @@ export const verifyOtp = async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-    return res.status(200).json({ success: true, message: "OTP verified successfully", redirect: "/home" });
+    return res.status(200).json({ success: true, message: "OTP verified successfully", redirect: "/users/home" });
   } catch (error) {
     console.error('Verify OTP Error:', error);
     if (error.code === 11000) {
@@ -206,6 +206,24 @@ export const googleAuthCallback = async (req, res) => {
     if (!req.user || !req.user.token) {
       return res.redirect('/users/login?message=Google authentication failed');
     }
+
+    const { googleId, email, name } = req.user; // From Google profile
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        name,
+        email,
+        googleId,
+        authMethod: 'google',
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      user.authMethod = 'google';
+      await user.save();
+    }
+
     res.cookie('token', req.user.token, { 
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',

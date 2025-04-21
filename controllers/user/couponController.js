@@ -1,37 +1,52 @@
-// controllers/userCouponController.js
 import Coupon from '../../models/Coupon.js';
 import User from '../../models/User.js';
 import Order from '../../models/Order.js';
 import Cart from '../../models/Carts.js';
+import Address from '../../models/Address.js';
 import Wishlist from '../../models/Wishlist.js';
 
 export const getUserCoupons = async (req, res) => {
   try {
     const user = req.user;
+    console.log('User in getUserCoupons:', user?.email, user?._id);
+    let coupons;
+
     if (!user || !user._id) {
-      return res.json({ success: false, message: "Please log in to view coupons." });
+      console.log('No user found, returning global coupons');
+      coupons = await Coupon.find({
+        userId: { $exists: false },
+        isListed: true,
+        expiryDate: { $gte: new Date() }
+      });
+    } else {
+      if (user.isBlocked) {
+        return res.json({ success: false, message: 'Account is blocked' });
+      }
+      coupons = await Coupon.find({
+        $or: [
+          { userId: user._id },
+          { userId: { $exists: false } }
+        ],
+        isListed: true,
+        expiryDate: { $gte: new Date() }
+      });
     }
 
-    const cartItems = await Cart.find({ userId: req.user._id }).populate('productId');
-    const wishlistCount = await Wishlist.countDocuments({ userId: req.user._id });
+    if (req.headers.accept?.includes('application/json')) {
+      return res.json({ success: true, coupons });
+    }
+
+    const cartItems = await Cart.find({ userId: user?._id }).populate('productId');
+    const wishlistCount = await Wishlist.countDocuments({ userId: user?._id });
     const cartCount = cartItems.length;
-    const coupons = await Coupon.find({
-      $or: [
-        { userId: user._id },
-        { userId: { $exists: false } }
-      ],
-      isListed: true,
-      isActive: true,
-      expiryDate: { $gte: new Date() }
-    });
     res.render('user/coupons', { 
       coupons, 
-      wishlistCount,
+      wishlistCount: wishlistCount || 0,
       cartCount
     });
   } catch (error) {
     console.error('Get User Coupons Error:', error);
-    res.status(500).send('Failed to load coupons');
+    res.status(500).json({ success: false, message: 'Failed to load coupons' });
   }
 };
 
@@ -39,19 +54,15 @@ export const applyCoupon = async (req, res) => {
   try {
     const { code } = req.body;
     const user = req.user;
-
-    if (!user || !user._id) {
-      return res.json({ success: false, message: "Please log in to apply a coupon." });
-    }
+    console.log('User in applyCoupon:', user?.email, user?._id, 'Code:', code);
 
     const coupon = await Coupon.findOne({
       code,
       $or: [
-        { userId: user._id },
+        { userId: user?._id },
         { userId: { $exists: false } }
       ],
       isListed: true,
-      isActive: true,
       expiryDate: { $gte: new Date() }
     });
 
@@ -59,10 +70,16 @@ export const applyCoupon = async (req, res) => {
       return res.json({ success: false, message: 'Invalid or expired coupon' });
     }
 
-    // Find latest active order (not Cancelled or Returned)
+    if (!user || !user._id) {
+      return res.json({ success: false, message: 'Please log in to apply coupon' });
+    }
+    if (user.isBlocked) {
+      return res.json({ success: false, message: 'Account is blocked' });
+    }
+
     let order = await Order.findOne({ 
       userId: user._id, 
-      status: { $nin: ['Cancelled', 'Returned'] } // Exclude final states
+      status: { $nin: ['Cancelled', 'Returned'] }
     }).sort({ createdAt: -1 });
 
     if (!order) {
@@ -70,16 +87,48 @@ export const applyCoupon = async (req, res) => {
       if (cartItems.length === 0) {
         return res.json({ success: false, message: 'No items in cart to apply coupon' });
       }
+
+      const items = cartItems.map(item => {
+        if (!item.productId || !item.productId.price) {
+          console.log('Missing price for product:', item.productId);
+        }
+        return {
+          productId: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.price || 100
+        };
+      });
+      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      // Fetch default address
+      const address = await Address.findOne({ 
+        userId: user._id, 
+        isDefault: true 
+      }) || await Address.findOne({ userId: user._id });
+
+      if (!address) {
+        return res.json({ success: false, message: 'Please add an address to apply coupon' });
+      }
+
       order = new Order({
         userId: user._id,
-        items: cartItems.map(item => ({ productId: item.productId._id, quantity: item.quantity })),
-        addressId: null,
-        total: 0,
-        status: 'Pending' // Default per your schema
+        orderId:`ORD-${Date.now()}`,
+        items,
+        address: {
+          name: address.name,
+          street: address.street,
+          city: address.city,
+          state: address.state,
+          postalCode: address.postalCode
+        },
+        paymentMethod: 'COD', // Default, adjust if needed
+        total,
+        status: 'Confirmed'
       });
     }
-    if (order.couponCode) {
-      return res.json({ success: false, message: 'A coupon is already applied' });
+
+    if (order.couponCode && order.couponCode !== code) {
+      return res.json({ success: false, message: 'Another coupon is already applied' });
     }
     order.couponCode = coupon.code;
     await order.save();
@@ -98,7 +147,6 @@ export const removeCoupon = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Please log in' });
     }
 
-    // Find latest active order (not Cancelled or Returned)
     const order = await Order.findOne({ 
       userId, 
       status: { $nin: ['Cancelled', 'Returned'] }

@@ -10,11 +10,11 @@ const orderSchema = new mongoose.Schema({
     discount: { type: Number, default: 0 }
   }],
   address: {
-    name: { type: String, required: true },
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    postalCode: { type: String, required: true },
+    name: { type: String},
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    postalCode: { type: String },
     country: { type: String, default: 'India' } 
   },
 

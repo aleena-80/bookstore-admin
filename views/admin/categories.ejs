@@ -12,19 +12,17 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: rgb(32,31,49); /* Deep navy */
+            background-color: rgb(32,31,49);
             color: #FFFFFF;
             min-height: 100vh;
             display: flex;
             margin: 0;
         }
-
         .sidebar {
             width: 220px;
-            background: rgb(32,31,49); /* Deep navy */
+            background: rgb(32,31,49);
             color: #FFFFFF;
             height: 100vh;
             position: fixed;
@@ -32,14 +30,12 @@
             left: 0;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
         }
-
         .sidebar-header {
             padding: 20px 10px;
             text-align: center;
             background: rgb(32,31,49);
             border-bottom: 1px solid #E5E5E5;
         }
-
         .sidebar-header h2 {
             font-size: 1.6em;
             margin: 0;
@@ -50,15 +46,12 @@
             justify-content: center;
             gap: 10px;
         }
-
         .sidebar ul {
             padding: 10px 0;
         }
-
         .sidebar li {
             margin-bottom: 10px;
         }
-
         .sidebar a, .sidebar button {
             color: #FFFFFF;
             text-decoration: none;
@@ -74,42 +67,35 @@
             gap: 10px;
             transition: background 0.3s;
         }
-
         .sidebar a:hover, .sidebar button:hover {
-            background: rgba(255, 186, 222, 0.2); /* Light pink hover */
+            background: rgba(255, 186, 222, 0.2);
         }
-
         .sidebar a.active {
             color: rgb(255, 255, 255);
         }
-
         .main-content {
             margin-left: 220px;
             flex: 1;
             padding: 20px;
         }
-
         h1 {
             color: #FFFFFF;
             margin-bottom: 20px;
             font-size: 28px;
             font-weight: 700;
         }
-
         .error {
-            color: #E74C3C; /* Red */
+            color: #E74C3C;
             margin-bottom: 15px;
             font-weight: bold;
             font-size: 14px;
         }
-
         .filter, .add-form {
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .filter input, .add-form input, .filter button, .add-form button {
             padding: 8px;
             border-radius: 5px;
@@ -118,81 +104,71 @@
             background: #FFFFFF;
             color: rgb(32,31,49);
         }
-
         .filter button, .add-form button {
-            background: #FFBADE; /* Soft pink */
+            background: #FFBADE;
             color: rgb(32,31,49);
             border: none;
             transition: background 0.3s;
         }
-
         .filter button:hover, .add-form button:hover {
             background: rgba(255, 186, 222, 0.8);
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             background: #FFFFFF;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #E5E5E5;
             color: rgb(32,31,49);
         }
-
         th {
             background: rgb(32,31,49);
             color: #FFFFFF;
         }
-
         .actions {
             display: flex;
             gap: 10px;
         }
-
         .actions button {
             padding: 5px 10px;
             border: none;
             border-radius: 3px;
             cursor: pointer;
             font-size: 14px;
-            background: #FFBADE; /* Soft pink */
+            background: #FFBADE;
             color: rgb(32,31,49);
             transition: background 0.3s;
         }
-
         .actions button:hover {
             background: rgba(255, 186, 222, 0.8);
         }
-
         .pagination {
             margin-top: 20px;
             text-align: center;
         }
-
-        .pagination a {
+        .pagination a, .pagination button {
             padding: 8px 12px;
             margin: 0 5px;
             text-decoration: none;
-            color: #FFBADE; /* Soft pink */
+            color: #FFBADE;
             transition: background 0.3s;
+            border: none;
+            background: none;
+            cursor: pointer;
         }
-
-        .pagination a:hover {
+        .pagination a:hover, .pagination button:hover {
             background: rgba(255, 186, 222, 0.2);
         }
-
-        .pagination a.active {
+        .pagination a.active, .pagination button.active {
             background: #FFBADE;
             color: rgb(32,31,49);
             border-radius: 5px;
         }
-
-        .confirmation-modal {
+        .confirmation-modal, .offer-modal, .toggle-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -202,8 +178,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
-
-        .confirmation-modal .modal-content {
+        .confirmation-modal .modal-content, .offer-modal .modal-content, .toggle-modal .modal-content {
             background: #FFFFFF;
             margin: 20% auto;
             padding: 20px;
@@ -213,8 +188,7 @@
             text-align: center;
             color: rgb(32,31,49);
         }
-
-        .confirmation-modal button {
+        .confirmation-modal button, .offer-modal button, .toggle-modal button {
             padding: 8px 20px;
             margin: 10px 5px;
             border: none;
@@ -223,35 +197,39 @@
             font-size: 14px;
             transition: background 0.3s;
         }
-
-        .confirm-btn {
-            background: #E74C3C; /* Red */
+        .confirm-btn, .toggle-confirm-btn {
+            background: #E74C3C;
             color: #FFFFFF;
         }
-
-        .cancel-btn {
-            background: #FFBADE; /* Soft pink */
+        .cancel-btn, .offer-cancel-btn, .toggle-cancel-btn {
+            background: #FFBADE;
             color: rgb(32,31,49);
         }
-
+        .offer-save-btn {
+            background: #2ECC71;
+            color: #FFFFFF;
+        }
+        .offer-modal input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #E5E5E5;
+            border-radius: 5px;
+        }
         @media (max-width: 768px) {
             .sidebar {
                 width: 180px;
             }
-
             .main-content {
                 margin-left: 180px;
             }
-
             .sidebar-header h2 {
                 font-size: 1.4em;
             }
-
             .sidebar a, .sidebar button {
                 font-size: 0.9em;
                 padding: 10px 15px;
             }
-
             h1 {
                 font-size: 24px;
             }
@@ -265,15 +243,16 @@
         </div>
         <ul>
             <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-
             <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
             <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
             <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
-            <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a></li>
-            <li><a href="/admin/coupons" class="active"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
+            <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="/admin/transactions" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
+
+            <li><a href="/admin/coupons"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
             <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li> 
-            <li><a href="/admin/banners" class="active"><i class="fas fa-images"></i> Banners</a></li>
+            <li><a href="/admin/banners"><i class="fas fa-images"></i> Banners</a></li>
             <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
         </ul>
     </div>
@@ -289,26 +268,34 @@
             </form>
         </div>
         <div class="filter">
-            <form method="GET" action="/admin/categories">
+            <form id="searchForm" method="GET" action="/admin/categories">
                 <input type="text" name="search" value="<%= search %>" placeholder="Search categories">
                 <button type="submit">Search</button>
                 <button type="button" onclick="window.location.href='/admin/categories'">Clear</button>
             </form>
         </div>
-        <table>
+        <table id="categoriesTable">
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Offer (%)</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <% categories.forEach(category => { %>
-                    <tr>
+                    <tr data-id="<%= category._id %>">
                         <td><%= category.name %></td>
+                        <td><%= category.offer %></td>
+                        <td><%= category.isDeleted ? 'Unlisted' : 'Listed' %></td>
                         <td class="actions">
                             <button onclick="toggleEditForm('<%= category._id %>')">Edit</button>
                             <button onclick="showConfirmation('<%= category._id %>')">Delete</button>
+                            <button onclick="showToggleConfirmation('<%= category._id %>', <%= category.isDeleted %>)" class="toggle-list-btn">
+                                <%= category.isDeleted ? 'List' : 'Unlist' %>
+                            </button>
+                            <button onclick="showOfferModal('<%= category._id %>', <%= category.offer %>)">Add Offer</button>
                             <form method="POST" action="/admin/categories/edit/<%= category._id %>" id="editForm-<%= category._id %>" style="display: none;">
                                 <input type="text" name="name" value="<%= category.name %>" required>
                                 <button type="submit">Save</button>
@@ -319,9 +306,9 @@
                 <% }); %>
             </tbody>
         </table>
-        <div class="pagination">
+        <div class="pagination" id="pagination">
             <% for(let i = 1; i <= totalPages; i++) { %>
-                <a href="/admin/categories?page=<%= i %>&search=<%= search %>" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></a>
+                <button onclick="fetchCategories(<%= i %>)" <%= currentPage === i ? 'class="active"' : '' %>><%= i %></button>
             <% } %>
         </div>
     </div>
@@ -334,8 +321,29 @@
         </div>
     </div>
 
+    <div id="toggleModal" class="toggle-modal">
+        <div class="modal-content">
+            <p id="toggleMessage"></p>
+            <button class="toggle-confirm-btn" onclick="confirmToggle()">Yes</button>
+            <button class="toggle-cancel-btn" onclick="hideToggleConfirmation()">No</button>
+        </div>
+    </div>
+
+    <div id="offerModal" class="offer-modal">
+        <div class="modal-content">
+            <p>Set Category Offer</p>
+            <input type="number" id="offerInput" min="0" max="100" placeholder="Offer (%)">
+            <button class="offer-save-btn" onclick="saveOffer()">Save</button>
+            <button class="offer-cancel-btn" onclick="hideOfferModal()">Cancel</button>
+        </div>
+    </div>
+
     <script>
-        let deleteForm;
+        let currentPage = <%= currentPage %>;
+        let searchQuery = '<%= search %>';
+        let currentCategoryId = null;
+        let toggleCategoryId = null;
+        let deleteCategoryId = null;
 
         function toggleEditForm(categoryId) {
             const editForm = document.getElementById(`editForm-${categoryId}`);
@@ -343,23 +351,187 @@
         }
 
         function showConfirmation(categoryId) {
-            deleteForm = document.createElement('form');
-            deleteForm.method = 'POST';
-            deleteForm.action = `/admin/categories/delete/${categoryId}`;
+            deleteCategoryId = categoryId;
             document.getElementById('confirmationModal').style.display = 'block';
         }
 
         function hideConfirmation() {
             document.getElementById('confirmationModal').style.display = 'none';
-            deleteForm = null;
+            deleteCategoryId = null;
         }
 
-        function confirmDelete() {
-            if (deleteForm) {
-                document.body.appendChild(deleteForm);
-                deleteForm.submit();
+        async function confirmDelete() {
+            if (!deleteCategoryId) {
+                alert('No category selected for deletion');
+                hideConfirmation();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/categories/delete/${deleteCategoryId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    // Remove the deleted row from the table immediately
+                    const row = document.querySelector(`tr[data-id="${deleteCategoryId}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                    hideConfirmation();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to delete category');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert(error.message);
+                hideConfirmation();
             }
         }
+
+        function showToggleConfirmation(categoryId, isDeleted) {
+            toggleCategoryId = categoryId;
+            const message = isDeleted ? 
+                'Are you sure you want to list this category?' : 
+                'Are you sure you want to unlist this category?';
+            document.getElementById('toggleMessage').textContent = message;
+            document.getElementById('toggleModal').style.display = 'block';
+        }
+
+        function hideToggleConfirmation() {
+            document.getElementById('toggleModal').style.display = 'none';
+            toggleCategoryId = null;
+        }
+
+        async function confirmToggle() {
+            if (!toggleCategoryId) {
+                alert('No category selected for toggling');
+                return;
+            }
+            try {
+                const response = await fetch(`/admin/categories/toggle/${toggleCategoryId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to toggle listing');
+                }
+                const result = await response.json();
+                if (result.success) {
+                    hideToggleConfirmation();
+                    await fetchCategories(currentPage);
+                } else {
+                    throw new Error(result.error || 'Failed to toggle listing');
+                }
+            } catch (error) {
+                console.error('Toggle Listing Error:', error.message);
+                alert(`Failed to toggle category listing: ${error.message}`);
+            }
+        }
+
+        function showOfferModal(categoryId, currentOffer) {
+            currentCategoryId = categoryId;
+            document.getElementById('offerInput').value = currentOffer || 0;
+            document.getElementById('offerModal').style.display = 'block';
+        }
+
+        function hideOfferModal() {
+            document.getElementById('offerModal').style.display = 'none';
+            currentCategoryId = null;
+        }
+
+        async function saveOffer() {
+            if (!currentCategoryId) {
+                alert('No category selected for offer update');
+                return;
+            }
+            const offer = document.getElementById('offerInput').value;
+            try {
+                const response = await fetch(`/admin/categories/offer/${currentCategoryId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offer }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update offer');
+                }
+                const result = await response.json();
+                if (result.success) {
+                    hideOfferModal();
+                    await fetchCategories(currentPage);
+                } else {
+                    throw new Error(result.error || 'Failed to update offer');
+                }
+            } catch (error) {
+                console.error('Update Offer Error:', error.message);
+                alert(`Failed to update category offer: ${error.message}`);
+            }
+        }
+
+        async function fetchCategories(page) {
+            try {
+                const url = `/admin/categories?page=${page}&search=${encodeURIComponent(searchQuery)}`;
+                const response = await fetch(url, { 
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch categories');
+                }
+                const data = await response.json();
+
+                const tableBody = document.querySelector('#categoriesTable tbody');
+                tableBody.innerHTML = data.categories.map(category => `
+                    <tr data-id="${category._id}">
+                        <td>${category.name}</td>
+                        <td>${category.offer}</td>
+                        <td>${category.isDeleted ? 'Unlisted' : 'Listed'}</td>
+                        <td class="actions">
+                            <button onclick="toggleEditForm('${category._id}')">Edit</button>
+                            <button onclick="showConfirmation('${category._id}')">Delete</button>
+                            <button onclick="showToggleConfirmation('${category._id}', ${category.isDeleted})" class="toggle-list-btn">
+                                ${category.isDeleted ? 'List' : 'Unlist'}
+                            </button>
+                            <button onclick="showOfferModal('${category._id}', ${category.offer})">Add Offer</button>
+                            <form method="POST" action="/admin/categories/edit/${category._id}" id="editForm-${category._id}" style="display: none;">
+                                <input type="text" name="name" value="${category.name}" required>
+                                <button type="submit">Save</button>
+                                <button type="button" onclick="toggleEditForm('${category._id}')">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                `).join('');
+
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                for (let i = 1; i <= data.totalPages; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.onclick = () => fetchCategories(i);
+                    if (i === page) button.className = 'active';
+                    pagination.appendChild(button);
+                }
+
+                currentPage = page;
+            } catch (error) {
+                console.error('Fetch Categories Error:', error.message);
+                alert(`Failed to load categories: ${error.message}`);
+            }
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            searchQuery = document.querySelector('#searchForm input[name="search"]').value;
+            currentPage = 1;
+            await fetchCategories(1);
+        });
 
         window.onload = function() {
             fetch('/admin/dashboard', { credentials: 'include' })

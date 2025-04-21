@@ -40,19 +40,19 @@ export const getCoupons = async (req, res) => {
     res.status(500).send('Failed to load coupons');
   }
 };
-export const unlistCoupon = async (req, res) => {
+
+export const toggleCoupon = async (req, res) => {
   try {
     const { couponId } = req.params;
     const coupon = await Coupon.findById(couponId);
     if (!coupon) {
       return res.status(404).json({ success: false, message: 'Coupon not found' });
     }
-    // Assuming "listing" is a boolean field (e.g., isListed)
-    coupon.isListed = false; // Add this field to schema if missing
+    coupon.isListed = !coupon.isListed; // Toggle isListed
     await coupon.save();
-    res.json({ success: true, message: 'Coupon unlisted' });
+    res.json({ success: true, message: `Coupon ${coupon.isListed ? 'listed' : 'unlisted'}`, isListed: coupon.isListed });
   } catch (error) {
-    console.error('Unlist Coupon Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to unlist coupon' });
+    console.error('Toggle Coupon Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to toggle coupon' });
   }
 };

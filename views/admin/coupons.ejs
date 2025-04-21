@@ -186,7 +186,7 @@
         }
 
         .coupon-actions .btn-unlist {
-            background: rgba(255, 186, 222, 0.6); /* Slightly darker pink */
+            background: rgba(255, 186, 222); /* Slightly darker pink */
         }
 
         @media (max-width: 768px) {
@@ -229,6 +229,8 @@
             <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
             <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
             <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="/admin/transactions" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
+
             <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
             <li><a href="/admin/banners"><i class="fas fa-images"></i> Banners</a></li>
             <li><a href="/admin/coupons" class="active"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
@@ -237,94 +239,94 @@
     </div>
     
     <div class="main-content">
-        <h1>Coupons</h1>
-        <div class="dashboard-info">
+      <h1>Coupons</h1>
+      <div class="dashboard-info">
           <form id="createCouponForm">
-            <input type="text" name="code" placeholder="Coupon Code" required>
-            <input type="number" name="discount" placeholder="Discount (%)" min="0" max="100" required>
-            <input type="date" name="expiryDate" required>
-            <button type="submit"><i class="fas fa-plus"></i> Create Coupon</button>
+              <input type="text" name="code" placeholder="Coupon Code" required>
+              <input type="number" name="discount" placeholder="Discount (%)" min="0" max="100" required>
+              <input type="date" name="expiryDate" required>
+              <button type="submit"><i class="fas fa-plus"></i> Create Coupon</button>
           </form>
           <ul class="coupon-list" id="couponList">
-            <% coupons.forEach(coupon => { %>
-              <li class="coupon-item">
-                <div class="coupon-details">
-                  <span><%= coupon.code %> - <%= coupon.discount %>% <span class="status">Active</span></span>
-                  <span>Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></span>
-                </div>
-                <div class="coupon-actions">
-                  <button class="btn-delete" onclick="deleteCoupon('<%= coupon._id %>')"><i class="fas fa-trash"></i> Delete</button>
-                  <button class="btn-unlist" onclick="unlistCoupon('<%= coupon._id %>')"><i class="fas fa-ban"></i> Unlist</button>
-                </div>
-              </li>
-            <% }) %>
+              <% coupons.forEach(coupon => { %>
+                  <li class="coupon-item">
+                      <div class="coupon-details">
+                          <span><%= coupon.code %> - <%= coupon.discount %>% <span class="status"><%= coupon.isListed ? 'Active' : 'Inactive' %></span></span>
+                          <span>Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></span>
+                      </div>
+                      <div class="coupon-actions">
+                          <button class="btn-delete" onclick="deleteCoupon('<%= coupon._id %>')"><i class="fas fa-trash"></i> Delete</button>
+                          <button class="btn-unlist" onclick="unlistCoupon('<%= coupon._id %>')"><i class="fas fa-<%= coupon.isListed ? 'ban' : 'check' %>"></i> <%= coupon.isListed ? 'Unlist' : 'List' %></button>
+                      </div>
+                  </li>
+              <% }) %>
           </ul>
-        </div>
       </div>
-      
-      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-      <script>
-        document.getElementById('createCouponForm').addEventListener('submit', async (e) => {
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+      document.getElementById('createCouponForm').addEventListener('submit', async (e) => {
           e.preventDefault();
           const formData = new FormData(e.target);
           const response = await fetch('/admin/coupons/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              code: formData.get('code'), 
-              discount: formData.get('discount'),
-              expiryDate: formData.get('expiryDate')
-            })
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                  code: formData.get('code'), 
+                  discount: formData.get('discount'),
+                  expiryDate: formData.get('expiryDate')
+              })
           });
           const data = await response.json();
           if (data.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: 'Coupon created successfully!',
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => location.reload());
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: 'Coupon created successfully!',
+                  timer: 1500,
+                  showConfirmButton: false
+              }).then(() => location.reload());
           } else {
-            Swal.fire('Error', data.message, 'error');
+              Swal.fire('Error', data.message, 'error');
           }
-        });
-      
-        async function deleteCoupon(couponId) {
+      });
+  
+      async function deleteCoupon(couponId) {
           const response = await fetch(`/admin/coupons/${couponId}`, { 
-            method: 'DELETE' 
+              method: 'DELETE' 
           });
           const data = await response.json();
           if (data.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Deleted',
-              text: 'Coupon deleted successfully!',
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => location.reload());
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Deleted',
+                  text: 'Coupon deleted successfully!',
+                  timer: 1500,
+                  showConfirmButton: false
+              }).then(() => location.reload());
           } else {
-            Swal.fire('Error', data.message, 'error');
+              Swal.fire('Error', data.message, 'error');
           }
-        }
-
-        async function unlistCoupon(couponId) {
-          const response = await fetch(`/admin/coupons/unlist/${couponId}`, { 
-            method: 'POST' 
+      }
+  
+      async function unlistCoupon(couponId) {
+          const response = await fetch(`/admin/coupons/toggle/${couponId}`, { 
+              method: 'POST' 
           });
           const data = await response.json();
           if (data.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Unlisted',
-              text: 'Coupon unlisted successfully!',
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => location.reload());
+              Swal.fire({
+                  icon: 'success',
+                  title: data.isListed ? 'Listed' : 'Unlisted',
+                  text: `Coupon ${data.isListed ? 'listed' : 'unlisted'} successfully!`,
+                  timer: 1500,
+                  showConfirmButton: false
+              }).then(() => location.reload());
           } else {
-            Swal.fire('Error', data.message, 'error');
+              Swal.fire('Error', data.message, 'error');
           }
-        }
-      </script>
+      }
+  </script>
 </body>
 </html>
