@@ -69,14 +69,12 @@
         }
 
         .breadcrumbs {
-            padding: 15px 25px;
+            padding: 20px 20px;
             font-size: 14px;
             color: #1C2526;
-            background-color: #E8ECEF;
-            border-bottom: 1px solid #DEE2E6;
+            background: #E5E5E5;
         }
 
-        .breadcrumbs { padding: 20px 20px; font-size: 14px; color: #1C2526; background: #E5E5E5; }
         .breadcrumbs a { color: #1C2526; text-decoration: none; }
         .breadcrumbs a:hover { color: #58CC02; }
         .breadcrumbs span { margin: 0 5px; }
@@ -200,81 +198,72 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
-                padding-top: 80px;
+                padding-top: 100px;
             }
-
             .navbar {
                 padding: 10px 15px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                height: 60px;
             }
-
             .logo h1 a {
                 font-size: 26px;
             }
-
             .tagline {
-                font-size: 12px;
+                font-size: 16px;
             }
-
             .nav-links {
                 gap: 15px;
-                width: 100%;
+                width: auto;
                 justify-content: flex-end;
+                align-items: center;
             }
-
             .nav-links li a {
                 font-size: 14px;
             }
-
             .breadcrumbs {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
                 padding: 10px 15px;
-                font-size: 12px;
+                font-size: 20px;
+                z-index: 999;
             }
-
             .order-details {
                 margin: 15px;
                 padding: 20px;
                 border-radius: 12px;
             }
-
             h2 {
                 font-size: 26px;
             }
-
             .section p {
                 font-size: 14px;
             }
-
             .section h3 {
                 font-size: 20px;
             }
-
             .item {
                 gap: 15px;
                 padding: 12px 0;
             }
-
             .item img {
                 width: 60px;
                 height: 80px;
             }
-
             .item-details h4 {
                 font-size: 16px;
             }
-
             .item-details p {
                 font-size: 14px;
             }
-
             .actions {
                 gap: 10px;
                 flex-direction: column;
                 align-items: stretch;
             }
-
             .btn {
                 padding: 10px 20px;
                 font-size: 14px;
@@ -287,54 +276,42 @@
             .navbar {
                 padding: 8px 10px;
             }
-
             .logo h1 a {
                 font-size: 22px;
             }
-
             .tagline {
                 font-size: 11px;
             }
-
             .nav-links {
                 gap: 10px;
             }
-
             .nav-links li a {
                 font-size: 13px;
             }
-
             .breadcrumbs {
                 font-size: 11px;
                 padding: 8px 10px;
             }
-
             .order-details {
                 margin: 10px;
                 padding: 15px;
             }
-
             h2 {
                 font-size: 22px;
             }
-
             .section p {
                 font-size: 13px;
             }
-
             .item img {
                 width: 50px;
                 height: 70px;
             }
-
             .item-details h4 {
                 font-size: 15px;
             }
-
             .item-details p {
                 font-size: 13px;
             }
-
             .btn {
                 padding: 8px 16px;
                 font-size: 13px;

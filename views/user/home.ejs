@@ -12,7 +12,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #FFFFFF;
@@ -20,7 +19,6 @@
             line-height: 1.6;
             padding-top: 100px;
         }
-
         /* Header */
         .navbar {
             background-color: #FFFFFF;
@@ -39,7 +37,7 @@
             position: absolute;
             top: -7px;
             right: -8px;
-            background: #58CC02; /* Match brand color */
+            background: #58CC02;
             color: #FFFFFF;
             font-size: 12px;
             font-weight: 700;
@@ -51,9 +49,8 @@
             justify-content: center;
             line-height: 1;
         }
-
         .count-badge:empty {
-            display: none; /* Hide if count is 0 */
+            display: none;
         }
         .logo h1 a {
             color: #58CC02;
@@ -61,13 +58,11 @@
             font-size: 28px;
             font-weight: 700;
         }
-
         .tagline {
             color: #1C2526;
             font-size: 14px;
             margin-top: 3px;
         }
-
         .nav-links {
             list-style: none;
             display: flex;
@@ -75,9 +70,8 @@
             align-items: center;
             flex-wrap: wrap;
             justify-content: flex-end;
-            width: auto; /* Adjusted for better mobile fit */
+            width: auto;
         }
-
         .nav-links li a {
             color: #1C2526;
             text-decoration: none;
@@ -88,19 +82,15 @@
             transition: color 0.3s;
             position: relative;
         }
-
         .nav-links li a:hover {
             color: #58CC02;
         }
-
         .nav-links li a i {
             margin-right: 5px;
         }
-
         .nav-links li.profile-link a {
             color: #1C2526;
         }
-
         .search-bar {
             position: absolute;
             left: 50%;
@@ -109,7 +99,6 @@
             gap: 10px;
             align-items: center;
         }
-
         .search-bar input {
             padding: 8px 12px;
             border: 1px solid #E5E5E5;
@@ -119,16 +108,13 @@
             width: 300px;
             transition: border-color 0.3s;
         }
-
         .search-bar input:focus {
             border-color: #58CC02;
         }
-
         .search-bar input::placeholder {
             color: #A0A0A0;
             text-align: center;
         }
-
         .search-bar button {
             padding: 8px 15px;
             background: #1C2526;
@@ -138,11 +124,9 @@
             font-weight: 700;
             cursor: pointer;
         }
-
         .search-bar button:hover {
             background: #58CC02;
         }
-
         /* Breadcrumbs */
         .breadcrumbs {
             margin-top: 10px;
@@ -151,25 +135,21 @@
             color: #1C2526;
             background-color: #E5E5E5;
         }
-
         /* Hero Banner */
         .hero {
             padding: 20px;
         }
-
         .banner {
             position: relative;
             width: 100%;
-            height: 50vh; /* Relative height */
+            height: 50vh;
             min-height: 300px;
             overflow: hidden;
         }
-
         .banner-slideshow {
             width: 100%;
             height: 100%;
         }
-
         .banner-img {
             width: 100%;
             height: 100%;
@@ -179,12 +159,11 @@
             left: 0;
             opacity: 0;
             transition: opacity 1s ease-in-out;
+            image-rendering: crisp-edges; 
         }
-
         .banner-img.active {
             opacity: 1;
         }
-
         .banner-content {
             position: absolute;
             top: 50%;
@@ -195,18 +174,15 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             width: 90%;
         }
-
         .banner-content h2 {
-            font-size: clamp(24px, 5vw, 36px); /* Responsive font */
+            font-size: clamp(24px, 5vw, 36px);
             font-weight: 700;
             margin-bottom: 10px;
         }
-
         .banner-content p {
             font-size: clamp(16px, 3vw, 20px);
             margin-bottom: 20px;
         }
-
         .banner-btn {
             display: inline-block;
             padding: 10px 20px;
@@ -217,11 +193,9 @@
             font-weight: 700;
             font-size: clamp(14px, 2.5vw, 16px);
         }
-
         .banner-btn:hover {
             background: #46a802;
         }
-
         .banner-dots {
             position: absolute;
             bottom: 10px;
@@ -230,7 +204,6 @@
             display: flex;
             gap: 10px;
         }
-
         .dot {
             width: 10px;
             height: 10px;
@@ -239,24 +212,20 @@
             cursor: pointer;
             opacity: 0.5;
         }
-
         .dot.active {
             opacity: 1;
         }
-
         /* Featured Books */
         .featured-books {
             padding: 40px 20px;
             text-align: center;
         }
-
         .featured-books h3 {
             font-size: 28px;
             color: #1C2526;
             font-weight: 700;
             margin-bottom: 20px;
         }
-
         .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -264,7 +233,6 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .book-card {
             background: #FFFFFF;
             padding: 15px;
@@ -276,16 +244,14 @@
             flex-direction: column;
             justify-content: space-between;
         }
-
         .book-card img {
             width: 100%;
-            height: auto; /* Show full image */
-            max-height: 250px; /* Cap for large images */
-            object-fit: contain; /* Preserve aspect ratio */
+            height: auto;
+            max-height: 250px;
+            object-fit: contain;
             border-radius: 8px;
             margin-bottom: 10px;
         }
-
         .book-card h4 {
             font-size: 18px;
             color: #1C2526;
@@ -295,12 +261,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .book-card p {
             font-size: 14px;
             margin-bottom: 5px;
         }
-
         .book-card button {
             padding: 8px;
             background: #58CC02;
@@ -314,7 +278,6 @@
             width: 100%;
             margin-top: 5px;
         }
-
         .book-card .wishlist-btn {
             background: none;
             border: none;
@@ -324,11 +287,9 @@
             cursor: pointer;
             transition: color 0.3s;
         }
-
         .book-card .wishlist-btn:hover {
             color: #58CC02;
         }
-
         /* Footer */
         footer {
             background: #FFFFFF;
@@ -336,7 +297,6 @@
             color: #1C2526;
             border-top: 1px solid #E5E5E5;
         }
-
         .footer-content {
             display: flex;
             justify-content: space-around;
@@ -345,48 +305,39 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .footer-section h4 {
             font-size: 18px;
             color: #1C2526;
             font-weight: 700;
             margin-bottom: 10px;
         }
-
         .footer-section p {
             font-size: 14px;
         }
-
         .footer-section ul {
             list-style: none;
         }
-
         .footer-section ul li a {
             color: #1C2526;
             text-decoration: none;
             font-size: 14px;
         }
-
         .footer-section ul li a:hover {
             color: #58CC02;
         }
-
         .social-links a {
             color: #1C2526;
             margin: 0 10px;
             font-size: 18px;
             transition: color 0.3s;
         }
-
         .social-links a:hover {
             color: #58CC02;
         }
-
         .footer-section form {
             display: flex;
             gap: 10px;
         }
-
         .footer-section input {
             padding: 8px;
             border: 1px solid #E5E5E5;
@@ -396,11 +347,9 @@
             outline: none;
             width: 150px;
         }
-
         .footer-section input::placeholder {
             color: #A0A0A0;
         }
-
         .footer-section button {
             padding: 8px 15px;
             background: #1C2526;
@@ -411,136 +360,109 @@
             font-weight: 700;
             transition: background 0.3s;
         }
-
         .footer-section button:hover {
             background: #58CC02;
         }
-
         .footer-bottom {
             text-align: center;
             margin-top: 20px;
             font-size: 12px;
         }
-
         /* Responsive */
         @media (max-width: 768px) {
             body {
-                padding-top: 120px; /* Adjust for taller header */
+                padding-top: 120px;
             }
-
             .navbar {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
             .logo h1 a {
                 font-size: 24px;
             }
-
             .tagline {
                 font-size: 12px;
                 margin-top: -3px;
             }
-
             .nav-links {
                 width: 100%;
                 margin-top: -40px;
             }
-
             .nav-links li a {
                 font-size: 14px;
-            
             }
-
             .search-bar {
                 position: static;
                 transform: none;
                 width: 100%;
                 margin-top: 20px;
             }
-
             .search-bar input {
                 width: 100%;
                 font-size: 14px;
             }
-
             .search-bar button {
                 padding: 8px 12px;
                 font-size: 14px;
             }
-
             .banner {
                 height: 40vh;
                 min-height: 200px;
             }
-
             .banner-img {
                 height: 100%;
             }
-
             .banner-content {
                 width: 95%;
             }
-
             .banner-content h2 {
                 font-size: clamp(18px, 5vw, 24px);
             }
-
             .banner-content p {
                 font-size: clamp(14px, 3vw, 16px);
             }
-
             .banner-btn {
                 padding: 8px 16px;
                 font-size: clamp(12px, 2.5vw, 14px);
             }
-
             .book-grid {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
-
             .book-card {
                 padding: 10px;
+                margin-left: 25px;
+                max-width: 300px;
             }
-
             .book-card img {
-                max-height: 200px; /* Smaller cap for mobile */
+                max-height: 300px;
             }
-
             .footer-content {
                 flex-direction: column;
                 text-align: center;
             }
-
             .footer-section form {
                 flex-direction: column;
                 align-items: center;
             }
-
             .footer-section input {
                 width: 100%;
             }
         }
-
         @media (min-width: 769px) and (max-width: 1024px) {
             .navbar {
                 padding: 10px 15px;
             }
-
             .search-bar input {
                 width: 250px;
             }
-
             .banner {
                 height: 45vh;
             }
-
             .book-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
-
             .book-card img {
                 max-height: 220px;
             }
@@ -555,15 +477,12 @@
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
             <ul class="nav-links">
-                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
-                <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
+                <li><a href="<%= user ? '/users/cart' : '/users/login' %>"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+                <li><a href="<%= user ? '/users/wishlist' : '/users/login' %>"><i class="fas fa-heart"></i><span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
                 <% if (user) { %>
+                    <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
                     <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
-                <% } else { %>
-                    <li><a href="/users/login"><i class="fas fa-sign-in-alt"></i></a></li>
-                    <li><a href="/users/signup"><i class="fas fa-user-plus"></i></a></li>
-                <% } %>
+                <% }   %>
                 <li class="search-bar">
                     <input type="text" id="searchInput" placeholder="Search by title, author...">
                     <button id="clearSearch">Clear</button>
@@ -581,21 +500,21 @@
             <div class="banner">
                 <div class="banner-slideshow">
                     <% banners.forEach((banner, index) => { %>
-                      <img src="<%= banner.image || '/images/default-banner.jpg' %>" alt="<%= banner.title || 'Banner' %>"  class="banner-img <%= index === 0 ? 'active' : '' %>">
+                      <img src="<%= banner.image || '/images/default-banner.jpg' %>" alt="<%= banner.title || 'Banner' %>" class="banner-img  <%= index === 0 ? 'active' : '' %>">  
                     <% }); %>
-                  </div>
-                  <div class="banner-dots">
+                </div>
+                <div class="banner-dots">
                     <% banners.forEach((_, index) => { %>
                       <span class="dot <%= index === 0 ? 'active' : '' %>" data-index="<%= index %>"></span>
                     <% }); %>
-                  </div>
-              <div class="banner-content">
-                <h2>Discover New Books!</h2>
-                <p>Explore our latest collection today.</p>
-                <a href="/users/products" class="banner-btn">Shop Now</a>
-              </div>
+                </div>
+                <div class="banner-content">
+                    <h2>Discover New Books!</h2>
+                    <p>Explore our latest collection today.</p>
+                    <a href="/users/products" class="banner-btn">Shop Now</a>
+                </div>
             </div>
-          </section>
+        </section>
 
         <section class="featured-books">
             <h3>Featured Books</h3>
@@ -608,8 +527,8 @@
                         <p>₹<%= book.price %></p>
                         <p><%= book.language %> | <%= book.inStock !== false ? 'In Stock' : 'Out of Stock' %></p>
                         <div>
-                            <button class="wishlist-btn" onclick="addToWishlist('<%= book.id %>')"><i class="fas fa-heart"></i></button>
-                            <button onclick="addToCart('<%= book.id %>')">Add to Cart</button>
+                            <button class="wishlist-btn" onclick="<%= user ? `addToWishlist('${book.id}')` : `window.location.href='/users/login'` %>"><i class="fas fa-heart"></i></button>
+                            <button onclick="<%= user ? `addToCart('${book.id}')` : `window.location.href='/users/login'` %>">Add to Cart</button>
                         </div>
                     </div>
                 <% }); %>
@@ -687,36 +606,34 @@
         }
 
         function addToWishlist(bookId) {
-    fetch(`/users/wishlist/add/${bookId}`, { method: 'POST', credentials: 'include' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
-                wishlistBadge.textContent = data.wishlistCount;
-                wishlistBadge.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
-            } else {
-                console.error('Wishlist add failed:', data.message || 'Unknown error');
-            }
-        })
-        .catch(err => console.error('Wishlist add failed:', err));
-}
+            fetch(`/users/wishlist/add/${bookId}`, { method: 'POST', credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
+                        wishlistBadge.textContent = data.wishlistCount;
+                        wishlistBadge.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
+                    } else {
+                        console.error('Wishlist add failed:', data.message || 'Unknown error');
+                    }
+                })
+                .catch(err => console.error('Wishlist add failed:', err));
+        }
 
-function addToCart(bookId) {
-    fetch(`/users/cart/add/${bookId}`, { method: 'POST', credentials: 'include' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                const cartBadge = document.querySelector('.nav-links a[href="/users/cart"] .count-badge');
-                cartBadge.textContent = data.cartCount;
-                cartBadge.style.display = data.cartCount > 0 ? 'flex' : 'none';
-            } else {
-                console.error('Cart add failed:', data.message || 'Unknown error');
-            }
-        })
-        .catch(err => console.error('Cart add failed:', err));
-}
-        
-      
+        function addToCart(bookId) {
+            fetch(`/users/cart/add/${bookId}`, { method: 'POST', credentials: 'include' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const cartBadge = document.querySelector('.nav-links a[href="/users/cart"] .count-badge');
+                        cartBadge.textContent = data.cartCount;
+                        cartBadge.style.display = data.cartCount > 0 ? 'flex' : 'none';
+                    } else {
+                        console.error('Cart add failed:', data.message || 'Unknown error');
+                    }
+                })
+                .catch(err => console.error('Cart add failed:', err));
+        }
 
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function() {
@@ -741,8 +658,8 @@ function addToCart(bookId) {
                                 <p>₹${book.price}</p>
                                 <p>${book.language} | ${book.inStock !== false ? 'In Stock' : 'Out of Stock'}</p>
                                 <div>
-                                    <button class="wishlist-btn" onclick="addToWishlist('${book.id}')"><i class="fas fa-heart"></i></button>
-                                    <button onclick="addToCart('${book.id}')">Add to Cart</button>
+                                    <button class="wishlist-btn" onclick="${user ? `addToWishlist('${book.id}')` : `window.location.href='/users/login'`}"><i class="fas fa-heart"></i></button>
+                                    <button onclick="${user ? `addToCart('${book.id}')` : `window.location.href='/users/login'`}">Add to Cart</button>
                                 </div>
                             </div>
                         `;

@@ -9,7 +9,7 @@ const walletSchema = new mongoose.Schema({
       amount: { type: Number, required: true },
       date: { type: Date, default: Date.now },
       source: {
-          type: { type: String, enum: ['order', 'refund', 'add_funds', 'manual'], required: true },
+          type: { type: String, enum: ['order', 'cancellation','refund', 'add_funds', 'manual'], required: true },
           orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' }
       }
   }]

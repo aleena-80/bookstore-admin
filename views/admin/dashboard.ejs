@@ -15,7 +15,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-h2{color: white;}
+        h2 { color: white; }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: rgb(32,31,49);
@@ -253,18 +253,25 @@ h2{color: white;}
             cursor: not-allowed;
         }
 
-        .chart-container {
+        .charts-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
             margin-top: 30px;
+        }
+
+        .chart-container {
+            flex: 1;
+            min-width: 300px;
             background: rgb(40, 39, 60);
             padding: 20px;
             border-radius: 10px;
-            max-width: 600px;
-            max-height: 400px; /* Limit container height */
-            overflow: hidden; /* Prevent overflow */
+            max-height: 400px;
+            overflow: hidden;
         }
 
         .chart-container canvas {
-            max-height: 300px !important; /* Constrain canvas height */
+            max-height: 300px !important;
             width: 100% !important;
         }
 
@@ -299,9 +306,13 @@ h2{color: white;}
                 align-items: flex-start;
             }
 
+            .charts-grid {
+                flex-direction: column;
+            }
+
             .chart-container {
                 max-width: 100%;
-                max-height: 350px; /* Smaller height for mobile */
+                max-height: 350px;
             }
 
             .chart-container canvas {
@@ -348,21 +359,6 @@ h2{color: white;}
                     <h3>Total Sales</h3>
                     <p>₹<%= totalSales ? totalSales.toFixed(2) : '0.00' %></p>
                 </div>
-                <div class="stat-card">
-                    <i class="fas fa-redo-alt"></i>
-                    <h3>Refunds</h3>
-                    <p>₹<%= totalRefund ? totalRefund.toFixed(2) : '0.00' %></p>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-ban"></i>
-                    <h3>Cancellations</h3>
-                    <p>₹<%= totalCancellations ? totalCancellations.toFixed(2) : '0.00' %></p>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-undo"></i>
-                    <h3>Returns</h3>
-                    <p>₹<%= totalReturns ? totalReturns.toFixed(2) : '0.00' %></p>
-                </div>
             </div>
 
             <div class="sales-report-container">
@@ -402,21 +398,19 @@ h2{color: white;}
                 <div class="pagination" id="pagination"></div>
             </div>
 
-            <div class="chart-container">
-                <h2>Sales Overview</h2>
-                <canvas id="salesChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h2>Top 10 Best Selling Products</h2>
-                <canvas id="productsChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h2>Top 10 Best Selling Categories</h2>
-                <canvas id="categoriesChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h2>Top 10 Best Selling Brands</h2>
-                <canvas id="brandsChart"></canvas>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h2>Sales Overview</h2>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2>Top 10 Best Selling Products</h2>
+                    <canvas id="productsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2>Top 10 Best Selling Categories</h2>
+                    <canvas id="categoriesChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -490,7 +484,7 @@ h2{color: white;}
             await Promise.all([
                 fetchTopProducts(start, end),
                 fetchTopCategories(start, end),
-                fetchTopBrands(start, end)
+                
             ]);
         }
 
@@ -930,86 +924,6 @@ h2{color: white;}
                     }
                 }
             });
-            console.log('Categories Chart Updated:', data);
-        }
-
-        async function fetchTopBrands(start, end) {
-            let url = '/admin/top-brands';
-            if (start && end) {
-                url += `?start=${start}&end=${end}`;
-            }
-            console.log('Fetching top brands with URL:', url);
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                console.log('Top Brands Data:', data);
-                updateBrandsChart(data);
-            } catch (error) {
-                console.error('Error fetching top brands:', error);
-            }
-        }
-
-        function updateBrandsChart(data) {
-            const ctx = document.getElementById('brandsChart').getContext('2d');
-            if (window.brandsChart instanceof Chart) {
-                window.brandsChart.destroy();
-            }
-            window.brandsChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: data.map(item => item.name),
-                    datasets: [{
-                        label: 'Units Sold',
-                        data: data.map(item => item.totalQuantity),
-                        backgroundColor: [
-                            'rgba(255, 186, 222, 0.6)',
-                            'rgba(88, 204, 2, 0.6)',
-                            'rgba(46, 204, 113, 0.6)',
-                            'rgba(52, 152, 219, 0.6)',
-                            'rgba(155, 89, 182, 0.6)',
-                            'rgba(241, 196, 15, 0.6)',
-                            'rgba(231, 76, 60, 0.6)',
-                            'rgba(26, 188, 156, 0.6)',
-                            'rgba(149, 165, 166, 0.6)',
-                            'rgba(230, 126, 34, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 186, 222, 1)',
-                            'rgba(88, 204, 2, 1)',
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(52, 152, 219, 1)',
-                            'rgba(155, 89, 182, 1)',
-                            'rgba(241, 196, 15, 1)',
-                            'rgba(231, 76, 60, 1)',
-                            'rgba(26, 188, 156, 1)',
-                            'rgba(149, 165, 166, 1)',
-                            'rgba(230, 126, 34, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { 
-                            labels: { color: '#FFFFFF' },
-                            position: 'bottom'
-                        },
-                        title: { 
-                            display: true, 
-                            text: 'Top 10 Best Selling Brands', 
-                            color: '#FFFFFF', 
-                            font: { size: 16 } 
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: 10
-                    }
-                }
-            });
-            console.log('Brands Chart Updated:', data);
         }
 
         // Prevent back navigation

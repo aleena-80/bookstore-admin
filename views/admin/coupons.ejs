@@ -230,7 +230,6 @@
             <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
             <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
             <li><a href="/admin/transactions" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
-
             <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
             <li><a href="/admin/banners"><i class="fas fa-images"></i> Banners</a></li>
             <li><a href="/admin/coupons" class="active"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
@@ -251,7 +250,7 @@
               <% coupons.forEach(coupon => { %>
                   <li class="coupon-item">
                       <div class="coupon-details">
-                          <span><%= coupon.code %> - <%= coupon.discount %>% <span class="status"><%= coupon.isListed ? 'Active' : 'Inactive' %></span></span>
+                          <span><%= coupon.code %> - <%= coupon.discount %>% <span class="status"><%= coupon.isListed && new Date() <= new Date(coupon.expiryDate) ? 'Active' : 'Inactive' %></span></span>
                           <span>Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></span>
                       </div>
                       <div class="coupon-actions">
@@ -328,5 +327,5 @@
           }
       }
   </script>
-</body>
+</body> 
 </html>

@@ -277,6 +277,7 @@ export const getHome = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(15)
     .select('name images price author language stock');
+    const categories = await Category.find({}); 
 
     const formattedBooks = books.map(book => ({
       id: book._id.toString(),
@@ -314,6 +315,7 @@ export const getHome = async (req, res) => {
       banners: bannersToShow, 
       user: req.user || null, 
       wishlistCount, 
+      categories,
       cartItems,
       cartCount,
       success: req.query.success || null 
@@ -322,7 +324,7 @@ export const getHome = async (req, res) => {
     console.error('Home Page Error:', error);
     res.render('user/home', { 
       books: [], 
-      banners: [{ image: '/images/default-banner.jpg' }], // Consistent fallback
+      banners: [{ image: '/images/default-banner.jpg' }], 
       user: req.user || null, 
       wishlistCount: 0, 
       cartCount: 0,

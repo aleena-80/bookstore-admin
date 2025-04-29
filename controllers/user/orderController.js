@@ -1,6 +1,7 @@
 import Order from '../../models/Order.js';
 import  Product from '../../models/Product.js';
 import Address from '../../models/Address.js';  
+import User from '../../models/User.js';
 import Wishlist from '../../models/Wishlist.js'
 import Wallet from '../../models/Wallets.js';
 import Cart from '../../models/Carts.js'
@@ -148,12 +149,6 @@ export const requestReturn = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -185,7 +180,7 @@ export const cancelOrder = async (req, res) => {
     order.status = 'Cancelled';
     order.cancelReason = reason;
 
-    if (order.paymentMethod === 'Razorpay') {
+    if (['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
       let wallet = await Wallet.findOne({ userId: req.user.id });
       if (!wallet) {
         console.log(`Creating new wallet for user ${req.user.id}`);

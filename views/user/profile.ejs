@@ -32,8 +32,26 @@
     .edit-icon { position: absolute; right: -20px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #58CC02; font-size: 16px; }
     .btn { padding: 10px 20px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; margin: 5px; display: inline-flex; align-items: center; gap: 5px; }
     .btn:hover { background: #46a802; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
-    .modal-content { background: #FFFFFF; padding: 20px; margin: 15% auto; width: 90%; max-width: 450px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+    .modal { 
+        display: none; 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0, 0, 0, 0.5); 
+        z-index: 2000; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    .modal-content { 
+        background: #FFFFFF; 
+        padding: 20px; 
+        width: 90%; 
+        max-width: 450px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+    }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: 700; }
     .form-group input { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; }
@@ -43,13 +61,61 @@
     #otpForm .btn-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
     #timer { font-size: 14px; color: #1C2526; margin: 10px 0; }
     @media (max-width: 768px) {
-      .hamburger { display: block; }
-      .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); z-index: 50; background-color: white; }
-      .sidebar.active { transform: translateX(0); }
-      .main-content { margin-left: 0; padding: 70px 10px 10px; }
-      .breadcrumbs { left: 0; }
-      .profile-card { padding: 20px; }
+        .hamburger { display: block; }
+        .nav-links { display: none; }
+        .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); z-index: 50; background-color: white; }
+        .sidebar.active { transform: translateX(0); }
+        .main-content { margin-left: 0; padding: 70px 10px 10px; }
+        .breadcrumbs { left: 0; }
+        .profile-card { padding: 20px; }
+        .modal-content {
+            width: 85%;
+            max-width: 320px;
+            padding: 15px;
+            margin: 20% auto;
+            border-radius: 8px;
+        }
+        .modal-content h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 16px;
+            margin: 4px;
+        }
+        #otpSection {
+            padding: 15px 0;
+            min-height: auto;
+        }
+        #otpMessage {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        #timer {
+            font-size: 12px;
+            margin: 8px 0;
+        }
+        #otpForm .form-group {
+            margin-bottom: 8px;
+        }
+        #otpForm .btn-container {
+            margin-top: 8px;
+            gap: 8px;
+        }
     }
   </style>
 </head>
@@ -171,7 +237,7 @@
 
     // Modal functions
     function openEditModal(field) {
-      console.log('Opening modal for:', field); // Debug
+      console.log('Opening modal for:', field);
       const editModal = document.getElementById('editModal');
       const editField = document.getElementById('editField');
       const nameField = document.getElementById('nameField');
@@ -210,7 +276,7 @@
       e.preventDefault();
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData);
-      console.log('Submitting edit data:', data); // Debug
+      console.log('Submitting edit data:', data);
 
       try {
         const response = await fetch('/users/profile/edit', {
@@ -220,7 +286,7 @@
           body: JSON.stringify(data),
         });
         const result = await response.json();
-        console.log('Edit response:', result); // Debug
+        console.log('Edit response:', result);
 
         if (result.success) {
           closeEditModal();
@@ -379,7 +445,7 @@
           }, 2000);
         } else {
           Toastify({
-            text: data.message || 'Failed to verify OTP',
+            text: 'Failed to verify OTP',
             duration: 3000,
             gravity: 'top',
             position: 'right',

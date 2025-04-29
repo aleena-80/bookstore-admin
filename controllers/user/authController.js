@@ -330,3 +330,7 @@ export const logout = (req, res) => {
   res.clearCookie('token');
   res.redirect('/users/login');
 };
+//----------------------------------------------------
+export const error = (req,res)=>{
+  res.render('user/error')
+}

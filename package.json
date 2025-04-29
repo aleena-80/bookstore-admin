@@ -34,10 +34,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.16.0",
-    "puppeteer": "^24.4.0",
-    "razorpay": "^2.9.6",
-    "resend": "^4.1.2",
-    "sharp": "^0.33.5"
+    "razorpay": "^2.9.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

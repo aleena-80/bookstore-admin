@@ -29,32 +29,49 @@
     .search-filter input { padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; width: 70%; }
     .search-filter select { padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; width: 30%; }
     .coupon-card { 
-  background: linear-gradient(135deg, #58CC02, #46a802); 
-  padding: 20px; 
-  border-radius: 12px; 
-  color: #FFFFFF; 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
-  margin-bottom: 20px; 
-  width: 100%; 
-  position: relative; 
-}
-     .coupon-container { margin-top: 77px; }
+        background: linear-gradient(135deg, #58CC02, #46a802); 
+        padding: 20px; 
+        border-radius: 12px; 
+        color: #FFFFFF; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+        margin-bottom: 20px; 
+        width: 100%; 
+        position: relative; 
+    }
+    .coupon-container { margin-top: 77px; }
     .coupon-container h2 { color: #58CC02; font-size: 28px; margin-bottom: 10px; }
     .coupon-card-content { position: relative; z-index: 2; }
     .coupon-card p { font-size: 16px; margin: 5px 0; }
     @media (max-width: 768px) {
-      .hamburger { display: block; }
-      .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px);  }
-      .sidebar.active { transform: translateX(0); }
-      .main-content { margin-left: 0; padding: 70px 10px 10px; }
-      .coupon-card { padding: 15px;}
-      .search-filter { flex-direction: column; }
-      .search-filter input, .search-filter select { width: 100%; }
+        .hamburger { display: block; }
+        .nav-links { display: none; }
+        .sidebar {
+            transform: translateX(-100%);
+            width: 200px;
+            height: calc(100% - 70px);
+        }
+        .sidebar.active {
+            transform: translateX(0);
+            z-index: 100;
+        }
+        .main-content {
+            margin-left: 0;
+            padding: 70px 10px 10px;
+        }
+        .coupon-card {
+            padding: 15px;
+        }
+        .search-filter {
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .search-filter input, .search-filter select {
+            width: 100%;
+        }
     }
     @media (min-width: 769px) {
-      .main-content { max-width: 1200px; } /* Wider content */
-      .coupon-card { width: 100%; } /* Full width */
+        .main-content { max-width: 1200px; }
+        .coupon-card { width: 100%; }
     }
   </style>
 </head>
@@ -104,7 +121,7 @@
           <div class="coupon-card" data-code="<%= coupon.code %>" data-discount="<%= coupon.discount %>">
             <div class="coupon-card-content">
               <p><strong><%= coupon.code %></strong> - <%= coupon.discount %>% off</p>
-              <p> Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></p>
+              <p>Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %></p>
             </div>
           </div>
         <% }); %>
@@ -115,32 +132,31 @@
   </div>
 
   <script>
-  const hamburger = document.querySelector('.hamburger');
-  const sidebar = document.querySelector('.sidebar');
-  hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
 
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const couponCards = document.querySelectorAll('.coupon-card');
 
-  const searchInput = document.getElementById('searchInput');
-  const categoryFilter = document.getElementById('categoryFilter');
-  const couponCards = document.querySelectorAll('.coupon-card');
+    function filterCoupons() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const discountFilter = categoryFilter.value;
 
-  function filterCoupons() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const discountFilter = categoryFilter.value;
+      couponCards.forEach(card => {
+        const code = card.dataset.code.toLowerCase();
+        const discount = card.dataset.discount;
 
-    couponCards.forEach(card => {
-      const code = card.dataset.code.toLowerCase();
-      const discount = card.dataset.discount;
+        const matchesSearch = code.includes(searchTerm);
+        const matchesDiscount = !discountFilter || discount === discountFilter;
 
-      const matchesSearch = code.includes(searchTerm);
-      const matchesDiscount = !discountFilter || discount === discountFilter;
+        card.style.display = (matchesSearch && matchesDiscount) ? 'block' : 'none';
+      });
+    }
 
-      card.style.display = (matchesSearch && matchesDiscount) ? 'block' : 'none';
-    });
-  }
-
-  searchInput.addEventListener('input', filterCoupons);
-  categoryFilter.addEventListener('change', filterCoupons);
-</script>
+    searchInput.addEventListener('input', filterCoupons);
+    categoryFilter.addEventListener('change', filterCoupons);
+  </script>
 </body>
 </html>

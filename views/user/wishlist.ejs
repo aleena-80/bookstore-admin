@@ -184,7 +184,7 @@
         .wishlist-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 200px));
-            gap: 20px;
+            gap: 63px;
             justify-items: center;
         }
 
@@ -195,17 +195,15 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 2px solid #E5E5E5;
             text-align: center;
-            height: 400px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 200px;
             max-width: 200px;
         }
 
         .wishlist-card img {
             width: 100%;
-            max-height: 150px;
+            max-height: 300px;
             object-fit: contain;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -389,7 +387,9 @@
         @media (min-width: 769px) and (max-width: 1024px) {
             .wishlist-grid {
                 grid-template-columns: repeat(2, 1fr);
+                
             }
+
 
         }
     </style>

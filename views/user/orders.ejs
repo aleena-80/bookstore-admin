@@ -12,14 +12,84 @@
         .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
         .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
         .tagline { color: #1C2526; font-size: 14px; margin-top: 5px; }
-        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
-        .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
-        .nav-links li a:hover { color: #58CC02; }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            width: auto;
+        }
+        .nav-links li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links li a:hover {
+            color: #58CC02;
+        }
+        .nav-links li a i {
+            margin-right: 5px;
+        }
+        .nav-links li.profile-link a {
+            color: #1C2526;
+        }
         .breadcrumbs { padding: 20px; font-size: 14px; color: #1C2526; background-color: #E5E5E5; position: fixed; top: 83px; left: 0; right: 0; z-index: 999; }
         .breadcrumbs a { color: #1C2526; text-decoration: none; transition: color 0.3s; }
         .breadcrumbs a:hover { color: #58CC02; }
         .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
-        .sidebar { position: fixed; top: 140px; width: 250px; height: calc(100% - 100px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: left 0.3s ease; z-index: 999; }
+        .sidebar {
+            position: fixed;
+            top: 140px;
+            width: 250px;
+            height: calc(100% - 100px);
+            background: #FFFFFF;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+        .wishlist-count, .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge:empty {
+            display: none;
+        }
         .sidebar.active { left: 0; }
         .sidebar ul { list-style: none; }
         .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
@@ -38,18 +108,37 @@
         .order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
         .item-details { flex: 1; }
         .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn { padding: 8px 16px; background: #58CC02; color: #FFFFFF; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; text-decoration: none; }
+        .btn {
+            padding: 8px 16px;
+            background: #58CC02;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: none;
+            width: 140px;
+            text-align: center;
+            display: inline-block;
+        }
         .btn:hover { background: #46a802; }
-        .btn-cancel { background: #e74c3c; }
+        .btn-cancel {
+            background: #e74c3c;
+            width: 140px;
+            text-align: center;
+        }
         .btn-cancel:hover { background: #c0392b; }
         .btn-return { background: #f39c12; }
+        .btn-retry { background: #3498db; }
         .return-reasons { margin: 10px 0; }
         .return-reasons label { display: block; margin: 5px 0; }
         .btn-return:hover { background: #e08e0b; }
+        .btn-retry:hover { background: #2980b9; }
         .message { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #58CC02; color: #FFFFFF; border-radius: 5px; display: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: #FFFFFF; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
         .modal-content h3 { color: #e74c3c; font-size: 20px; margin-bottom: 15px; }
+        .modal-content h3.retry { color: #3498db; }
         .modal-content p { color: #1C2526; margin-bottom: 10px; }
         #cancel-reason { width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 8px; resize: none; font-family: 'Roboto', sans-serif; }
         .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
@@ -61,14 +150,42 @@
             .navbar { flex-wrap: wrap; }
             .hamburger { display: block; }
             .nav-links { display: none; }
-            .main-content { margin-left: 0; padding: 70px 10px 10px; }
+            .sidebar {
+                width: 80%;
+                max-width: 250px;
+                left: -80%;
+                top: 118px;
+                height: calc(100% - 83px);
+            }
+            .sidebar.active { left: 0; }
+            .main-content {
+                margin-left: 0;
+                padding: 70px 10px 10px;
+                margin-top: -30px;
+            }
             .order-list { padding: 10px; }
             .order-card { padding: 15px; }
             .order-header { flex-direction: column; align-items: flex-start; }
             .order-item { flex-direction: column; align-items: flex-start; }
             .order-item img { width: 50px; height: 50px; }
-            .actions { flex-direction: column; align-items: flex-start; }
-            .breadcrumbs { padding: 10px; }
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .btn, .btn-cancel, .btn-retry {
+                width: 100%;
+                padding: 10px;
+                font-size: 14px;
+            }
+            .breadcrumbs {
+                padding: 10px;
+                font-size: 12px;
+            }
+            .pagination button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -81,8 +198,8 @@
             </div>
             <div class="hamburger"><i class="fas fa-bars"></i></div>
             <ul class="nav-links">
-                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
-                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
+                <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+                <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
                 <li><a href="/users/profile"><i class="fas fa-user"></i></a></li>
                 <% if (user) { %>
                     <li><a href="/users/logout"><i class="fas fa-sign-out-alt"></i></a></li>
@@ -104,7 +221,7 @@
             <li><i class="fas fa-map-marker-alt"></i><a href="/users/addresses">Addresses</a></li>
             <li><i class="fas fa-shopping-bag"></i><a href="/users/orders" class="active">Orders</a></li>
             <li><i class="fas fa-wallet"></i><a href="/users/wallet">Wallet</a></li>
-            <li><i class="fas fa-ticket-alt"></i><a href="/users turkeys">Coupons</a></li>
+            <li><i class="fas fa-ticket-alt"></i><a href="/users/coupons">Coupons</a></li>
             <li><i class="fas fa-sign-out-alt"></i><a href="/users/logout">Logout</a></li>
         </ul>
     </div>
@@ -144,6 +261,9 @@
                             <% } %>
                             <% if (order.status === 'Delivered' && !order.returnRequest) { %>
                                 <button class="btn btn-return" onclick="showReturnModal('<%= order._id %>')">Request Return</button>
+                            <% } %>
+                            <% if (order.status === 'Confirmed' && !order.expectedDelivery) { %>
+                                <button class="btn btn-retry" onclick="showRetryModal('<%= order._id %>')">Retry Payment</button>
                             <% } %>
                             <% if (order.returnRequest) { %>
                                 <p>Return Requested</p>
@@ -190,9 +310,19 @@
         </div>
     </div>
 
+    <div id="retry-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="retry">Retry Payment</h3>
+            <p>Would you like to retry the payment for this order?</p>
+            <div class="modal-actions">
+                <button class="btn btn-retry" onclick="confirmRetry()">Confirm</button>
+                <button class="btn" onclick="closeRetryModal()">Close</button>
+            </div>
+        </div>
+    </div>
     <script>
         let currentOrderId;
-
+    
         function showMessage(text, isError = false) {
             const msg = document.getElementById('message');
             msg.textContent = text;
@@ -200,34 +330,43 @@
             msg.style.display = 'block';
             setTimeout(() => msg.style.display = 'none', 3000);
         }
-
+    
         function showCancelModal(orderId) {
             currentOrderId = orderId;
             document.getElementById('cancel-modal').style.display = 'flex';
             document.getElementById('cancel-reason').value = '';
         }
-
+    
         function closeCancelModal() {
             document.getElementById('cancel-modal').style.display = 'none';
         }
-
+    
         function showReturnModal(orderId) {
             currentOrderId = orderId;
             document.getElementById('return-modal').style.display = 'flex';
             document.querySelectorAll('.return-reasons input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
-
+    
         function closeReturnModal() {
             document.getElementById('return-modal').style.display = 'none';
         }
-
+    
+        function showRetryModal(orderId) {
+            currentOrderId = orderId;
+            document.getElementById('retry-modal').style.display = 'flex';
+        }
+    
+        function closeRetryModal() {
+            document.getElementById('retry-modal').style.display = 'none';
+        }
+    
         async function confirmCancel() {
             const reason = document.getElementById('cancel-reason').value.trim();
             if (!reason) {
                 showMessage('Please provide a reason', true);
                 return;
             }
-
+    
             try {
                 console.log('Cancelling order:', currentOrderId, 'Reason:', reason);
                 const res = await fetch(`/users/orders/cancel/${currentOrderId}`, {
@@ -241,7 +380,7 @@
                 if (data.success) {
                     showMessage('Order cancelled successfully');
                     closeCancelModal();
-                    loadPage(<%= page %>); // Refresh current page
+                    loadPage(<%= page %>);
                 } else {
                     showMessage(data.message || 'Failed to cancel order', true);
                 }
@@ -250,7 +389,7 @@
                 showMessage('Error cancelling order', true);
             }
         }
-
+    
         async function confirmReturn() {
             const reasons = Array.from(document.querySelectorAll('.return-reasons input[type="checkbox"]:checked'))
                 .map(cb => cb.value)
@@ -266,7 +405,7 @@
                 if (data.success) {
                     showMessage('Return requested successfully');
                     closeReturnModal();
-                    loadPage(<%= page %>); // Refresh current page
+                    loadPage(<%= page %>);
                 } else {
                     showMessage(data.message || 'Failed to request return', true);
                 }
@@ -275,20 +414,51 @@
                 showMessage('Error requesting return', true);
             }
         }
-
+    
+        async function confirmRetry() {
+            try {
+                console.log('Initiating retry payment for order:', currentOrderId);
+                const res = await fetch(`/users/orders/retry-payment/${currentOrderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+               
+                const data = await res.json();
+                if (data.success && data.redirectUrl) {
+                    console.log('Redirecting to payment page:', data.redirectUrl);
+                    closeRetryModal();
+                    window.location.href = data.redirectUrl;
+                } else {
+                    showMessage(data.message || 'Failed to initiate payment retry', true);
+                }
+            } catch (error) {
+                console.error('Retry Payment Error:', error);
+                showMessage(`Error retrying payment: ${error.message}`, true);
+            }
+        }
+    
         const hamburger = document.querySelector('.hamburger');
         const sidebar = document.querySelector('.sidebar');
-        hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
-
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    
         async function loadPage(page) {
             try {
                 const response = await fetch(`/users/orders?page=${page}`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' } // Signal AJAX
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const data = await response.json();
                 const orderList = document.getElementById('order-list');
                 orderList.innerHTML = '<h2>Your Orders</h2>';
-
+    
                 if (data.orders.length === 0) {
                     orderList.innerHTML += '<p>No orders found.</p>';
                 } else {
@@ -306,6 +476,7 @@
                             <a href="/users/orders/view/${order._id}" class="btn">View Details</a>
                             ${order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Returned' ? `<button class="btn btn-cancel" onclick="showCancelModal('${order._id}')">Cancel Order</button>` : ''}
                             ${order.status === 'Delivered' && !order.returnRequest ? `<button class="btn btn-return" onclick="showReturnModal('${order._id}')">Request Return</button>` : ''}
+                            ${order.status === 'Confirmed' && !order.expectedDelivery && !order.paymentCompleted ? `<button class="btn btn-retry" onclick="showRetryModal('${order._id}')">Retry Payment</button>` : ''}
                             ${order.returnRequest ? '<p>Return Requested</p>' : ''}
                         `;
                         orderList.innerHTML += `
@@ -322,7 +493,7 @@
                         `;
                     });
                 }
-
+    
                 const pagination = document.getElementById('pagination');
                 pagination.innerHTML = '';
                 for (let i = 1; i <= data.totalPages; i++) {
@@ -336,24 +507,3 @@
     </script>
 </body>
 </html>
-        <!-- // async function requestReturn(orderId) {
-        //     if (!confirm('Are you sure you want to request a return?')) return;
-        //     try {
-        //         const res = await fetch(`/users/orders/return/${orderId}`, {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             credentials: 'include'
-        //         });
-        //         const data = await res.json();
-        //         if (data.success) {
-        //             showMessage('Return requested successfully');
-        //             setTimeout(() => location.reload(), 1000);
-        //         } else {
-        //             showMessage(data.message || 'Failed to request return', true);
-        //         }
-        //     } catch (error) {
-        //         console.error('Request Return Error:', error);
-        //         showMessage('Error requesting return', true);
-        //     }
-        // }
-    -->

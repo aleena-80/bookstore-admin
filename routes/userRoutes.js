@@ -8,12 +8,12 @@ import { sendOtp, verifyOtp, resendOtp, login, googleAuthCallback, forgotPasswor
     getOrderView,requestReturn,buyNow,getOrderSuccess,
     getProfile, editProfile, verifyEmailOtp, changePassword, getAddresses,
     profileaddAddress, profileeditAddress, getWallet, addFundsToWallet,changeEmail,createRazorpayOrder,verifyPayment,
-    getOrderfailure,getUserCoupons,applyCoupon,removeCoupon
+    getOrderfailure,getUserCoupons,applyCoupon,removeCoupon,retryPayment,handlePaymentCallback,error,getPaymentPageReturn,
+    getWalletBalance
 } from '../controllers/userController.js';
 import passport from 'passport';
 import '../config/passportConfig.js';
 import autheMiddleware from '../middleware/autheMiddleware.js';
-//import  checkoutController from '../controllers/user/checkoutController.js'
 const { protectUser } = autheMiddleware;
 
 const router = express.Router();
@@ -35,7 +35,7 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/users/login', session: false }), googleAuthCallback);
 
 router.get('/logout', protectUser, logout);
-router.get('/home', protectUser,getHome);
+router.get('/home',protectUser,getHome);
 router.get('/search', protectUser,searchBooks);
 router.post('/subscribe', protectUser, subscribeNewsletter);
 router.get('/products', protectUser, getProducts);
@@ -69,6 +69,8 @@ router.post('/orders/return/:orderId', protectUser, requestReturn);
 router.get('/orders/invoice/:id', protectUser, downloadInvoice);
 router.post('/checkout/confirm-payment', protectUser, confirmPayment);
 router.get('/orders/view/:orderId', protectUser, getOrderView);
+router.post('/orders/retry-payment/:orderId',protectUser, retryPayment);
+router.post('/payment/callback', protectUser,handlePaymentCallback);
 
 
 
@@ -81,6 +83,7 @@ router.get('/addresses', protectUser, getAddresses);
 router.post('/addresses/add', protectUser, profileaddAddress);
 router.post('/addresses/edit/:addressId', protectUser, profileeditAddress);
 
+router.get('/wallet/balance', protectUser,getWalletBalance)
 router.get('/wallet', protectUser, getWallet);
 router.post('/wallet/add', protectUser, addFundsToWallet);
 router.post('/profile/change-email', protectUser, changeEmail);
@@ -92,9 +95,12 @@ router.post('/profile/change-email', protectUser, changeEmail);
 //router.post('/verify-email-otp', protect, verifyEmailOTP);
 //router.post('/change-password', protect, changePassword);
 
+router.get('/error',protectUser,error)
+
 
 router.post('/checkout/initiate-order', protectUser, initiateOrder);
 router.get('/checkout/payment', protectUser, getPaymentPage);
+router.get('/orders/payment/:orderId', protectUser,getPaymentPageReturn);
 router.post('/checkout/create-razorpay-order',protectUser, createRazorpayOrder);
 router.post('/checkout/verify-payment',protectUser, verifyPayment);
 
@@ -102,8 +108,4 @@ router.get('/coupons',protectUser, getUserCoupons);
 router.post('/coupons/apply',protectUser, applyCoupon);
 router.post('/coupons/remove', protectUser, removeCoupon);
 
-
-//router.get('/coupons/applied', protectUser, getAppliedCoupon);
-// router.post('/', protectUser, cloudinaryUpload.array('images', 5), addProduct);
-// router.patch('/:id/images', protectUser, cloudinaryUpload.array('images', 3), updateProductImages);
 export default router;

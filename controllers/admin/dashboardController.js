@@ -14,33 +14,18 @@ export const getDashboard = async (req, res) => {
       order.items.forEach(item => {
         const price = Number(item.price) || 0;
         if (item.status === 'Cancelled') {
-          totalCancellations += 1; // Count orders, not amount
-        } else if (item.status === 'Refunded') {
-          totalRefund += 1;
-        } else if (item.status === 'Returned') {
-          totalReturns += 1;
+          totalCancellations += 1; 
         } else {
           totalSales += price;
         }
       });
     });
 
-    console.log('Dashboard Stats:', { 
-      totalUsers, 
-      totalOrders, 
-      totalSales, 
-      totalRefund, 
-      totalCancellations, 
-      totalReturns 
-    });
-
+   
     res.render('admin/dashboard', { 
       totalUsers, 
       totalOrders, 
       totalSales, 
-      totalRefund, 
-      totalCancellations, 
-      totalReturns 
     });
   } catch (error) {
     console.error('Error loading dashboard:', error);
@@ -123,12 +108,6 @@ export const getSalesReportPDF = async (req, res) => {
     if (!orders.length) {
       return res.status(404).json({ error: 'No orders found for the selected criteria' });
     }
-
-    console.log('PDF Orders:', orders.map(o => ({
-      orderId: o.orderId,
-      date: o.createdAt,
-      customer: o.userId?.name
-    })));
 
     const doc = new PDFDocument({ 
       margin: 50, 
@@ -253,8 +232,6 @@ export const getTopProducts = async (req, res) => {
       { $sort: { totalQuantity: -1 } },
       { $limit: 10 }
     ]);
-
-    console.log(`Fetched ${products.length} top products`);
     res.json(products);
   } catch (error) {
     console.error('Get Top Products Error:', error);
@@ -310,7 +287,6 @@ export const getTopCategories = async (req, res) => {
       { $limit: 10 }
     ]);
 
-    console.log(`Fetched ${categories.length} top categories`);
     res.json(categories);
   } catch (error) {
     console.error('Get Top Categories Error:', error);

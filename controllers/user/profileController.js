@@ -158,6 +158,26 @@ export const getWallet = async (req, res) => {
   }
 };
 
+export const getWalletBalance = async (req,res)=>{
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+        console.log('Unauthorized wallet balance request');
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const wallet = await Wallet.findOne({ userId });
+    const balance = wallet ? wallet.balance : 0;
+    console.log('Wallet balance fetched:', { userId, balance });
+    res.json({ success: true, balance });
+} catch (error) {
+    console.error('Wallet Balance Error:', {
+        message: error.message,
+        stack: error.stack,
+        userId:  req.user.id
+    });
+    res.status(500).json({ success: false, message: 'Failed to fetch wallet balance' });
+}
+}
 
 
 export const addFundsToWallet = async (req, res) => {

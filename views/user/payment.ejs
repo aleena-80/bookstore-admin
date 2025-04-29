@@ -35,7 +35,7 @@
     <header>
         <nav class="navbar">
             <div class="logo">
-                <h1><a href="/users/landing">Ocean Books</a></h1>
+                <h1><a href="/users/home">Ocean Books</a></h1>
                 <p class="tagline">Dive into a Sea of Stories</p>
             </div>
             <ul class="nav-links">
@@ -68,14 +68,39 @@
                 <input type="radio" name="paymentMethod" value="Razorpay" <%= order.total > 1000 ? 'checked' : '' %>> Pay with Razorpay
             </label>
             <label class="payment-option">
-                <input type="radio" name="paymentMethod" value="Wallet" disabled> Wallet (Coming Soon)
+                <input type="radio" name="paymentMethod" value="Wallet"> Pay with Wallet
             </label>
             <button id="confirm-payment-btn" class="confirm-btn">Confirm Payment</button>
         </div>
     </div>
     <div class="message" id="message"></div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        let walletBalance = 0;
+
+        // Fetch wallet balance on page load
+        async function fetchWalletBalance() {
+            try {
+                const response = await fetch('/users/wallet/balance', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    walletBalance = data.balance || 0;
+                } else {
+                    console.error('Failed to fetch wallet balance:', data.message);
+                }
+            } catch (error) {
+                console.error('Fetch Wallet Balance Error:', error);
+            }
+        }
+
+        // Initialize wallet balance
+        fetchWalletBalance();
+
         function showMessage(text, isError = false) {
             const msg = document.getElementById('message');
             msg.textContent = text;
@@ -83,81 +108,138 @@
             msg.style.display = 'block';
             setTimeout(() => msg.style.display = 'none', 3000);
         }
+
         document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
-            const button = document.getElementById('confirm-payment-btn');
-            button.disabled = true;
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const orderId = '<%= order.orderId %>';
-            console.log('Confirming Payment:', { orderId, paymentMethod });
-            try {
-                const response = await fetch('/users/checkout/confirm-payment', {
+    const button = document.getElementById('confirm-payment-btn');
+    button.disabled = true;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const orderId = '<%= order.orderId %>';
+    const orderTotal = <%= order.total %>;
+    const userId = '<%= user._id %>';
+
+    console.log('Confirming Payment:', { orderId, paymentMethod, orderTotal, 
+        walletBalance });
+
+    // Validate wallet balance for Wallet payment
+    if (paymentMethod === 'Wallet') {
+        if (balance === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Empty Wallet',
+                text: 'Your wallet is empty (₹0.00). Please add funds or select another payment method.',
+                showCancelButton: true,
+                cancelButtonColor: '#FF4D4D',
+                confirmButtonColor: '#58CC02',
+                confirmButtonText: 'Add Funds',
+                cancelButtonText: 'Close'
+            }).then((result) => {
+                if (result.isConfirmed) window.location.href = '/users/wallet';
+                button.disabled = false;
+            });
+            return;
+        }
+        if (balance < orderTotal) {
+            const shortfall = (orderTotal - balance).toFixed(2);
+            Swal.fire({
+                icon: 'error',
+                title: 'Insufficient Balance',
+                text: `Your wallet balance (₹${balance.toFixed(2)}) is insufficient for this order (₹${orderTotal.toFixed(2)}). Please add ₹${shortfall} more.`,
+                showCancelButton: true,
+                cancelButtonColor: '#FF4D4D',
+                confirmButtonColor: '#58CC02',
+                confirmButtonText: 'Add Funds',
+                cancelButtonText: 'Close'
+            }).then((result) => {
+                if (result.isConfirmed) window.location.href = '/users/wallet';
+                button.disabled = false;
+            });
+            return;
+        }
+    }
+
+    try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const response = await fetch('/users/checkout/confirm-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ orderId, paymentMethod,userId }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        const data = await response.json();
+        console.log('Confirm Payment Response:', data);
+
+        if (data.success) {
+            if (paymentMethod === 'Razorpay') {
+                const razorpayResponse = await fetch('/users/checkout/create-razorpay-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ orderId, paymentMethod })
+                    body: JSON.stringify({ orderId })
                 });
-                const data = await response.json();
-                if (data.success) {
-                    if (paymentMethod === 'Razorpay') {
-                        const razorpayResponse = await fetch('/users/checkout/create-razorpay-order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            credentials: 'include',
-                            body: JSON.stringify({ orderId })
-                        });
-                        const razorpayData = await razorpayResponse.json();
-                        if (razorpayData.success) {
-                            const options = {
-                                key: '<%= razorpayKeyId %>',
-                                amount: razorpayData.amount,
-                                currency: razorpayData.currency,
-                                order_id: razorpayData.orderId,
-                                name: 'Ocean Books',
-                                description: 'Order Payment',
-                                handler: async function (response) {
-                                    const verifyResponse = await fetch('/users/checkout/verify-payment', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        credentials: 'include',
-                                        body: JSON.stringify({
-                                            razorpay_order_id: response.razorpay_order_id,
-                                            razorpay_payment_id: response.razorpay_payment_id,
-                                            razorpay_signature: response.razorpay_signature,
-                                            orderId: '<%= order.orderId %>'
-                                        })
-                                    });
-                                    const verifyData = await verifyResponse.json();
-                                    if (verifyData.success) {
-                                        window.location.href = `${verifyData.redirect}?orderId=${verifyData.orderId}`;
-                                    } else {
-                                        window.location.href = `${verifyData.redirect}?orderId=${verifyData.orderId}`;
-                                    }
-                                },
-                                prefill: { name: '<%= user.name %>', email: '<%= user.email %>' },
-                                theme: { color: '#3395FF' }
-                            };
-                            const rzp = new Razorpay(options);
-                            rzp.on('payment.failed', function () {
-                                window.location.href = `/users/order-failure?orderId=${orderId}`;
+                const razorpayData = await razorpayResponse.json();
+                console.log('Razorpay Response:', razorpayData);
+                if (razorpayData.success) {
+                    const options = {
+                        key: '<%= razorpayKeyId %>',
+                        amount: razorpayData.amount,
+                        currency: razorpayData.currency,
+                        order_id: razorpayData.orderId,
+                        name: 'Ocean Books',
+                        description: 'Order Payment',
+                        handler: async function (response) {
+                            const verifyResponse = await fetch('/users/checkout/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId
+                                })
                             });
-                            rzp.open();
-                        } else {
-                            showMessage(razorpayData.message || 'Failed to initiate Razorpay payment', true);
-                            button.disabled = false;
-                        }
-                    } else {
-                        window.location.href = `${data.redirect}?orderId=${data.orderId}`;
-                    }
+                            const verifyData = await verifyResponse.json();
+                            console.log('Verify Payment Response:', verifyData);
+                            if (verifyData.success) {
+                                window.location.href = `${verifyData.redirect}?orderId=${verifyData.orderId}`;
+                            } else {
+                                window.location.href = `${verifyData.redirect}?orderId=${verifyData.orderId}`;
+                            }
+                        },
+                        prefill: { name: '<%= user.name %>', email: '<%= user.email %>' },
+                        theme: { color: '#3395FF' }
+                    };
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function () {
+                        window.location.href = `/users/order-failure?orderId=${orderId}`;
+                    });
+                    rzp.open();
                 } else {
-                    showMessage(data.message || 'Failed to confirm payment', true);
+                    showMessage(razorpayData.message || 'Failed to initiate Razorpay payment', true);
                     button.disabled = false;
                 }
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                showMessage('Error confirming payment', true);
-                button.disabled = false;
+            } else {
+                console.log('Redirecting to:', `${data.redirect}?orderId=${data.orderId}`);
+                window.location.href = `${data.redirect}?orderId=${data.orderId}`;
             }
-        });
+        } else {
+            console.error('Payment failed:', data.message);
+            showMessage(data.message || 'Failed to confirm payment', true);
+            button.disabled = false;
+        }
+    } catch (error) {
+        console.error('Fetch Error:', error.message);
+        showMessage('Error confirming payment: ' + error.message, true);
+        button.disabled = false;
+    }
+});
     </script>
 </body>
 </html>

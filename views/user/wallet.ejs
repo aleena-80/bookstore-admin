@@ -37,6 +37,8 @@
     th { background: #58CC02; color: #FFFFFF; font-weight: 700; }
     .no-transactions { text-align: center; padding: 20px; color: #1C2526; }
     .error { color: #FF4D4D; margin-bottom: 15px; font-weight: bold; }
+    .credit { color: #58CC02; }
+    .debit { color: #FF4D4D; }
     @media (max-width: 768px) {
       .hamburger { display: block; }
       .nav-links { display: none; }
@@ -107,10 +109,23 @@
               <tr>
                 <td><%= t.transactionId %></td>
                 <td><%= t.date.toLocaleDateString() %></td>
-                <td><%= t.source.type.charAt(0).toUpperCase() + t.source.type.slice(1) %></td>
-                <td>₹<%= t.amount.toFixed(2) %></td>
-                <td><%= t.source.orderId && t.source.orderId.paymentMethod ? t.source.orderId.paymentMethod : 'N/A' %></td>
-                <td><%= t.source.type %> <%= t.source.orderId && t.source.orderId.orderId ? `(Order: ${t.source.orderId.orderId})` : '' %></td>
+                <td><%= t.type.charAt(0).toUpperCase() + t.type.slice(1) %></td>
+                <td class="<%= t.type === 'credit' ? 'credit' : 'debit' %>">
+                  <%= t.type === 'credit' ? '+' : '–' %>₹<%= t.amount.toFixed(2) %>
+                </td>
+                <td>
+                  <% if (t.source.type === 'add_funds' || t.source.type === 'manual') { %>
+                    N/A
+                  <% } else if (t.source.type === 'order') { %>
+                    <%= t.paymentMethod || 'Wallet' %>
+                  <% } else { %>
+                    <%= t.source.orderId && t.source.orderId.paymentMethod ? t.source.orderId.paymentMethod : 'N/A' %>
+                  <% } %>
+                </td>
+                <td>
+                  <%= t.source.type.charAt(0).toUpperCase() + t.source.type.slice(1) %>
+                  <%= t.source.orderId && t.source.orderId.orderId ? `(Order: ${t.source.orderId.orderId})` : '' %>
+                </td>
               </tr>
             <% }); %>
           </tbody>

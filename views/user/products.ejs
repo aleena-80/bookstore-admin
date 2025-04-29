@@ -29,7 +29,7 @@
             position: absolute;
             top: -7px;
             right: -8px;
-            background: #58CC02; /* Match brand color */
+            background: #58CC02;
             color: #FFFFFF;
             font-size: 12px;
             font-weight: 700;
@@ -42,7 +42,7 @@
             line-height: 1;
         }
         .count-badge:empty {
-            display: none; /* Hide if count is 0 */
+            display: none;
         }
         .navbar {
             background-color: #FFFFFF;
@@ -63,13 +63,11 @@
             font-size: 28px;
             font-weight: 700;
         }
-
         .tagline {
             color: #1C2526;
             font-size: 14px;
             margin-top: 3px;
         }
-
         .nav-links {
             list-style: none;
             display: flex;
@@ -77,9 +75,8 @@
             align-items: center;
             flex-wrap: wrap;
             justify-content: flex-end;
-            width: auto; /* Adjusted for better mobile fit */
+            width: auto;
         }
-
         .nav-links li a {
             color: #1C2526;
             text-decoration: none;
@@ -90,19 +87,15 @@
             transition: color 0.3s;
             position: relative;
         }
-
         .nav-links li a:hover {
             color: #58CC02;
         }
-
         .nav-links li a i {
             margin-right: 5px;
         }
-
         .nav-links li.profile-link a {
             color: #1C2526;
         }
-
         .search-bar {
             position: absolute;
             left: 50%;
@@ -111,7 +104,6 @@
             gap: 10px;
             align-items: center;
         }
-
         .search-bar input {
             padding: 8px 12px;
             border: 1px solid #E5E5E5;
@@ -121,16 +113,13 @@
             width: 300px;
             transition: border-color 0.3s;
         }
-
         .search-bar input:focus {
             border-color: #58CC02;
         }
-
         .search-bar input::placeholder {
             color: #A0A0A0;
             text-align: center;
         }
-
         .search-bar button {
             padding: 8px 15px;
             background: #1C2526;
@@ -140,13 +129,9 @@
             font-weight: 700;
             cursor: pointer;
         }
-
         .search-bar button:hover {
             background: #58CC02;
         }
-
-
-
         .breadcrumbs { padding: 15px 12px; font-size: 14px; color: #1C2526; background: #E5E5E5; }
         .breadcrumbs a { color: #1C2526; text-decoration: none; }
         .breadcrumbs a:hover { color: #58CC02; }
@@ -185,56 +170,22 @@
         .footer-bottom { text-align: center; margin-top: 20px; font-size: 12px; }
         .message { position: fixed; top: 20px; right: 20px; padding: 10px; background: #58CC02; color: #FFFFFF; border-radius: 5px; display: none; }
         @media (max-width: 768px) {
-            body {
-                padding-top: 120px; /* Adjust for taller header */
-            }
-
-            .navbar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .logo h1 a {
-                font-size: 24px;
-            }
-
-            .tagline {
-                font-size: 12px;
-                margin-top: 5px;
-            }
-
-            .nav-links {
-                width: 100%;
-                margin-top: -30px;
-            }
-
-            .nav-links li a {
-                font-size: 14px;
-            
-            }
-
-            .search-bar {
-                position: static;
-                transform: none;
-                width: 100%;
-                margin-top: 20px;
-            }
-
-            .search-bar input {
-                width: 100%;
-                font-size: 14px;
-            }
-
-            .search-bar button {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-            .products-section { flex-direction: column; align-items: center;}
+            body { padding-top: 120px; }
+            .navbar { flex-direction: column; align-items: flex-start; }
+            .logo h1 a { font-size: 24px; }
+            .tagline { font-size: 12px; margin-top: 5px; }
+            .nav-links { width: 100%; margin-top: -30px; }
+            .nav-links li a { font-size: 14px; }
+            .search-bar { position: static; transform: none; width: 100%; margin-top: 20px; }
+            .search-bar input { width: 100%; font-size: 14px; }
+            .search-bar button { padding: 8px 12px; font-size: 14px; }
+            .products-section { flex-direction: column; align-items: center; }
             .sidebar { width: 100%; margin-left: 0; }
-            .product-grid { grid-template-columns: 1fr; }
-            .product-card .image-slideshow { height: 200px; }
-            .product-card img { height: 200px; }
-           
+            .product-grid { grid-template-columns: 1fr; gap: 20px; }
+            .product-card { max-width: 300px; padding: 10px; }
+            .product-card .image-slideshow { height: 300px; width: 100%; min-width: 100px; }
+            .product-card img { height: 300px; width: 100%; min-width: 100px; object-fit: contain; }
+            .product-card button { padding: 6px; font-size: 12px; }
         }
     </style>
 </head>
@@ -368,12 +319,23 @@
         async function loadProducts(page = 1) {
             const search = document.getElementById('search').value || '';
             const sort = document.getElementById('sort').value || '';
-            const category = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value)[0] || '';
+            const categories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
             const language = document.querySelector('input[name="language"]:checked')?.value || '';
             const priceMin = document.getElementById('priceMin').value || '';
             const priceMax = document.getElementById('priceMax').value || '';
 
-            const response = await fetch(`/users/products?search=${encodeURIComponent(search)}&sort=${sort}&category=${category}&language=${language}&priceMin=${priceMin}&priceMax=${priceMax}&page=${page}&limit=12`, {
+            const queryParams = new URLSearchParams({
+                search: encodeURIComponent(search),
+                sort,
+                language,
+                priceMin,
+                priceMax,
+                page,
+                limit: 12
+            });
+            categories.forEach(cat => queryParams.append('category[]', cat));
+
+            const response = await fetch(`/users/products?${queryParams.toString()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
             const data = await response.json();
@@ -382,11 +344,16 @@
             productList.innerHTML = '';
             if (data.success && data.products.length > 0) {
                 data.products.forEach(product => {
+                    // Log Fantasy images for debugging
+                    if (categories.includes(product.category?._id?.toString())) {
+                        console.log(`Product: ${product.name}, Images:`, product.images || ['/default.jpg']);
+                    }
+                    const images = Array.isArray(product.images) && product.images.length > 0 ? product.images : ['/default.jpg'];
                     const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
                     productList.innerHTML += `
                         <div class="product-card">
                             <div class="image-slideshow">
-                                ${(product.images || ['/default.jpg']).slice(0, 2).map((img, index) => `
+                                ${images.slice(0, 2).map((img, index) => `
                                     <img src="${img}" alt="${product.name}" class="${index === 0 ? 'active' : ''}">
                                 `).join('')}
                             </div>
@@ -416,46 +383,45 @@
         }
 
         function addEventListeners() {
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const productId = btn.dataset.productId;
-            const response = await fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' });
-            const data = await response.json();
-            if (data.success) {
-                const cartBadge = document.querySelector('.nav-links a[href="/users/cart"] .count-badge');
-                cartBadge.textContent = data.cartCount;
-                showMessage('Added to cart!');
-            } else {
-                showMessage(data.message || 'Already in cart!');
-            }
-        });
-    });
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const productId = btn.dataset.productId;
+                    const response = await fetch(`/users/cart/add/${productId}`, { method: 'POST', credentials: 'include' });
+                    const data = await response.json();
+                    if (data.success) {
+                        const cartBadge = document.querySelector('.nav-links a[href="/users/cart"] .count-badge');
+                        cartBadge.textContent = data.cartCount;
+                        showMessage('Added to cart!');
+                    } else {
+                        showMessage(data.message || 'Already in cart!');
+                    }
+                });
+            });
 
-    document.querySelectorAll('.add-to-wishlist').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const productId = btn.dataset.productId;
-            const response = await fetch(`/users/wishlist/add/${productId}`, { method: 'POST', credentials: 'include' });
-            const data = await response.json();
-            if (data.success) {
-                const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
-                wishlistBadge.textContent = data.wishlistCount;
-                showMessage('Added to wishlist!');
-            } else {
-                showMessage(data.message || 'Already in wishlist!');
-            }
-        });
-    });
+            document.querySelectorAll('.add-to-wishlist').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const productId = btn.dataset.productId;
+                    const response = await fetch(`/users/wishlist/add/${productId}`, { method: 'POST', credentials: 'include' });
+                    const data = await response.json();
+                    if (data.success) {
+                        const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
+                        wishlistBadge.textContent = data.wishlistCount;
+                        showMessage('Added to wishlist!');
+                    } else {
+                        showMessage(data.message || 'Already in wishlist!');
+                    }
+                });
+            });
 
-    document.querySelectorAll('.page-link').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            const page = parseInt(link.dataset.page);
-            loadProducts(page);
-        });
-    });
-}
+            document.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    const page = parseInt(link.dataset.page);
+                    loadProducts(page);
+                });
+            });
+        }
 
-        // Optional Image Slideshow (Remove if not needed)
         function initImageSlideshows() {
             document.querySelectorAll('.image-slideshow').forEach(slideshow => {
                 const images = slideshow.querySelectorAll('img');
@@ -466,7 +432,7 @@
                     current = (current + 1) % images.length;
                     images[current].classList.add('active');
                 }
-                setInterval(nextImage, 20000); // 60 seconds
+                setInterval(nextImage, 5000);
             });
         }
 

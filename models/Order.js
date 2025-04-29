@@ -25,8 +25,11 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, enum: ['Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'], default: 'Pending' },
   expectedDelivery: { type: Date },
   cancelReason: { type: String },
+  couponDiscount: { type: Number, default: 0 },
   returnReason: { type: String },
+  paymentId: { type: String },
   paymentMethod: { type: String, required: true },
+  paymentCompleted: { type: Boolean, default: false },
   returnRequest: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

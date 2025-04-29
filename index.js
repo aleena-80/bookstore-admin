@@ -8,10 +8,9 @@ import path from 'path';
 import passport from './config/passportConfig.js'; 
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-import Product from './models/Product.js';
-import multer from 'multer';
-
-
+import { getHome } from './controllers/userController.js';
+import autheMiddleware from './middleware/autheMiddleware.js';
+const {protectUser} = autheMiddleware
 dotenv.config();
 
 const app = express();
@@ -29,7 +28,7 @@ app.use(cors({
   credentials: true, 
 }));
 app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private'); // ✅ Disable cache
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private'); 
   next();
 });
 
@@ -41,23 +40,18 @@ app.use((req, res, next) => {
   app.set('view engine', 'ejs');
   app.set('views', path.join(path.resolve(), 'views'));
   
-  app.use(express.static(path.join(path.resolve(), 'public')));
-  app.use('/images', express.static(path.join(path.resolve(), 'images')));
-  
-  app.get('/', (req, res) => {
-    res.render('user/landing');
-  });
+app.use(express.static(path.join(path.resolve(), 'public')));
+app.use('/images', express.static(path.join(path.resolve(), 'images')));
+
+app.get('/', getHome);
   
 app.use('/users', userRoutes); 
 app.use('/admin', adminRoutes);
 
-
-
-app._router?.stack.forEach((r) => {
-    if (r.route) {
-        console.log(r.route.path);
-    }
+app.use((req, res, next) => {
+  res.status(404).render('user/error', { message: 'Page not found', status: 404 });
 });
+
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
