@@ -1,6 +1,6 @@
-// config/cloudinary.js
+
 import { v2 as cloudinary } from 'cloudinary';
-import '../load-env.js'; // Add this line
+import '../load-env.js'; 
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

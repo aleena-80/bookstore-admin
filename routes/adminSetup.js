@@ -8,17 +8,16 @@ dotenv.config();
 const createAdmin = async () => {
   await mongoose.connect(process.env.MONGO_URI|| "mongodb://127.0.0.1:27017/bookstore");
 
-  const hashedPassword = await bcrypt.hash("admin123", 10); 
+  const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10); 
 
   const admin = new Admin({
-    name: "Admin",
-    email: "admin@gmail.com",
+    name: process.env.ADMIN_NAME,
+    email: process.env.ADMIN_EMAIL,
     password: hashedPassword,
     role: "admin",
   });
 
   await admin.save();
-  console.log("Admin user created successfully!");
   mongoose.connection.close();
 };
 

@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 
 const bannerSchema = new mongoose.Schema({
-  image: { type: String, required: true }, // Cloudinary URL
+  image: { type: String, required: true }, 
   link: { type: String },
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date },
