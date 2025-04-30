@@ -5,7 +5,6 @@ export const createCoupon = async (req, res) => {
   try {
     const { code, discount, expiryDate } = req.body;
 
-    // No userId needed for admin creation
     const coupon = new Coupon({
       code,
       discount,
@@ -19,7 +18,7 @@ export const createCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to create coupon' });
   }
 };
-
+//---------------------------------------------------------
 export const deleteCoupon = async (req, res) => {
   try {
     const { couponId } = req.params;
@@ -30,7 +29,7 @@ export const deleteCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to delete coupon' });
   }
 };
-
+//-------------------------------------------------------------------
 export const getCoupons = async (req, res) => {
   try {
     const coupons = await Coupon.find();
@@ -40,7 +39,7 @@ export const getCoupons = async (req, res) => {
     res.status(500).send('Failed to load coupons');
   }
 };
-
+//------------------------------------------------------------
 export const toggleCoupon = async (req, res) => {
   try {
     const { couponId } = req.params;
@@ -48,7 +47,7 @@ export const toggleCoupon = async (req, res) => {
     if (!coupon) {
       return res.status(404).json({ success: false, message: 'Coupon not found' });
     }
-    coupon.isListed = !coupon.isListed; // Toggle isListed
+    coupon.isListed = !coupon.isListed; 
     await coupon.save();
     res.json({ success: true, message: `Coupon ${coupon.isListed ? 'listed' : 'unlisted'}`, isListed: coupon.isListed });
   } catch (error) {

@@ -406,13 +406,12 @@
           const addressId = selectedAddress.value;
           const couponCode = document.getElementById('couponCode').value || '';
 
-          console.log('Place Order:', { addressId, couponCode }); // Debug log
           try {
               const response = await fetch('/users/checkout/initiate-order', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'include',
-                  body: JSON.stringify({ addressId, couponCode }) // Include couponCode
+                  body: JSON.stringify({ addressId, couponCode }) 
               });
               const data = await response.json();
               if (data.success) {
@@ -557,7 +556,6 @@
       });
 
       async function applyCoupon(code) {
-          console.log('Applying coupon:', code);
           const response = await fetch('/users/coupons/apply', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -565,7 +563,6 @@
               body: JSON.stringify({ code })
           });
           const data = await response.json();
-          console.log('Response:', data);
           if (data.success) {
               closeCouponModal();
               showMessage(`Coupon ${code} applied! Discount: ${data.discount}%`);

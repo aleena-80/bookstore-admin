@@ -717,7 +717,7 @@
                 </div>
                 <div class="action-buttons">
                     <button id="add-to-cart" class="add-to-cart" data-product-id="<%= product._id %>" <%= product.stock === 0 ? 'disabled' : '' %>>Add to Cart</button>
-                    <button id="buy-now" data-product-id="<%= product._id %>">Buy Now</button>
+                    <button id="add-to-wishlist" class="add-to-cart" data-product-id="<%= product._id %>">Wishlist</button>
                 </div>
             </div>
         </div>
@@ -935,20 +935,22 @@
             }
         });
 
-        document.getElementById('buy-now').addEventListener('click', async () => {
-            const productId = document.getElementById('buy-now').dataset.productId;
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const response = await fetch(`/users/order/buy-now/${productId}`, {
+        document.getElementById('add-to-wishlist').addEventListener('click', async () => {
+            const productId = document.getElementById('add-to-wishlist').dataset.productId;
+            const response = await fetch(`/users/wishlist/add/${productId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity }),
                 credentials: 'include'
             });
             const data = await response.json();
             if (data.success) {
-                window.location.href = `/users/checkout?orderId=${data.orderId}`;
+                const wishlistBadge = document.querySelector('.nav-links a[href="/users/wishlist"] .count-badge');
+                let currentCount = parseInt(wishlistBadge.dataset.count) || 0;
+                wishlistBadge.dataset.count = currentCount + 1;
+                wishlistBadge.textContent = currentCount + 1;
+                showToast('Added to wishlist!');
             } else {
-                showToast(data.message || 'Failed to proceed to checkout', 'error');
+                showToast(data.message || 'Already in wishlist!', 'error');
             }
         });
 

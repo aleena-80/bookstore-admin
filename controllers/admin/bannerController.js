@@ -1,4 +1,4 @@
-// controllers/bannerController.js
+
 import Banner from '../../models/Banner.js';
 import upload from '../../middleware/upload.js';
 
@@ -9,7 +9,7 @@ export const addBanner = [
     try {
       const { startDate, endDate } = req.body;
       if (!req.file) throw new Error('No image uploaded');
-      const image = req.file.path; // Cloudinary URL
+      const image = req.file.path; 
       const banner = new Banner({
         image,
         startDate,
@@ -21,11 +21,11 @@ export const addBanner = [
       res.redirect('/admin/banners');
     } catch (error) {
       console.error('Add Banner Error:', error.message);
-      res.status(500).send('Server Error: ' + error.message); // Show error detail
+      res.status(500).send('Server Error: ' + error.message); 
     }
   }
 ];
-
+//----------------------------------------------------
 export const getBanners = async (req, res) => {
   try {
     const banners = await Banner.find();
@@ -35,7 +35,7 @@ export const getBanners = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-
+//----------------------------------------------------------------------------
 export const deleteBanner = async (req, res) => {
   try {
     await Banner.deleteOne({ _id: req.params.id });
@@ -45,3 +45,4 @@ export const deleteBanner = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+//--------------------------------------------------------

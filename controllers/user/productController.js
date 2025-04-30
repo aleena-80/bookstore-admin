@@ -143,45 +143,9 @@ export const getProductDetails = async (req, res) => {
       wishlistCount,
       totalPages });
 
-
-
-
   } catch (error) {
     console.error("Get Product Error:", error);
     res.status(500).send("Error loading product");
-  }
-};
-//-------------------------------------------------------------
-export const buyNow = async (req, res) => {
-  try {
-      const { productId } = req.params;
-      const { quantity = 1 } = req.body;
-      const userId = req.user._id;
-      const product = await Product.findById(productId);
-      if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-      if (product.stock < quantity) return res.status(400).json({ success: false, message: 'Insufficient stock' });
-
-      const order = new Order({
-          userId,
-          items: [{
-              productId: product._id,
-              quantity,
-              price: product.price,
-              discount: product.discount || 0
-          }],
-          subtotal: product.price * (1 - (product.discount || 0) / 100) * quantity,
-          taxes: product.price * (1 - (product.discount || 0) / 100) * quantity * 0.05,
-          shipping: 100,
-          total: product.price * (1 - (product.discount || 0) / 100) * quantity * 1.05 + 100,
-          paymentMethod: 'Pending',
-          status: 'Confirmed',
-          orderId: `ORD${Date.now()}`
-      });
-      await order.save();
-      res.json({ success: true, orderId: order._id });
-  } catch (error) {
-      console.error('Buy Now Error:', error);
-      res.status(500).json({ success: false, message: 'Failed to process Buy Now' });
   }
 };
 //--------------------------------------------------------------------
@@ -190,7 +154,6 @@ export const addReview = async (req, res) => {
     const { productId, rating, comment } = req.body;
     const user = req.user;
 
-    console.log("User from JWT:", user);
 
     if (!user || !user._id) {
       return res.json({ success: false, message: "Please log in to add a review." });
@@ -253,9 +216,6 @@ export const editReview = async (req, res) => {
       if (!review) {
           return res.json({ success: false, message: "Review not found." });
       }
-
-
-    
       review.rating = rating;
       review.comment = comment;
       await product.save();
@@ -296,10 +256,7 @@ export const getHome = async (req, res) => {
       $or: [{ endDate: { $gte: new Date() } }, { endDate: null }]
     }).sort({ startDate: -1 });
     const bannersToShow = banners.length > 0 ? banners : [{ image: '/images/default-banner.jpg' }];
-    console.log('Banners to show:', bannersToShow);
-
-
-
+    
     let wishlistCount = 0;
     let cartCount = 0;
     let cartItems = [];

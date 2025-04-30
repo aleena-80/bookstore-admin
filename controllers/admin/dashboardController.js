@@ -32,7 +32,7 @@ export const getDashboard = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
-
+//---------------------------------------------------------------------------
 export const getSalesReport = async (req, res) => {
   try {
     const { start, end } = req.query;
@@ -46,18 +46,11 @@ export const getSalesReport = async (req, res) => {
         $lte: new Date(end)
       };
     }
-    console.log('Sales Report Query:', filterCondition);
-
     const orders = await Order.find(filterCondition)
       .populate('userId', 'name')
       .populate('items.productId', 'name')
       .sort({ createdAt: -1 });
 
-    console.log('Fetched Orders:', orders.map(o => ({
-      orderId: o.orderId,
-      date: o.createdAt,
-      customer: o.userId?.name
-    })));
 
     const salesData = orders.map(order => {
       const totalPrice = order.items.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
@@ -84,7 +77,7 @@ export const getSalesReport = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
+//----------------------------------------------------------------------------------
 export const getSalesReportPDF = async (req, res) => {
   try {
     const { start, end } = req.query;
@@ -98,7 +91,6 @@ export const getSalesReportPDF = async (req, res) => {
         $lte: new Date(end)
       };
     }
-    console.log('PDF Query:', filterCondition);
 
     const orders = await Order.find(filterCondition)
       .populate('userId', 'name')
@@ -125,7 +117,6 @@ export const getSalesReportPDF = async (req, res) => {
       res.status(200).send(pdfData);
     });
     doc.on('error', error => {
-      console.error('PDF Stream Error:', error);
       res.status(500).send('Error generating PDF');
     });
 
@@ -194,6 +185,7 @@ export const getSalesReportPDF = async (req, res) => {
     res.status(500).json({ error: 'Failed to generate PDF' });
   }
 };
+//------------------------------------------------------------------------
 export const getTopProducts = async (req, res) => {
   try {
     const { start, end } = req.query;
@@ -238,7 +230,7 @@ export const getTopProducts = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch top products' });
   }
 };
-
+//---------------------------------------------------------------------------
 export const getTopCategories = async (req, res) => {
   try {
     const { start, end } = req.query;
@@ -293,50 +285,4 @@ export const getTopCategories = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch top categories' });
   }
 };
-
-export const getTopBrands = async (req, res) => {
-  try {
-    const { start, end } = req.query;
-    const match = { status: { $nin: ['Cancelled', 'Returned'] } };
-    if (start && end) {
-      match.date = {
-        $gte: new Date(start),
-        $lte: new Date(new Date(end).setHours(23, 59, 59, 999))
-      };
-    }
-
-    const brands = await Order.aggregate([
-      { $match: match },
-      { $unwind: '$items' },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'items.productId',
-          foreignField: '_id',
-          as: 'product'
-        }
-      },
-      { $unwind: '$product' },
-      {
-        $group: {
-          _id: '$product.brand',
-          totalQuantity: { $sum: '$items.quantity' }
-        }
-      },
-      {
-        $project: {
-          name: '$_id',
-          totalQuantity: 1
-        }
-      },
-      { $sort: { totalQuantity: -1 } },
-      { $limit: 10 }
-    ]);
-
-    console.log(`Fetched ${brands.length} top brands`);
-    res.json(brands);
-  } catch (error) {
-    console.error('Get Top Brands Error:', error);
-    res.status(500).json({ error: 'Failed to fetch top brands' });
-  }
-};
+//---------------------------------------------------------------------------

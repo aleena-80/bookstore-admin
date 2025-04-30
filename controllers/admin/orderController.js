@@ -40,6 +40,7 @@ export const getOrders = async (req, res) => {
     res.render('admin/orders', { orders: [], currentPage: 1, totalPages: 1, search: '', status: '', error: 'Failed to load orders' });
   }
 };
+//---------------------------------------------------------------------------------------
 export const getOrderView = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -59,12 +60,8 @@ export const verifyReturn = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { action } = req.body;
-
-    console.log(`Processing return for order ${orderId}, action: ${action}`);
-
     const order = await Order.findById(orderId).populate('userId');
     if (!order || !order.returnRequest) {
-      console.log(`No return request found for order ${orderId}`);
       return res.json({ success: false, message: 'No return request found' });
     }
 
@@ -72,11 +69,9 @@ export const verifyReturn = async (req, res) => {
       order.status = 'Returned';
       order.returnRequest = false;
 
-      if (order.paymentMethod === 'Razorpay') {
-        console.log(`Processing Razorpay refund for order ${order.orderId}, amount: ₹${order.total}, paymentId: ${order.paymentId || 'none'}`);
+      if (order.paymentMethod === 'Razorpay'||  order.paymentMethod === 'Wallet') {
         let wallet = await Wallet.findOne({ userId: order.userId._id });
         if (!wallet) {
-          console.log(`Creating new wallet for user ${order.userId._id}`);
           wallet = new Wallet({
             userId: order.userId._id,
             balance: 0,
@@ -94,10 +89,9 @@ export const verifyReturn = async (req, res) => {
         };
         wallet.transactions.push(transaction);
         await wallet.save();
-        console.log(`Wallet updated for user ${order.userId._id}: balance = ₹${previousBalance} -> ₹${wallet.balance}, new transaction: ${transaction.transactionId}`);
+        
         // Sync User.wallet with Wallet.balance
         const userUpdate = await User.findByIdAndUpdate(order.userId._id, { wallet: wallet.balance }, { new: true });
-        console.log(`Synced User.wallet for user ${order.userId._id}: ₹${userUpdate.wallet}`);
       } else {
         console.log(`No refund processed for order ${order.orderId} (paymentMethod: ${order.paymentMethod})`);
       }
@@ -107,15 +101,12 @@ export const verifyReturn = async (req, res) => {
         await Product.findByIdAndUpdate(item.productId, {
           $inc: { stock: item.quantity }
         });
-        console.log(`Restored stock for product ${item.productId}: +${item.quantity}`);
       }
     } else if (action === 'reject') {
-      console.log(`Return rejected for order ${orderId}`);
       order.returnRequest = false;
     }
 
     await order.save();
-    console.log(`Order ${order.orderId} updated, status: ${order.status}`);
     res.json({ success: true, message: 'Return processed successfully' });
   } catch (error) {
     console.error('Verify Return Error:', error);

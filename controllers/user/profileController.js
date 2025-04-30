@@ -33,6 +33,7 @@ export const getEditProfile = async (req, res) => {
     res.render('user/edit-profile', { user: req.user, wishlistCount: 0, cartCount: 0, error: 'Failed to load edit profile' });
   }
 };
+//-----------------------------------------
 export const verifyEmailOtp = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -51,7 +52,7 @@ export const verifyEmailOtp = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to verify OTP' });
   }
 };
-
+//------------------------------------------------------------
 export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -67,7 +68,7 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to change password' });
   }
 };
-
+//-------------------------------------------
 export const getAddresses = async (req, res) => {
   try {
     const addresses = await Address.find({ userId: req.user._id });
@@ -75,13 +76,13 @@ export const getAddresses = async (req, res) => {
     if (!user) return res.status(404).send('User not found');
     const wishlistCount = user ? await Wishlist.countDocuments({ userId: user.id }) : 0;
     const cartCount = user ? await Carts.countDocuments({ userId: user.id }) : 0;
-    res.render('user/addresses', { addresses ,wishlistCount, cartCount});
+    res.render('user/addresses', { addresses ,wishlistCount, cartCount,user});
   } catch (error) {
     console.error('Addresses Error:', error);
     res.render('user/addresses', { addresses: [], error: 'Failed to load addresses' });
   }
 };
-
+//------------------------------------------------------------------------
 export const profileaddAddress = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -95,7 +96,7 @@ export const profileaddAddress = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to add address' });
   }
 };
-
+//-----------------------------------------------------------------------------
 export const profileeditAddress = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -112,7 +113,7 @@ export const profileeditAddress = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to edit address' });
   }
 };
-
+//------------------------------------------------------------------------
 export const getWallet = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -121,7 +122,6 @@ export const getWallet = async (req, res) => {
     if (!user) return res.status(404).send('User not found');
 
     if (!wallet) {
-      console.log(`Creating new wallet for user ${userId}`);
       wallet = new Wallet({
         userId,
         balance: 0,
@@ -130,11 +130,9 @@ export const getWallet = async (req, res) => {
       await wallet.save();
     }
     if (!Array.isArray(wallet.transactions)) {
-      console.log(`Fixing transactions array for wallet ${wallet._id}`);
       wallet.transactions = [];
       await wallet.save();
     }
-    console.log(`Fetched wallet for user ${userId}: balance = ₹${wallet.balance}, transactions = ${wallet.transactions.length}`);
 
     const wishlistCount = await Wishlist.countDocuments({ userId });
     const cartCount = await Carts.countDocuments({ userId });
@@ -157,17 +155,15 @@ export const getWallet = async (req, res) => {
     });
   }
 };
-
+//--------------------------------------------------------------------------------
 export const getWalletBalance = async (req,res)=>{
   try {
     const userId = req.user.id;
     if (!userId) {
-        console.log('Unauthorized wallet balance request');
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     const wallet = await Wallet.findOne({ userId });
     const balance = wallet ? wallet.balance : 0;
-    console.log('Wallet balance fetched:', { userId, balance });
     res.json({ success: true, balance });
 } catch (error) {
     console.error('Wallet Balance Error:', {
@@ -178,8 +174,7 @@ export const getWalletBalance = async (req,res)=>{
     res.status(500).json({ success: false, message: 'Failed to fetch wallet balance' });
 }
 }
-
-
+//---------------------------------------------------
 export const addFundsToWallet = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -193,6 +188,7 @@ export const addFundsToWallet = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to add funds' });
   }
 };
+//--------------------------------------------------------------------
 export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('name email phone wallet');
@@ -215,7 +211,7 @@ export const getProfile = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-
+//---------------------------------------------------------------------
 export const editProfile =  async (req, res) => {
   try {
     const userId = req.user._id;
@@ -231,7 +227,7 @@ export const editProfile =  async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update profile' });
   }
 };
-
+//-----------------------------------------------------------------------
 export const changeEmail = async (req, res) => {
   try {
     const { email } = req.body;

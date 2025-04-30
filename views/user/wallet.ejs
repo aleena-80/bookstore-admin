@@ -7,49 +7,335 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; }
-    .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-    .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
-    .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
-    .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
-    .nav-links li a:hover { color: #58CC02; }
-    .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
-    .sidebar { position: fixed; top: 70px; left: 0; width: 250px; height: calc(100% - 70px); background: #FFFFFF; padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
-    .sidebar ul { list-style: none; }
-    .sidebar ul li { margin: 20px 0; display: flex; align-items: center; gap: 10px; }
-    .sidebar ul li a { color: #1C2526; text-decoration: none; font-weight: 700; font-size: 16px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
-    .sidebar ul li a:hover, .sidebar ul li a.active { color: #58CC02; background: #E5E5E5; width: 100%; }
-    .main-content { margin-left: 270px; padding: 70px 20px 20px; max-width: 800px; }
-    .breadcrumbs { position: fixed; top: 65px; left: 2px; right: 0; padding: 18px 20px; font-size: 14px; color: #1C2526; background: #E5E5E5; z-index: 999; }
-    .breadcrumbs a { color: #1C2526; text-decoration: none; }
-    .breadcrumbs a:hover { color: #58CC02; }
-    .breadcrumbs span { margin: 0 5px; }
-    .wallet-card { margin-top: 77px; background: linear-gradient(135deg, #58CC02, #46a802); padding: 30px; border-radius: 12px; color: #FFFFFF; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }
-    .wallet-card h2 { font-size: 28px; margin-bottom: 20px; }
-    .wallet-card .balance { font-size: 36px; font-weight: 700; margin: 20px 0; }
-    .wallet-card .btn { background: #FFFFFF; color: #58CC02; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: 700; }
-    .wallet-card .btn:hover { background: #F5F5F5; }
-    .transactions { margin-top: 20px; background: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-    .transactions h3 { font-size: 20px; color: #1C2526; margin-bottom: 15px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-    th { background: #58CC02; color: #FFFFFF; font-weight: 700; }
-    .no-transactions { text-align: center; padding: 20px; color: #1C2526; }
-    .error { color: #FF4D4D; margin-bottom: 15px; font-weight: bold; }
-    .credit { color: #58CC02; }
-    .debit { color: #FF4D4D; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #F5F5F5;
+      color: #1C2526;
+      padding-top: 70px;
+    }
+
+    .count-badge {
+      position: absolute;
+      top: -7px;
+      right: -8px;
+      background: #58CC02;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .count-badge:empty {
+      display: none;
+    }
+
+    .navbar {
+      background-color: #FFFFFF;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .logo h1 a {
+      color: #58CC02;
+      text-decoration: none;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .tagline {
+      color: #1C2526;
+      font-size: 14px;
+      margin-top: 3px;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: auto;
+    }
+    .nav-links li a {
+      color: #1C2526;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links li a:hover {
+      color: #58CC02;
+    }
+    .nav-links li a i {
+      margin-right: 5px;
+      font-size: 18px;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #1C2526;
+    }
+    .sidebar {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 250px;
+      height: calc(100% - 70px);
+      background: #FFFFFF;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    .sidebar ul {
+      list-style: none;
+    }
+    .sidebar ul li {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar ul li a {
+      color: #1C2526;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.3s;
+      width: 100%;
+    }
+    .sidebar ul li a:hover,
+    .sidebar ul li a.active {
+      color: #58CC02;
+      background: #E5E5E5;
+    }
+    .main-content {
+      margin-left: 0;
+      padding: 70px 20px 20px;
+      max-width: 1200px;
+      margin-right: auto;
+      margin-left: auto;
+    }
+    .breadcrumbs {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      padding: 18px 20px;
+      font-size: 14px;
+      color: #1C2526;
+      background: #E5E5E5;
+      z-index: 999;
+    }
+    .breadcrumbs a {
+      color: #1C2526;
+      text-decoration: none;
+    }
+    .breadcrumbs a:hover {
+      color: #58CC02;
+    }
+    .breadcrumbs span {
+      margin: 0 5px;
+    }
+    .breadcrumbs a::after {
+      content: " › ";
+      color: #A0A0A0;
+    }
+    .breadcrumbs span::after {
+      content: "";
+    }
+    .wallet-card {
+      margin-top: 77px;
+      background: linear-gradient(135deg, #58CC02, #46a802);
+      padding: 20px;
+      border-radius: 12px;
+      color: #FFFFFF;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .wallet-card h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .wallet-card .balance {
+      font-size: 36px;
+      font-weight: 700;
+      margin: 20px 0;
+    }
+    .wallet-card .btn {
+      padding: 10px 20px;
+      background: #FFFFFF;
+      color: #58CC02;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .wallet-card .btn:hover {
+      background: #F5F5F5;
+    }
+    .transactions {
+      margin-top: 10px;
+      background: #FFFFFF;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .transactions h3 {
+      font-size: 24px;
+      color: #58CC02;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 16px;
+    }
+    th {
+      background: #58CC02;
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+    .no-transactions {
+      text-align: center;
+      padding: 20px;
+      color: #1C2526;
+      font-size: 16px;
+    }
+    .error {
+      color: #FF4D4D;
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .credit {
+      color: #58CC02;
+    }
+    .debit {
+      color: #FF4D4D;
+    }
     @media (max-width: 768px) {
-      .hamburger { display: block; }
-      .nav-links { display: none; }
-      .sidebar { transform: translateX(-100%); width: 200px; height: calc(100% - 70px); }
-      .sidebar.active { transform: translateX(0); }
-      .main-content { margin-left: 0; padding: 70px 10px 10px; }
-      .wallet-card { padding: 20px; }
-      .wallet-card .balance { font-size: 28px; }
-      .breadcrumbs { padding: 10px; font-size: 12px; }
-      table { font-size: 14px; }
-      th, td { padding: 8px; }
+      .hamburger {
+        display: block !important;
+      }
+      .nav-links {
+        display: none;
+      }
+      .sidebar {
+        transform: translateX(-100%);
+        width: 200px;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 10px;
+        margin-top: 50px;
+      }
+      .breadcrumbs {
+        padding: 10px;
+        font-size: 14px;
+      }
+      .wallet-card {
+        padding: 15px;
+      }
+      .wallet-card h2 {
+        font-size: 24px;
+      }
+      .wallet-card .balance {
+        font-size: 28px;
+      }
+      .wallet-card .btn {
+        font-size: 14px;
+      }
+      .transactions {
+        padding: 15px;
+      }
+      .transactions h3 {
+        font-size: 20px;
+      }
+      table {
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 8px;
+      }
+      .no-transactions {
+        font-size: 14px;
+      }
+      .error {
+        font-size: 14px;
+      }
+    }
+    @media (max-width: 480px) {
+      .logo h1 a {
+        font-size: 24px;
+      }
+      .hamburger {
+        font-size: 20px;
+      }
+      .sidebar {
+        width: 180px;
+      }
+      .sidebar ul li a {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .wallet-card h2 {
+        font-size: 20px;
+      }
+      .wallet-card .balance {
+        font-size: 24px;
+      }
+      .transactions h3 {
+        font-size: 18px;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+      th,
+      td {
+        padding: 6px;
+      }
     }
   </style>
 </head>
@@ -61,8 +347,8 @@
       </div>
       <div class="hamburger"><i class="fas fa-bars"></i></div>
       <ul class="nav-links">
-        <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
-        <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
+        <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+        <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
       </ul>
     </nav>
   </header>
@@ -140,7 +426,16 @@
   <script>
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => sidebar.classList.toggle('active'));
+    console.log('Hamburger:', hamburger);
+    console.log('Sidebar:', sidebar);
+    if (hamburger && sidebar) {
+      hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        console.log('Sidebar toggled:', sidebar.classList.contains('active'));
+      });
+    } else {
+      console.warn('Hamburger or Sidebar not found.');
+    }
 
     function addFunds() {
       Swal.fire({
@@ -173,6 +468,12 @@
           }
         }
       });
+    }
+
+    // Debug responsive styles
+    if (window.innerWidth <= 768) {
+      const hamburgerStyle = getComputedStyle(hamburger);
+      const navLinksStyle = getComputedStyle(document.querySelector('.nav-links'));
     }
   </script>
 </body>

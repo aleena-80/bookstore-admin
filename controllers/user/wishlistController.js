@@ -6,8 +6,6 @@ export const getWishlist = async (req, res) => {
         if (!req.user) {
             return res.redirect('/users/login');
         }
-
-
         const cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
         const cartCount = cartItems.length;
     

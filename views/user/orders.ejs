@@ -368,7 +368,6 @@
             }
     
             try {
-                console.log('Cancelling order:', currentOrderId, 'Reason:', reason);
                 const res = await fetch(`/users/orders/cancel/${currentOrderId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -376,7 +375,6 @@
                     body: JSON.stringify({ reason })
                 });
                 const data = await res.json();
-                console.log('Cancel Response:', data);
                 if (data.success) {
                     showMessage('Order cancelled successfully');
                     closeCancelModal();
@@ -417,7 +415,6 @@
     
         async function confirmRetry() {
             try {
-                console.log('Initiating retry payment for order:', currentOrderId);
                 const res = await fetch(`/users/orders/retry-payment/${currentOrderId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -426,7 +423,6 @@
                
                 const data = await res.json();
                 if (data.success && data.redirectUrl) {
-                    console.log('Redirecting to payment page:', data.redirectUrl);
                     closeRetryModal();
                     window.location.href = data.redirectUrl;
                 } else {

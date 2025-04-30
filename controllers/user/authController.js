@@ -25,19 +25,16 @@ export const login = async (req, res) => {
   }
   try {
     const { email, password } = req.body;
-    console.log("Login Attempt:", { email, password: password ? "[Provided]" : "[Missing]" });
     if (!email || !password) {
-      console.log("Missing Field:", !email ? "Email" : "Password");
+
       return res.status(400).json({ error: !email ? 'Email is required.' : 'Password is required.' });
     }
     const user = await User.findOne({ email: email.toLowerCase() });
-    console.log("User Found:", user ? { email: user.email, passwordHash: user.password } : "None");
+
     if (!user) {
       return res.status(400).json({ error: 'Invalid email—user not found.' });
     }
-    console.log("Password to Compare:", password);
-    const passwordMatch = await bcrypt.compare(password, user.password); // No hashing, just compare
-    console.log("Password Match:", passwordMatch);
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       return res.status(400).json({ error: 'Invalid password—does not match.' });
     }
@@ -49,7 +46,6 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    console.log("Token:", token);
     res.cookie('token', token, { 
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
@@ -207,7 +203,7 @@ export const googleAuthCallback = async (req, res) => {
       return res.redirect('/users/login?message=Google authentication failed');
     }
 
-    const { googleId, email, name } = req.user; // From Google profile
+    const { googleId, email, name } = req.user; 
     let user = await User.findOne({ email });
 
     if (!user) {

@@ -8,7 +8,7 @@ import {
    logoutAdmin,getProducts,blockUser,unblockUser,
   getAdminLogin,getOrders,updateOrderStatus,getOrderView,verifyReturn,addBanner,getBanners,deleteBanner,
   getCoupons,createCoupon,deleteCoupon,getDashboard,getSalesReport,deleteProduct,getSalesReportPDF,toggleCategoryListing,
-  updateCategoryOffer,updateProductOffer,toggleCoupon,getTransactionDetails,getTransactions,getTopBrands,getTopCategories,getTopProducts
+  updateCategoryOffer,updateProductOffer,toggleCoupon,getTransactionDetails,getTransactions,getTopCategories,getTopProducts
 } from '../controllers/adminController.js';
 
 import multer from 'multer';
@@ -25,7 +25,6 @@ router.post('/logout', protectAdmin, logoutAdmin);
 router.get('/products', protectAdmin, getProducts);
 router.get('/products-add', protectAdmin, getaddProduct);
 router.post('/products-add', protectAdmin, addProduct);
-//router.get('/products/edit/:id', protectAdmin, getEditProduct);
 router.post('/products/offer/:id', protectAdmin,updateProductOffer);
 router.post('/products/delete/:id', deleteProduct);
 router.post('/products/edit/:id', protectAdmin, editProduct);
@@ -61,8 +60,6 @@ router.get('/sales-report',protectAdmin, getSalesReport)
 router.get('/sales-report-pdf',protectAdmin, getSalesReportPDF);
 router.get('/top-products', protectAdmin,getTopProducts);
 router.get('/top-categories', protectAdmin,getTopCategories);
-router.get('/top-brands', protectAdmin,getTopBrands);
-
 
 
 

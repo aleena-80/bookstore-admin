@@ -241,11 +241,9 @@
     </footer>
 
     <script>
-        console.log('Cart page loaded');
         const incrementButtons = document.querySelectorAll('.increment');
         const decrementButtons = document.querySelectorAll('.decrement');
         const removeButtons = document.querySelectorAll('.remove-btn');
-        console.log('Increment buttons:', incrementButtons.length, 'Decrement buttons:', decrementButtons.length);
 
         function showMessage(text, isError = false) {
             const msg = document.getElementById('message');
@@ -264,7 +262,6 @@
                 });
 
                 const data = await response.json();
-                console.log('Update Response:', data);
 
                 if (data.success) {
                     const card = document.querySelector(`[data-cart-id="${productId}"]`);

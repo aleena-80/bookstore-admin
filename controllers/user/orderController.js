@@ -26,15 +26,12 @@ export const getOrderDetail = async (req, res) => {
     const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
     const cartCount = await Cart.countDocuments({ userId: req.user.id });
 
-    console.log('Order Address:', order.address);
     res.render('user/order-details', { order, wishlistCount, cartCount, user: req.user , });
   } catch (error) {
     console.error('Get Order Details Error:', error);
     res.status(500).send('Server Error');
   }
 };
-//----------------------------------------------------------------------------------------------
-
 //-------------------------------------------------------------------------------------------------
 export const downloadInvoice = async (req, res) => {
   try {
@@ -104,12 +101,9 @@ export const getOrderView = async (req, res) => {
     const order = await Order.findById(orderId)
       .populate('items.productId', 'name price images discount')
 
-      console.log('Full order data:', JSON.stringify(order, null, 2));
-
     if (!order || order.userId.toString() !== req.user.id) {
       return res.status(404).send('Order not found');
     }
-    console.log('Order Address:', order.address); 
     res.render('user/order-view', { order, user: req.user });
   } catch (error) {
     console.error('Get Order View Error:', error);
@@ -117,7 +111,6 @@ export const getOrderView = async (req, res) => {
   }
 };
 //---------------------------------------------------------------------------
-
 export const requestReturn = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -133,7 +126,6 @@ export const requestReturn = async (req, res) => {
     order.returnRequest = true;
     order.returnReason = reason || 'No reason provided';
 
-    // Increase stock on return
     for (const item of order.items) {
       const product = item.productId;
       product.stock += item.quantity;
@@ -141,39 +133,28 @@ export const requestReturn = async (req, res) => {
     }
 
     await order.save();
-    console.log('Return Requested:', order.orderId, 'Reason:', reason);
     res.json({ success: true, message: 'Return requested successfully' });
   } catch (error) {
     console.error('Request Return Error:', error);
     res.status(500).json({ success: false, message: 'Failed to request return' });
   }
 };
-
+//--------------------------------------------------------------------
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { reason } = req.body;
-    console.log('Cancel Order Attempt:', { orderId, userId: req.user.id, reason });
 
     const order = await Order.findById(orderId).populate('items.productId');
     if (!order || order.userId.toString() !== req.user.id) {
-      console.log('Order not found or unauthorized:', { orderId, userId: req.user.id });
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
-    console.log('Order Details:', {
-      orderId: order.orderId,
-      status: order.status,
-      paymentMethod: order.paymentMethod,
-      paymentId: order.paymentId,
-      total: order.total
-    });
+   
 
     if (order.status === 'Cancelled') {
-      console.log('Order already cancelled:', order.orderId);
       return res.json({ success: false, message: 'Order already cancelled' });
     }
     if (order.status === 'Delivered' || order.status === 'Returned') {
-      console.log('Cannot cancel order:', { orderId: order.orderId, status: order.status });
       return res.json({ success: false, message: 'Cannot cancel delivered or returned order' });
     }
 
@@ -183,10 +164,8 @@ export const cancelOrder = async (req, res) => {
     if (['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
       let wallet = await Wallet.findOne({ userId: req.user.id });
       if (!wallet) {
-        console.log(`Creating new wallet for user ${req.user.id}`);
         wallet = new Wallet({ userId: req.user.id, balance: 0, transactions: [] });
       }
-      console.log('Before refund:', { walletBalance: wallet.balance, refundAmount: order.total });
       const previousBalance = wallet.balance;
       wallet.balance += order.total;
       const transaction = {
@@ -198,10 +177,8 @@ export const cancelOrder = async (req, res) => {
       };
       wallet.transactions.push(transaction);
       await wallet.save();
-      console.log('After refund:', { walletBalance: wallet.balance, newTransaction: transaction.transactionId });
       // Sync User.wallet with Wallet.balance
       const userUpdate = await User.findByIdAndUpdate(req.user.id, { wallet: wallet.balance }, { new: true });
-      console.log(`Synced User.wallet for user ${req.user.id}: ₹${userUpdate.wallet}`);
     } else {
       console.log('No refund processed:', {
         paymentMethod: order.paymentMethod,
@@ -214,85 +191,12 @@ export const cancelOrder = async (req, res) => {
       const product = item.productId;
       product.stock += item.quantity;
       await product.save();
-      console.log(`Restored stock for product ${product._id}: +${item.quantity}`);
     }
 
     await order.save();
-    console.log('Order Cancelled:', order.orderId, 'Reason:', reason);
     res.json({ success: true, message: 'Order cancelled successfully' });
   } catch (error) {
     console.error('Cancel Order Error:', error);
     res.status(500).json({ success: false, message: 'Failed to cancel order' });
   }
 };
-
-// export const cancelOrder = async (req, res) => {
-//   try {
-//     const { orderId } = req.params;
-//     const { reason } = req.body;
-//     console.log('Cancel Order Attempt:', { orderId, userId: req.user.id, reason });
-
-//     const order = await Order.findById(orderId).populate('items.productId');
-//     if (!order || order.userId.toString() !== req.user.id) {
-//       console.log('Order not found or unauthorized:', { orderId, userId: req.user.id });
-//       return res.status(404).json({ success: false, message: 'Order not found' });
-//     }
-//     console.log('Order Details:', {
-//       orderId: order.orderId,
-//       status: order.status,
-//       paymentMethod: order.paymentMethod,
-//       paymentId: order.paymentId,
-//       total: order.total
-//     });
-
-//     if (order.status === 'Cancelled') {
-//       console.log('Order already cancelled:', order.orderId);
-//       return res.json({ success: false, message: 'Order already cancelled' });
-//     }
-//     if (order.status === 'Delivered' || order.status === 'Returned') {
-//       console.log('Cannot cancel order:', { orderId: order.orderId, status: order.status });
-//       return res.json({ success: false, message: 'Cannot cancel delivered or returned order' });
-//     }
-
-//     order.status = 'Cancelled';
-//     order.cancelReason = reason;
-
-//     if (order.paymentMethod === 'Razorpay' && order.paymentId) {
-//       let wallet = await Wallet.findOne({ userId: req.user.id });
-//       if (!wallet) {
-//         wallet = new Wallet({ userId: req.user.id, balance: 0, transactions: [] });
-//       }
-//       console.log('Before refund:', { walletBalance: wallet.balance, refundAmount: order.total });
-//       wallet.balance += order.total;
-//       wallet.transactions.push({
-//         transactionId: `TXN${Date.now()}`,
-//         type: 'credit',
-//         amount: order.total,
-//         source: { type: 'refund', orderId: order._id },
-//         date: new Date()
-//       });
-//       await wallet.save();
-//       console.log('After refund:', { walletBalance: wallet.balance });
-//       console.log(`Refunded ₹${order.total} to wallet for Razorpay order ${order.orderId}`);
-//     } else {
-//       console.log('No refund processed:', {
-//         paymentMethod: order.paymentMethod,
-//         paymentId: order.paymentId
-//       });
-//     }
-
-//     // Increase stock on cancellation
-//     for (const item of order.items) {
-//       const product = item.productId;
-//       product.stock += item.quantity;
-//       await product.save();
-//     }
-
-//     await order.save();
-//     console.log('Order Cancelled:', order.orderId, 'Reason:', reason);
-//     res.json({ success: true, message: 'Order cancelled successfully' });
-//   } catch (error) {
-//     console.error('Cancel Order Error:', error);
-//     res.status(500).json({ success: false, message: 'Failed to cancel order' });
-//   }
-// };

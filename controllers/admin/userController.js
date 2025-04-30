@@ -23,7 +23,7 @@ export const renderUsers = async (req, res) => {
       search
     });
 };
-  
+//-----------------------------------------------------------------
 export const blockUser = async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(req.params.id, { isBlocked: true }, { new: true });
@@ -34,7 +34,7 @@ export const blockUser = async (req, res) => {
       res.status(500).json({ message: "Failed to block user" });
     }
 };
-  
+//----------------------------------------------
 export const unblockUser = async (req, res) => {
     await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
     res.redirect('/admin/users');

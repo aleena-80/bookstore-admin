@@ -8,11 +8,9 @@ import Wishlist from '../../models/Wishlist.js';
 export const getUserCoupons = async (req, res) => {
   try {
     const user = req.user;
-    console.log('User in getUserCoupons:', user?.email, user?._id);
     let coupons;
 
     if (!user || !user._id) {
-      console.log('No user found, returning global coupons');
       coupons = await Coupon.find({
         userId: { $exists: false },
         isListed: true,
@@ -49,13 +47,11 @@ export const getUserCoupons = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to load coupons' });
   }
 };
-
+//-----------------------------------------------------------
 export const applyCoupon = async (req, res) => {
   try {
     const { code } = req.body;
     const user = req.user;
-    console.log('User in applyCoupon:', user?.email, user?._id, 'Code:', code);
-
     const coupon = await Coupon.findOne({
       code,
       $or: [
@@ -90,7 +86,6 @@ export const applyCoupon = async (req, res) => {
 
       const items = cartItems.map(item => {
         if (!item.productId || !item.productId.price) {
-          console.log('Missing price for product:', item.productId);
         }
         return {
           productId: item.productId._id,
@@ -121,7 +116,7 @@ export const applyCoupon = async (req, res) => {
           state: address.state,
           postalCode: address.postalCode
         },
-        paymentMethod: 'COD', // Default, adjust if needed
+        paymentMethod: 'COD', 
         total,
         status: 'Confirmed'
       });
@@ -139,7 +134,7 @@ export const applyCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to apply coupon' });
   }
 };
-
+//--------------------------------------------------------
 export const removeCoupon = async (req, res) => {
   try {
     const userId = req.user._id;

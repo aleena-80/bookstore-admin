@@ -5,7 +5,7 @@ import { sendOtp, verifyOtp, resendOtp, login, googleAuthCallback, forgotPasswor
     getCheckout,addAddress,editAddress,getOrderDetail,getOrders,
     searchOrders,cancelOrder,downloadInvoice,
     initiateOrder,getPaymentPage,confirmPayment,
-    getOrderView,requestReturn,buyNow,getOrderSuccess,
+    getOrderView,requestReturn,getOrderSuccess,
     getProfile, editProfile, verifyEmailOtp, changePassword, getAddresses,
     profileaddAddress, profileeditAddress, getWallet, addFundsToWallet,changeEmail,createRazorpayOrder,verifyPayment,
     getOrderfailure,getUserCoupons,applyCoupon,removeCoupon,retryPayment,handlePaymentCallback,error,getPaymentPageReturn,
@@ -44,7 +44,6 @@ router.get('/products/:id', protectUser, getProductDetails);
 router.get('/wishlist',protectUser, getWishlist);
 router.post('/wishlist/add/:productId', protectUser, addToWishlist);
 router.post('/wishlist/remove/:productId',protectUser, removeFromWishlist);
-router.post('/order/buy-now/:productId', protectUser, buyNow);
 router.post('/products/:id/review', protectUser, addReview);
 router.post('/products/:id/review/edit', protectUser, editReview);
 
@@ -58,8 +57,6 @@ router.post('/checkout/add-address', protectUser,addAddress);
 router.post('/checkout/edit-address/:addressId', protectUser,editAddress);
 router.get('/order-success', protectUser, getOrderSuccess);
 router.get('/order-failure', protectUser, getOrderfailure);
-//  router.post('/checkout/place-order', protectUser,placeOrder);
-//  router.get('/order-success/:orderId',protectUser,getOrderSuccess);
 
 router.get('/orders', protectUser,getOrders);
 router.get('/orders/search',protectUser,searchOrders);
@@ -71,9 +68,6 @@ router.post('/checkout/confirm-payment', protectUser, confirmPayment);
 router.get('/orders/view/:orderId', protectUser, getOrderView);
 router.post('/orders/retry-payment/:orderId',protectUser, retryPayment);
 router.post('/payment/callback', protectUser,handlePaymentCallback);
-
-
-
 
 router.get('/profile', protectUser, getProfile);
 router.post('/profile/edit', protectUser, editProfile);
@@ -87,13 +81,6 @@ router.get('/wallet/balance', protectUser,getWalletBalance)
 router.get('/wallet', protectUser, getWallet);
 router.post('/wallet/add', protectUser, addFundsToWallet);
 router.post('/profile/change-email', protectUser, changeEmail);
-
-//router.post('/address/add', protectUser, addAddress);
-//router.post('/address/edit/:id', protectUser, editAddress);
-//router.post('/address/delete/:id', protectUser, deleteAddress);
-//router.post('/send-otp', protect, sendOTP);
-//router.post('/verify-email-otp', protect, verifyEmailOTP);
-//router.post('/change-password', protect, changePassword);
 
 router.get('/error',protectUser,error)
 

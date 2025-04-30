@@ -7,16 +7,11 @@ export const addToCart = async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: 'Login required' });
       const { productId } = req.params;
-      console.log('Add to Cart, User ID:', req.user.id, 'Product ID:', productId);
       const product = await Product.findById(productId).populate('category');
       if (!product || !product.isListed || (product.category && product.category.isListed === false) || product.stock <= 0) {
         return res.json({ success: false, message: 'Product unavailable' });
       }
-
-
       let cartItem = await Cart.findOne({ userId: req.user.id, productId });
-
-
       if (cartItem) {
         if (cartItem.quantity >= product.stock || cartItem.quantity >= 5) {
           return res.json({ success: false, message: 'Max quantity reached' });
@@ -26,7 +21,6 @@ export const addToCart = async (req, res) => {
         cartItem = new Cart({ userId: req.user.id, productId, quantity: 1 });
       }
       await cartItem.save();
-      console.log('Added to Cart:', { productId, quantity: cartItem.quantity });
   
       const cartCount = await Cart.countDocuments({ userId: req.user.id });
       const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });
@@ -49,9 +43,6 @@ export const addToCart = async (req, res) => {
       const shipping = 100;
       const total = subtotal + taxes + shipping;
   
-      console.log('Cart Items:', cartItems.map(item => ({ name: item.productId.name, qty: item.quantity, price: item.productId.price })));
-      console.log('Subtotal:', subtotal);
-  
       res.render('user/cart', { 
         cartItems, 
         subtotal: subtotal.toFixed(2), 
@@ -60,7 +51,7 @@ export const addToCart = async (req, res) => {
         total: total.toFixed(2), 
         wishlistCount, 
         cartCount,
-        user: req.user // Add this
+        user: req.user 
       });
     } catch (error) {
       console.error('Get Cart Error:', error);
@@ -85,7 +76,6 @@ export const updateCartQuantity = async (req, res) => {
         const cartItem = await Cart.findOne({ _id: productId, userId }).populate('productId');
         if (!cartItem) return res.json({ success: false, message: 'Cart item not found' });
 
-        // Check stock availability
         if (action === 'increment') {
             if (cartItem.quantity >= cartItem.productId.stock) {
                 return res.json({ success: false, message: 'Out of stock' });
@@ -95,15 +85,15 @@ export const updateCartQuantity = async (req, res) => {
             }
         }
 
-        // Update quantity
+    
         cartItem.quantity += (action === 'increment' ? 1 : -1);
         await cartItem.save();
 
-        // Get updated cart data
+        
         const cartItems = await Cart.find({ userId }).populate('productId');
         const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
         
-        // Calculate prices
+  
         const subtotal = cartItems.reduce((sum, item) => {
             const discountedPrice = item.productId.price * (1 - (item.productId.discount || 0) / 100);
             return sum + (discountedPrice * item.quantity);
@@ -141,8 +131,8 @@ export const removeFromCart = async (req, res) => {
 
     const cartItems = await Cart.find({ userId: req.user.id }).populate('productId');
     const subtotal = cartItems.reduce((sum, item) => sum + item.productId.price * item.quantity * (1 - (item.productId.discount || 0) / 100), 0);
-    const taxes = subtotal * 0.05; // Match your tax logic
-    const shipping = cartItems.length > 0 ? 100 : 0; // Adjust as needed
+    const taxes = subtotal * 0.05; 
+    const shipping = cartItems.length > 0 ? 100 : 0; 
     const total = subtotal + taxes + shipping;
     const cartCount = cartItems.length;
     const wishlistCount = await Wishlist.countDocuments({ userId: req.user.id });

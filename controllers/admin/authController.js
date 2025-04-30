@@ -14,7 +14,7 @@ export const getAdminLogin = (req, res) => {
       }
     } catch (error) {
       console.log('Invalid token on login check:', error.message);
-      res.clearCookie('token'); // Clear invalid token
+      res.clearCookie('token');
     }
   }
   res.render('admin/login', { message: null });

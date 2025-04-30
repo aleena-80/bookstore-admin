@@ -11,11 +11,97 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Roboto', sans-serif; background: #F5F5F5; color: #1C2526; padding-top: 70px; }
-    .navbar { background: #FFFFFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-    .logo h1 a { color: #58CC02; text-decoration: none; font-size: 28px; font-weight: 700; }
-    .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
-    .nav-links li a { color: #1C2526; text-decoration: none; font-size: 16px; font-weight: 700; }
-    .nav-links li a:hover { color: #58CC02; }
+   
+
+    .wishlist-count, .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #58CC02;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .count-badge:empty {
+            display: none;
+        }
+
+        .navbar {
+            background-color: #FFFFFF;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo h1 a {
+            color: #58CC02;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .tagline {
+            color: #1C2526;
+            font-size: 14px;
+            margin-top: 3px;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            width: auto;
+        }
+        .nav-links li a {
+            color: #1C2526;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links li a:hover {
+            color: #58CC02;
+        }
+        .nav-links li a i {
+            margin-right: 5px;
+        }
+        .nav-links li.profile-link a {
+            color: #1C2526;
+        }
+
     .hamburger { display: none; font-size: 24px; cursor: pointer; color: #1C2526; }
     .sidebar { 
       position: fixed; 
@@ -143,8 +229,8 @@
       </div>
       <div class="hamburger"><i class="fas fa-bars"></i></div>
       <ul class="nav-links">
-        <li><a href="/users/wishlist"><i class="fas fa-heart"></i> (<%= wishlistCount || 0 %>)</a></li>
-        <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i> (<%= cartCount || 0 %>)</a></li>
+        <li><a href="/users/cart"><i class="fas fa-shopping-cart"></i><span class="count-badge" data-count="<%= cartCount || 0 %>"><%= cartCount || 0 %></span></a></li>
+        <li><a href="/users/wishlist"><i class="fas fa-heart"></i> <span class="count-badge" data-count="<%= wishlistCount || 0 %>"><%= wishlistCount || 0 %></span></a></li>
       </ul>
     </nav>
   </header>
@@ -410,7 +496,6 @@
           }
         }
       } catch (error) {
-        console.error('Add Address Error:', error);
         if (typeof Swal !== 'undefined') {
           Swal.fire({
             title: 'Error!',

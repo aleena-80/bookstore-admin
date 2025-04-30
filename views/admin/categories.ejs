@@ -246,13 +246,13 @@
             <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
             <li><a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a></li>
             <li><a href="/admin/languages"><i class="fas fa-globe"></i> Languages</a></li>
-            <li><a href="/admin/products"><i class="fas fa-book"></i> Products</a></li>
+            <li><a href="/admin/products" class="active"><i class="fas fa-book"></i> Products</a></li>
             <li><a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
             <li><a href="/admin/transactions" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
-
+            <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li>
             <li><a href="/admin/coupons"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
-            <li><a href="/admin/products-add"><i class="fas fa-plus-circle"></i> Add Product</a></li> 
             <li><a href="/admin/banners"><i class="fas fa-images"></i> Banners</a></li>
+            <li><a href="/admin/transactions" class="active"><i class="fas fa-wallet"></i> Wallet</a></li>
             <li><form action="/admin/logout" method="POST"><button><i class="fas fa-sign-out-alt"></i> Logout</button></form></li>
         </ul>
     </div>
@@ -388,7 +388,6 @@
                     throw new Error(errorData.message || 'Failed to delete category');
                 }
             } catch (error) {
-                console.error('Delete error:', error);
                 alert(error.message);
                 hideConfirmation();
             }
@@ -430,7 +429,6 @@
                     throw new Error(result.error || 'Failed to toggle listing');
                 }
             } catch (error) {
-                console.error('Toggle Listing Error:', error.message);
                 alert(`Failed to toggle category listing: ${error.message}`);
             }
         }
@@ -470,7 +468,6 @@
                     throw new Error(result.error || 'Failed to update offer');
                 }
             } catch (error) {
-                console.error('Update Offer Error:', error.message);
                 alert(`Failed to update category offer: ${error.message}`);
             }
         }
@@ -521,7 +518,6 @@
 
                 currentPage = page;
             } catch (error) {
-                console.error('Fetch Categories Error:', error.message);
                 alert(`Failed to load categories: ${error.message}`);
             }
         }
