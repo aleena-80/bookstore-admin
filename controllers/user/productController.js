@@ -15,6 +15,7 @@ export const getProducts = async (req, res) => {
   try {
     const user = req.user || null;
     const { search = '', sort = '', category = '', priceMin = '', priceMax = '', page = 1, limit = 12 ,language=''} = req.query;
+    console.log("Query Params:", { search, sort, category, priceMin, priceMax, page, limit, language });
     const skip = (page - 1) * limit;
 
     let query = { isListed: true, isDeleted: false };

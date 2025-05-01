@@ -52,10 +52,17 @@ app.use((req, res, next) => {
   res.status(404).render('user/error', { message: 'Page not found', status: 404 });
 });
 
-
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('MongoDB connection error:', err));
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+
+    const { name, host } = mongoose.connection;
+    console.log(' DB Name:', name);
+    console.log(' DB Host:', host);
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+  });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
